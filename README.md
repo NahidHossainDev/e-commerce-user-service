@@ -4,8 +4,9 @@
 
 To avoid CRLF line endings when generating files, always use:
 
-````bash
+```bash
 nestg module <name>
+```
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
@@ -38,7 +39,7 @@ nestg module <name>
 
 ```bash
 $ yarn install
-````
+```
 
 ## Compile and run the project
 
