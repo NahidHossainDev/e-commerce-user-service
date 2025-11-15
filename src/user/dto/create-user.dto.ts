@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -9,53 +10,80 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { Gender, UserRole } from '../user.schema';
 
 export class CreateProfileDto {
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({ type: String, required: true, example: 'Jone Doe' })
   fullName: string;
 
   @IsOptional()
   @IsString()
+  @ApiProperty({ type: String, example: 'https://ibb.co/5WHkfvR4' })
   imageUrl?: string;
 
   @IsOptional()
   @IsDate()
   @Type((): DateConstructor => Date)
+  @ApiProperty({ type: String, required: false, example: '1998-07-21' })
   dateOfBirth?: Date;
 
   @IsOptional()
-  @IsEnum(['MALE', 'FEMALE', 'OTHER'])
+  @IsEnum(Gender)
+  @ApiProperty({ type: String, example: Gender.MALE })
   gender?: string;
 }
 
 export class CreateRoleDto {
-  @IsEnum(['CUSTOMER', 'SELLER', 'ADMIN', 'SUPER_ADMIN'])
+  @IsEnum(UserRole)
+  @ApiProperty({ type: String, example: UserRole.CUSTOMER })
   type: string;
 }
 
 export class CreateUserDto {
   @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, example: 'example@email.com' })
   email: string;
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, example: '01234567890' })
   phoneNumber: string;
 
   @IsString()
   @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, example: 'secrete-password' })
   password: string;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateRoleDto)
+  @ApiProperty({
+    type: [CreateRoleDto],
+    example: [{ type: UserRole.CUSTOMER }],
+  })
   roles?: CreateRoleDto[];
 
   @IsOptional()
-  @IsEnum(['CUSTOMER', 'SELLER', 'ADMIN', 'SUPER_ADMIN'])
+  @IsEnum(UserRole)
+  @ApiProperty({
+    type: String,
+    example: UserRole.CUSTOMER,
+  })
   primaryRole?: string;
 
+  @ApiProperty({
+    type: CreateProfileDto,
+    example: {
+      fullName: 'John Doe',
+      imageUrl: 'https://i.ibb.co/5WHkfvR4/profile.jpg',
+      dateOfBirth: '1998-07-21',
+      gender: Gender.MALE,
+    },
+  })
   @ValidateNested()
   @Type(() => CreateProfileDto)
   profile: CreateProfileDto;

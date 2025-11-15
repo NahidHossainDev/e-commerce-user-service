@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -7,6 +7,7 @@ import {
   IsOptional,
   ValidateNested,
 } from 'class-validator';
+import { RoleStatus } from '../user.schema';
 import {
   CreateProfileDto,
   CreateRoleDto,
@@ -15,7 +16,8 @@ import {
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
-  @IsEnum(['ACTIVE', 'INACTIVE', 'SUSPENDED', 'BLOCKED', 'DELETED', 'PENDING'])
+  @IsEnum(RoleStatus)
+  @ApiProperty({ type: String, example: RoleStatus.ACTIVE })
   accountStatus?: string;
 
   @IsOptional()
@@ -31,5 +33,6 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @IsOptional()
   @IsBoolean()
+  @ApiProperty({ type: Boolean, example: false })
   isDeleted?: boolean;
 }
