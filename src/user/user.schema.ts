@@ -190,13 +190,13 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ phoneNumber: 1 }, { unique: true });
-UserSchema.index({ 'roles.type': 1 });
-UserSchema.index({ primaryRole: 1, accountStatus: 1 });
-UserSchema.index(
-  { 'roles.metadata.referralCode': 1 },
-  { unique: true, sparse: true },
-);
-UserSchema.index({ createdAt: -1 });
-UserSchema.index({ isDeleted: 1, accountStatus: 1 });
+// UserSchema.index({ email: 1 }, { unique: true });
+// UserSchema.index({ phoneNumber: 1 }, { unique: true });
+// UserSchema.index({ 'roles.type': 1 });
+// UserSchema.index({ primaryRole: 1, accountStatus: 1 });
+// UserSchema.index(
+//   { 'roles.metadata.referralCode': 1 },
+//   { unique: true, sparse: true },
+// );
+// UserSchema.index({ createdAt: -1 });
+// UserSchema.index({ isDeleted: 1, accountStatus: 1 });

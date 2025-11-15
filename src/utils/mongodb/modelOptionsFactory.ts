@@ -1,44 +1,40 @@
-import { IModelOptions } from '@typegoose/typegoose/lib/types';
+import { SchemaOptions } from 'mongoose';
 
-export const modelOptionsFactory = (
+const transformDocument = (
+  ret: Record<string, any>,
+  deleteTimestamps: boolean,
+): Record<string, any> => {
+  if (ret._id) {
+    ret.id = String(ret._id);
+  }
+  delete ret._id;
+  delete ret.__v;
+
+  if (deleteTimestamps) {
+    delete ret.createdAt;
+    delete ret.updatedAt;
+  }
+
+  return ret;
+};
+
+export const schemaOptionsFactory = (
   collection: string,
   timestamps: boolean,
   deleteTimestamps = false,
-): IModelOptions => {
+): SchemaOptions => {
   return {
-    schemaOptions: {
-      collection,
-      timestamps,
-      toJSON: {
-        virtuals: true,
-        transform: (_, ret: Record<string, unknown>) => {
-          if ('_id' in ret) ret.id = ret._id;
-          delete ret._id;
-          delete ret.__v;
-
-          if (deleteTimestamps) {
-            if ('createdAt' in ret) delete ret.createdAt;
-            if ('updatedAt' in ret) delete ret.updatedAt;
-          }
-
-          return ret;
-        },
-      },
-      toObject: {
-        virtuals: true,
-        transform: (_, ret: Record<string, unknown>) => {
-          if ('_id' in ret) ret.id = ret._id;
-          delete ret._id;
-          delete ret.__v;
-
-          if (deleteTimestamps) {
-            if ('createdAt' in ret) delete ret.createdAt;
-            if ('updatedAt' in ret) delete ret.updatedAt;
-          }
-
-          return ret;
-        },
-      },
+    collection,
+    timestamps,
+    toJSON: {
+      virtuals: true,
+      transform: (_, ret: Record<string, any>) =>
+        transformDocument(ret, deleteTimestamps),
+    },
+    toObject: {
+      virtuals: true,
+      transform: (_, ret: Record<string, any>) =>
+        transformDocument(ret, deleteTimestamps),
     },
   };
 };
