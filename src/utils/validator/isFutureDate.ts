@@ -1,0 +1,26 @@
+import {
+  registerDecorator,
+  ValidationArguments,
+  ValidationOptions,
+} from 'class-validator';
+
+export function IsNotFutureDate(validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'isNotFutureDate',
+      target: object.constructor,
+      propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: string, args: ValidationArguments) {
+          const date = new Date(value);
+          const now = new Date();
+          return date <= now;
+        },
+        defaultMessage(args: ValidationArguments) {
+          return `${args.property} must not be a future date`;
+        },
+      },
+    });
+  };
+}
