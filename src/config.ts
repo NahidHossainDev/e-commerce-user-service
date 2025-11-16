@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { install } from 'source-map-support';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 install({
   environment: 'node',
   handleUncaughtExceptions: true,
@@ -16,6 +17,7 @@ export interface Config {
   jwtExpire: string;
   redisHost: string;
   redisPort: number;
+  saltRound: number;
 }
 
 dotenv.config();
@@ -30,6 +32,7 @@ const getConfig = (): Config => {
     REDIS_PORT: redisPort,
     REDIS_HOST: redisHost,
     NATS_URL: natsURL,
+    SALT_ROUND: saltRound,
   } = process.env;
 
   if (!dbURL) throw new Error('DataBase url is required');
@@ -49,6 +52,7 @@ const getConfig = (): Config => {
     jwtExpire,
     redisHost,
     redisPort: Number(redisPort),
+    saltRound: Number(saltRound),
   };
 };
 
