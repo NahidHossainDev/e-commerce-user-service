@@ -4,19 +4,22 @@ import { Model } from 'mongoose';
 import { paginate } from 'src/utils/mongodb/pagination';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserQueryOptions } from './dto/user-query-options.dto';
 import { User } from './user.schema';
-
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    return this.userModel.create(createUserDto);
+  async create(payload: CreateUserDto): Promise<Omit<User, 'password'>> {
+    return this.userModel.create(payload);
   }
 
-  async findAll(query: any) {
+  async findAll(query: UserQueryOptions) {
+    // const { page, limit, skip, orderBy } =
+    //   PaginationBuilder.buildPaginationAndSort(query);
+
     return await paginate(this.userModel);
   }
 
