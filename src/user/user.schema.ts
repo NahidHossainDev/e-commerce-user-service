@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import bcrypt from 'bcrypt';
 import { HydratedDocument, Types } from 'mongoose';
+import { config } from 'src/config';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -39,6 +41,7 @@ export enum Language {
 }
 
 // ---------- SUB_DOCUMENTS ----------
+@Schema({ _id: false })
 class Role {
   @Prop({ type: String, enum: UserRole, required: true })
   type: UserRole;
@@ -52,7 +55,7 @@ class Role {
   @Prop({ type: Object })
   metadata?: Record<string, unknown>;
 }
-
+@Schema({ _id: false })
 class Profile {
   @Prop({ required: true })
   fullName: string;
@@ -66,7 +69,7 @@ class Profile {
   @Prop({ type: String, enum: Gender })
   gender?: Gender;
 }
-
+@Schema({ _id: false })
 class Verification {
   @Prop({ default: false })
   emailVerified: boolean;
@@ -86,7 +89,7 @@ class Verification {
   @Prop()
   phoneVerifiedAt?: Date;
 }
-
+@Schema({ _id: false })
 class Security {
   @Prop()
   lastLoginAt?: Date;
@@ -112,7 +115,7 @@ class Security {
   @Prop()
   lockUntil?: Date;
 }
-
+@Schema({ _id: false })
 class NotificationSettings {
   @Prop({ default: true })
   email: boolean;
@@ -123,9 +126,9 @@ class NotificationSettings {
   @Prop({ default: true })
   push: boolean;
 }
-
+@Schema({ _id: false })
 class Preferences {
-  @Prop({ type: String, enum: Language, default: 'en' })
+  @Prop({ type: String, enum: Language, default: Language.EN })
   language: Language;
 
   @Prop({ default: 'BDT' })
@@ -189,6 +192,12 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.pre('save', async function (this: UserDocument) {
+  this.password = await bcrypt?.hash(this.password, Number(config.saltRound));
+  if (this.security.passwordChangedAt)
+    this.security.passwordChangedAt = new Date();
+});
 
 // UserSchema.index({ email: 1 }, { unique: true });
 // UserSchema.index({ phoneNumber: 1 }, { unique: true });
