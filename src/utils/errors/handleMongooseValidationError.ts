@@ -1,5 +1,6 @@
 import { Error as MongooseError } from 'mongoose';
 import { IErrorMsg, IGenericError } from 'src/common/interface';
+import { formatCamelCase } from '../helpers';
 
 interface MongoError extends Error {
   code?: number;
@@ -73,7 +74,7 @@ export const handleDuplicateKeyError = (error: unknown): IGenericError => {
     errorMsg: [
       {
         path: field,
-        message: `${field} already exists`,
+        message: `This ${formatCamelCase(field)} already exists`,
       },
     ],
   };
