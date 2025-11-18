@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { paginateOptions } from 'src/common/constants';
+import { paginationHelpers, pick } from 'src/utils/helpers';
 import { paginate } from 'src/utils/mongodb/pagination';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,8 +19,10 @@ export class UserService {
   }
 
   async findAll(query: UserQueryOptions) {
-    // const { page, limit, skip, orderBy } =
-    //   PaginationBuilder.buildPaginationAndSort(query);
+    const paginateQueries = pick(query, paginateOptions);
+    const filters = pick(query, ['searchTerm']);
+
+    const pagiantion = paginationHelpers.calculatePagination(paginateQueries);
 
     return await paginate(this.userModel);
   }
