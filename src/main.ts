@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { config } from './config';
 import {
-  AllExceptionsFilter,
+  GlobalExceptionFilter,
   GlobalResponseTransformer,
 } from './utils/response';
 
@@ -44,7 +43,7 @@ async function bootstrap() {
   // app.startAllMicroservices()
 
   setupSwagger(app);
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new GlobalResponseTransformer());
 

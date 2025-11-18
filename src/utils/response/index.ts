@@ -1,5 +1,6 @@
 import {
   ArgumentsHost,
+  BadRequestException,
   CallHandler,
   Catch,
   ExceptionFilter,
@@ -7,89 +8,88 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  Logger,
   NestInterceptor,
 } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Request, Response } from 'express';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Response } from 'express';
+import { map, Observable } from 'rxjs';
+import { IGenericError } from 'src/common/interface';
+import {
+  ApiError,
+  handleCastError,
+  handleDuplicateKeyError,
+  handleMongooseValidationError,
+  handleUnknownError,
+  handleValidationError,
+  isClassValidatorError,
+  isDuplicateKeyError,
+  isMongooseCastError,
+  isMongooseValidationError,
+} from '../errors';
 
 @Catch()
-export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger(AllExceptionsFilter.name);
-
+export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
 
-    // Default values
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let messages: string[] = ['Internal server error'];
+    let errorResponse: IGenericError;
 
-    // If it's an HttpException, extract status and message safely
-    if (exception instanceof HttpException) {
-      status = exception.getStatus();
+    // 1. Custom API Error
+    if (exception instanceof ApiError) {
+      errorResponse = {
+        statusCode: exception.statusCode,
+        message: exception.message,
+        errorMsg: [],
+      };
+    }
+    // 2. BadRequest with class-validator errors
+    else if (exception instanceof BadRequestException) {
+      const response = exception.getResponse();
 
-      const res = exception.getResponse();
-      if (typeof res === 'string') {
-        messages = [res];
-      } else if (res && typeof res === 'object') {
-        // res might be { message: string | string[] } or similar
-        // Use runtime checks to be safe
-        const maybeMessage = (res as { message?: unknown }).message;
-        if (Array.isArray(maybeMessage)) {
-          messages = maybeMessage.filter(
-            (m): m is string => typeof m === 'string',
-          );
-        } else if (typeof maybeMessage === 'string') {
-          messages = [maybeMessage];
+      if (
+        typeof response === 'object' &&
+        response !== null &&
+        'message' in response
+      ) {
+        const msg = (response as { message: unknown }).message;
+
+        if (isClassValidatorError(msg)) {
+          errorResponse = handleValidationError(msg);
         } else {
-          // Fallback to stringified object if no message field
-          messages = [JSON.stringify(res)];
+          errorResponse = {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: exception.message,
+            errorMsg: [],
+          };
         }
       } else {
-        messages = [String(res)];
+        errorResponse = {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: exception.message,
+          errorMsg: [],
+        };
       }
-    } else if (exception instanceof Error) {
-      // Generic Error instance
-      messages = [exception.message];
-    } else if (typeof exception === 'string') {
-      messages = [exception];
+    } else if (isMongooseValidationError(exception)) {
+      errorResponse = handleMongooseValidationError(exception);
+    } else if (isMongooseCastError(exception)) {
+      errorResponse = handleCastError(exception);
+    } else if (isDuplicateKeyError(exception)) {
+      errorResponse = handleDuplicateKeyError(exception);
+    } else if (exception instanceof HttpException) {
+      errorResponse = {
+        statusCode: exception.getStatus(),
+        message: exception.message,
+        errorMsg: [],
+      };
     } else {
-      // unknown shape — keep default or stringify
-      try {
-        messages = [JSON.stringify(exception)];
-      } catch {
-        /* keep default message */
-      }
+      errorResponse = handleUnknownError(exception);
     }
 
-    // Log with stack if available
-    const stack =
-      typeof exception === 'object' &&
-      exception !== null &&
-      'stack' in exception &&
-      typeof (exception as { stack?: unknown }).stack === 'string'
-        ? (exception as { stack: string }).stack
-        : undefined;
-
-    this.logger.error(
-      `HTTP Status: ${status} Message: ${messages.join('; ')}`,
-      stack,
-      request?.url,
-    );
-
-    response.status(status).json({
-      success: false,
-      message: messages,
-      data: null,
-    });
+    res.status(errorResponse.statusCode).json(errorResponse);
   }
 }
 
-/* Generic response shape used by the interceptor */
 export class ResponseDto<T> {
   @ApiProperty()
   success!: boolean;
