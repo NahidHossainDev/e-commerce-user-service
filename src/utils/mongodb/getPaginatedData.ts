@@ -1,9 +1,9 @@
-import { FilterQuery, Model, PipelineStage } from 'mongoose';
+import { Document, FilterQuery, Model, PipelineStage } from 'mongoose';
 import {
   IPaginateCalculateResult,
   IPaginatedResponse,
 } from 'src/common/interface';
-interface IPropsType<T extends Document> {
+interface IPropsType<T> {
   model: Model<T>;
   paginationQuery: IPaginateCalculateResult;
   filterQuery?: FilterQuery<T>;
