@@ -1,19 +1,17 @@
-type IOptions = {
+interface IPaginationQuery {
   page?: number;
   limit?: number;
   sortBy?: string;
   sortOrder?: string;
-};
+}
 
-type IOptionsResult = {
-  page: number;
-  limit: number;
+interface IPaginationCalculation extends Required<IPaginationQuery> {
   skip: number;
-  sortBy: string;
-  sortOrder: string;
-};
+}
 
-const calculatePagination = (options: IOptions): IOptionsResult => {
+const calculatePagination = (
+  options: IPaginationQuery,
+): IPaginationCalculation => {
   const page = Number(options.page || 1);
   const limit = Number(options.limit || 10);
   const skip = (page - 1) * limit;
