@@ -3,15 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
 import { paginationHelpers, pick } from 'src/utils/helpers';
-import { paginate } from 'src/utils/mongodb/pagination';
+import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserQueryOptions } from './dto/user-query-options.dto';
-import { User } from './user.schema';
+import { User, UserDocument } from './user.schema';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
   async create(payload: CreateUserDto): Promise<Omit<User, 'password'>> {
@@ -22,9 +22,13 @@ export class UserService {
     const paginateQueries = pick(query, paginateOptions);
     const filters = pick(query, ['searchTerm']);
 
-    const pagiantion = paginationHelpers.calculatePagination(paginateQueries);
+    const pagination = paginationHelpers.calculatePagination(paginateQueries);
 
-    return await paginate(this.userModel);
+    return await getPaginatedData<UserDocument>({
+      model: this.userModel,
+      paginationQuery: pagination,
+      filterQuery: filters,
+    });
   }
 
   async findOne(id: string) {

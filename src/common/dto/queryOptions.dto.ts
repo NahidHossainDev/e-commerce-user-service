@@ -25,5 +25,5 @@ export class QueryOptions {
   @ApiPropertyOptional({ description: 'Sort order' })
   @IsOptional()
   @IsString()
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: 1 | -1;
 }
