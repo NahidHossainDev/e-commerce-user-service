@@ -7,6 +7,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -49,7 +50,8 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ type: String, required: true, example: '01234567890' })
+  @IsPhoneNumber('BD')
+  @ApiProperty({ type: String, required: true, example: '+880123456789' })
   phoneNumber: string;
 
   @IsString()
