@@ -14,7 +14,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(payload: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async create(payload: CreateUserDto): Promise<UserDocument> {
     return this.userModel.create(payload);
   }
 
@@ -50,5 +50,27 @@ export class UserService {
     const deleted = await this.userModel.findByIdAndDelete(id);
     if (!deleted) throw new NotFoundException('User not found');
     return deleted;
+  }
+
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ email });
+  }
+
+  async findByPhoneNumber(phoneNumber: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ phoneNumber });
+  }
+
+  async updateRefreshToken(userId: string, hashedToken: string | null) {
+      return this.userModel.findByIdAndUpdate(userId, {
+          'security.refreshTokenHash': hashedToken
+      });
+  }
+  async updateSecurity(userId: string, securityUpdates: Partial<User['security']>) {
+     const updateQuery = Object.keys(securityUpdates).reduce((acc, key) => {
+         acc[`security.${key}`] = securityUpdates[key];
+         return acc;
+     }, {});
+     
+     return this.userModel.findByIdAndUpdate(userId, updateQuery, { new: true });
   }
 }

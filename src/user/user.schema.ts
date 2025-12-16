@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { HydratedDocument, Types } from 'mongoose';
 import { config } from 'src/config';
 
@@ -114,6 +114,9 @@ class Security {
 
   @Prop()
   lockUntil?: Date;
+
+  @Prop()
+  refreshTokenHash?: string;
 }
 @Schema({ _id: false })
 class NotificationSettings {
@@ -143,11 +146,11 @@ class Preferences {
 export class User {
   _id: Types.ObjectId;
 
-  @Prop({ required: true, unique: true, lowercase: true })
-  email: string;
+  @Prop({ required: false, unique: true, lowercase: true, sparse: true })
+  email?: string;
 
-  @Prop({ required: true, unique: true })
-  phoneNumber: string;
+  @Prop({ required: false, unique: true, sparse: true })
+  phoneNumber?: string;
 
   @Prop({ required: true })
   password: string;
