@@ -93,7 +93,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Fix #3: Brute Force Protection
+    // Brute Force Protection
     if (user.security.lockUntil && user.security.lockUntil > new Date()) {
         throw new UnauthorizedException(`Account is locked until ${user.security.lockUntil}`);
     }
