@@ -31,9 +31,6 @@ export class Review {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   user: Types.ObjectId;
 
-  @Prop({ required: true, maxlength: 100 })
-  title: string;
-
   @Prop({ required: true, maxlength: 1000 })
   comment: string;
 

@@ -27,6 +27,12 @@ export class Unit {
 
   @Prop({ required: true })
   allowsDecimal: boolean;
+
+  // @Prop()
+  // baseUnit: string;
+
+  // @Prop()
+  // conversionFactor: number;
 }
 
 export const UnitSchema = SchemaFactory.createForClass(Unit);

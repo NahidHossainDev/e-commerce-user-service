@@ -30,9 +30,6 @@ export class Category {
   isActive: boolean;
 
   @Prop({ default: 0 })
-  sortOrder: number;
-
-  @Prop({ default: 0 })
   productCount: number;
 
   @Prop({ type: Object })

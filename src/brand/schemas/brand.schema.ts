@@ -44,9 +44,6 @@ export class Brand {
   @Prop({ default: true })
   isActive: boolean;
 
-  @Prop({ default: 0 })
-  sortOrder: number;
-
   @Prop({ type: SocialMedia, default: {} })
   socialMedia: SocialMedia;
 
