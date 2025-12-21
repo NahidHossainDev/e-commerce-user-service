@@ -8,8 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { BrandModule } from './brand/brand.module';
 import { CategoryModule } from './category/category.module';
 import { config } from './config';
+import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
 import { UserModule } from './user/user.module';
+
 @Module({
   imports: [
     MongooseModule.forRoot(config.dbURL),
@@ -23,6 +25,7 @@ import { UserModule } from './user/user.module';
     BrandModule,
     CategoryModule,
     ReviewModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
