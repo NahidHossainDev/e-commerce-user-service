@@ -5,9 +5,9 @@ import { AddressModule } from './address/address.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { BrandModule } from './brand/brand.module';
 import { config } from './config';
 import { UserModule } from './user/user.module';
-
 @Module({
   imports: [
     MongooseModule.forRoot(config.dbURL),
@@ -18,6 +18,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     AddressModule,
     AuthModule,
+    BrandModule,
   ],
   controllers: [AppController],
   providers: [AppService],
