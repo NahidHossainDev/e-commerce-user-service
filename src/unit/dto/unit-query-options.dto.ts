@@ -9,7 +9,10 @@ export class UnitQueryOptions extends QueryOptions {
   @IsString()
   searchTerm?: string;
 
-  @ApiPropertyOptional({ enum: UnitCategory, description: 'Filter by category' })
+  @ApiPropertyOptional({
+    enum: UnitCategory,
+    description: 'Filter by category',
+  })
   @IsOptional()
   @IsEnum(UnitCategory)
   category?: UnitCategory;

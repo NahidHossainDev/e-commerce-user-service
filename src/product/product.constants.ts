@@ -1,16 +1,27 @@
-export const PRODUCT_FILTER_FIELDS = [
+import { ProductQueryDto } from './dto/product.dto';
+export const PRODUCT_FILTER_FIELDS: (keyof ProductQueryDto)[] = [
+  'searchTerm',
   'status',
-  'category.id',
-  'brand.id',
+  'categoryId',
+  'brandId',
   'isFeatured',
   'isBestSeller',
   'isOnOffer',
   'isNew',
   'isPerishable',
   'vendorId',
+  'minPrice',
+  'maxPrice',
 ];
 
-export const PRODUCT_SEARCH_FIELDS = ['title', 'slug', 'sku', 'barcode', 'tags', 'keywords'];
+export const PRODUCT_SEARCH_FIELDS = [
+  'title',
+  'slug',
+  'sku',
+  'barcode',
+  'tags',
+  'keywords',
+];
 
 export const PRODUCT_SORT_OPTIONS = {
   NEWEST: { createdAt: -1 },

@@ -9,7 +9,7 @@ export class ImageAsset {
   url: string;
 
   @Prop()
-  mobileUrl: string;  
+  mobileUrl: string;
 
   @Prop()
   alt: string;
@@ -20,7 +20,13 @@ export class ImageAsset {
 
 @Schema({ timestamps: true, collection: 'product_media' })
 export class ProductMedia {
-  @Prop({ type: Types.ObjectId, ref: 'Product', required: true, unique: true, index: true })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Product',
+    required: true,
+    unique: true,
+    index: true,
+  })
   productId: Types.ObjectId;
 
   @Prop({ required: true })

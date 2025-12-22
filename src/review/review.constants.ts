@@ -1,5 +1,4 @@
-import { ReviewQueryOptionsDto } from "./dto/review-query-options.dto";
-
+import { ReviewQueryOptionsDto } from './dto/review-query-options.dto';
 
 export const reviewSearchableFields = ['title', 'comment'];
 

@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AdjustStockDto, CreateInventoryDto, UpdateInventoryDto } from './dto/inventory.dto';
+import {
+  AdjustStockDto,
+  CreateInventoryDto,
+  UpdateInventoryDto,
+} from './dto/inventory.dto';
 import { InventoryService } from './inventory.service';
 
 @ApiTags('Inventory')
@@ -22,13 +26,19 @@ export class InventoryController {
 
   @Patch(':productId')
   @ApiOperation({ summary: 'Update inventory settings by product ID' })
-  update(@Param('productId') productId: string, @Body() updateInventoryDto: UpdateInventoryDto) {
+  update(
+    @Param('productId') productId: string,
+    @Body() updateInventoryDto: UpdateInventoryDto,
+  ) {
     return this.inventoryService.update(productId, updateInventoryDto);
   }
 
   @Post(':productId/adjust')
   @ApiOperation({ summary: 'Adjust stock quantity' })
-  adjustStock(@Param('productId') productId: string, @Body() adjustStockDto: AdjustStockDto) {
+  adjustStock(
+    @Param('productId') productId: string,
+    @Body() adjustStockDto: AdjustStockDto,
+  ) {
     return this.inventoryService.adjustStock(productId, adjustStockDto);
   }
 

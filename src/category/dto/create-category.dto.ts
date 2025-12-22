@@ -1,12 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-    IsBoolean,
-    IsMongoId,
-    IsNumber,
-    IsOptional,
-    IsString,
-    ValidateNested,
+  IsBoolean,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
 } from 'class-validator';
 
 class CategoryMetaDto {

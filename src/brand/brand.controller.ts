@@ -1,12 +1,12 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post,
-    Query,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BrandService } from './brand.service';
@@ -21,14 +21,22 @@ export class BrandController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new brand' })
-  @ApiResponse({ status: 201, description: 'The brand has been successfully created.' })
-  @ApiResponse({ status: 409, description: 'Brand name or slug already exists.' })
+  @ApiResponse({
+    status: 201,
+    description: 'The brand has been successfully created.',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Brand name or slug already exists.',
+  })
   create(@Body() createBrandDto: CreateBrandDto) {
     return this.brandService.create(createBrandDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all brands with pagination and filtering' })
+  @ApiOperation({
+    summary: 'Retrieve all brands with pagination and filtering',
+  })
   findAll(@Query() query: BrandQueryOptionsDto) {
     return this.brandService.findAll(query);
   }
@@ -43,7 +51,10 @@ export class BrandController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a brand by ID' })
   @ApiResponse({ status: 404, description: 'Brand not found.' })
-  @ApiResponse({ status: 409, description: 'Brand name or slug already exists.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Brand name or slug already exists.',
+  })
   update(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
     return this.brandService.update(id, updateBrandDto);
   }

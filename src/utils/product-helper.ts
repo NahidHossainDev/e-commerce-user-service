@@ -46,8 +46,9 @@ export const generateSKU = (
 ): string => {
   const brandPfx = brandName.substring(0, 3).toUpperCase();
   const catPfx = categoryName.substring(0, 3).toUpperCase();
-  const randomSuffix = suffix || Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `${brandPfx}-${catPfx}-${randomSuffix}`;
+  const randomSuffix =
+    suffix || Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `${brandPfx}-${catPfx}-${randomSuffix}`.toLowerCase();
 };
 
 /**

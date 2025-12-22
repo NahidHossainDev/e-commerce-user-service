@@ -1,12 +1,12 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post,
-    Query,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
@@ -27,7 +27,8 @@ export class CategoryController {
   })
   @ApiResponse({
     status: 409,
-    description: 'Category name or slug already exists or depth limit exceeded.',
+    description:
+      'Category name or slug already exists or depth limit exceeded.',
   })
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);

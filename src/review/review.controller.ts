@@ -1,13 +1,13 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post,
-    Query,
-    UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -33,7 +33,10 @@ export class ReviewController {
     @CurrentUser() user: UserDocument,
     @Body() createReviewDto: CreateReviewDto,
   ) {
-    return await this.reviewService.create(user._id.toString(), createReviewDto);
+    return await this.reviewService.create(
+      user._id.toString(),
+      createReviewDto,
+    );
   }
 
   @Get()
@@ -60,7 +63,11 @@ export class ReviewController {
     @Body() updateReviewDto: UpdateReviewDto,
     @CurrentUser() admin: UserDocument,
   ) {
-    return await this.reviewService.update(id, updateReviewDto, admin._id.toString());
+    return await this.reviewService.update(
+      id,
+      updateReviewDto,
+      admin._id.toString(),
+    );
   }
 
   @Delete(':id')

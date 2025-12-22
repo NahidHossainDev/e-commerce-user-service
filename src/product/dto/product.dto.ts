@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
     IsArray,
     IsBoolean,
@@ -11,7 +11,7 @@ import {
     IsString,
     Max,
     Min,
-    ValidateNested
+    ValidateNested,
 } from 'class-validator';
 import { AppCurrency } from '../../common/constants/currency.constants';
 import { QueryOptions } from '../../common/dto/queryOptions.dto';
@@ -167,7 +167,11 @@ export class CreateProductDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ description: 'Status', enum: ProductStatus, default: ProductStatus.DRAFT })
+  @ApiProperty({
+    description: 'Status',
+    enum: ProductStatus,
+    default: ProductStatus.DRAFT,
+  })
   @IsEnum(ProductStatus)
   @IsOptional()
   status?: ProductStatus;
@@ -313,24 +317,28 @@ export class ProductQueryDto extends QueryOptions {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  search?: string;
+  searchTerm?: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  category?: string;
+  categoryId?: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  brand?: string;
+  brandId?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   minPrice?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   maxPrice?: number;
 
   @ApiProperty({ required: false, enum: ProductStatus })
@@ -339,14 +347,37 @@ export class ProductQueryDto extends QueryOptions {
   status?: ProductStatus;
 
   @ApiProperty({ required: false })
+  @IsMongoId()
+  @IsOptional()
+  vendorId?: string;
+
+  @ApiProperty({ required: false })
   @IsBoolean()
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => value === 'true')
   isFeatured?: boolean;
 
   @ApiProperty({ required: false })
   @IsBoolean()
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => value === 'true')
   isOnOffer?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true')
+  isBestSeller?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true')
+  isNew?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true')
+  isPerishable?: boolean;
 }

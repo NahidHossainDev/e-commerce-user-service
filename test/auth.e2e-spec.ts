@@ -21,7 +21,7 @@ describe('AuthController (e2e)', () => {
     email: 'test@example.com',
     password: 'password123',
     fullName: 'Test User',
-    phoneNumber: '+1234567890'
+    phoneNumber: '+1234567890',
   };
 
   const loginDto = {
@@ -31,7 +31,7 @@ describe('AuthController (e2e)', () => {
 
   it('/auth/register (POST)', async () => {
     // Use current time + random to ensure uniqueness across runs
-    const randomEmail = `test_${Date.now()}_${Math.floor(Math.random()*1000)}@example.com`;
+    const randomEmail = `test_${Date.now()}_${Math.floor(Math.random() * 1000)}@example.com`;
     const randomPhone = `+880${Math.floor(100000000 + Math.random() * 900000000)}`;
     registerDto.email = randomEmail;
     registerDto.phoneNumber = randomPhone;
@@ -40,12 +40,12 @@ describe('AuthController (e2e)', () => {
     const response = await request(app.getHttpServer())
       .post('/auth/register')
       .send(registerDto);
-    
+
     if (response.status !== 201) {
-        console.error('Register Failed:', response.body);
+      console.error('Register Failed:', response.body);
     }
     expect(response.status).toBe(201);
-    
+
     expect(response.body).toHaveProperty('_id');
     expect(response.body.email).toBe(randomEmail.toLowerCase());
     expect(response.body).not.toHaveProperty('password');
@@ -58,7 +58,7 @@ describe('AuthController (e2e)', () => {
       .send(loginDto);
 
     if (response.status !== 201) {
-        console.error('Login Failed:', response.body);
+      console.error('Login Failed:', response.body);
     }
     expect(response.status).toBe(201);
 

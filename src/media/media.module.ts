@@ -6,7 +6,9 @@ import { ProductMedia, ProductMediaSchema } from './schemas/media.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: ProductMedia.name, schema: ProductMediaSchema }]),
+    MongooseModule.forFeature([
+      { name: ProductMedia.name, schema: ProductMediaSchema },
+    ]),
   ],
   controllers: [MediaController],
   providers: [MediaService],

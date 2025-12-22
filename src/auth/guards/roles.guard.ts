@@ -8,17 +8,17 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
     if (!requiredRoles) {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    
+
     if (!user) {
-        return false;
+      return false;
     }
 
     // Collect all active roles from the user
@@ -26,16 +26,16 @@ export class RolesGuard implements CanActivate {
 
     // Add primary role
     if (user.primaryRole) {
-        activeRoles.push(user.primaryRole);
+      activeRoles.push(user.primaryRole);
     }
 
     // Add other active roles
     if (user.roles && Array.isArray(user.roles)) {
-        user.roles.forEach(role => {
-            if (role.status === RoleStatus.ACTIVE && role.type) {
-                activeRoles.push(role.type);
-            }
-        });
+      user.roles.forEach((role) => {
+        if (role.status === RoleStatus.ACTIVE && role.type) {
+          activeRoles.push(role.type);
+        }
+      });
     }
 
     // Check if user has any of the required roles

@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
-export type ProductInventoryHistoryDocument = ProductInventoryHistory & Document;
+export type ProductInventoryHistoryDocument = ProductInventoryHistory &
+  Document;
 
 export enum InventoryTransactionType {
   RESTOCK = 'RESTOCK',
@@ -16,7 +17,12 @@ export class ProductInventoryHistory {
   @Prop({ type: Types.ObjectId, ref: 'Product', required: true, index: true })
   productId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'ProductInventory', required: true, index: true })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'ProductInventory',
+    required: true,
+    index: true,
+  })
   inventoryId: Types.ObjectId;
 
   @Prop({ trim: true })
@@ -49,7 +55,6 @@ export class ProductInventoryHistory {
   @Prop()
   referenceId: string; // e.g., Order ID, Restock ID
 
-  
   @Prop({ type: Types.ObjectId, ref: 'User' })
   performedBy: Types.ObjectId;
 
@@ -60,7 +65,9 @@ export class ProductInventoryHistory {
   reason: string;
 }
 
-export const ProductInventoryHistorySchema = SchemaFactory.createForClass(ProductInventoryHistory);
+export const ProductInventoryHistorySchema = SchemaFactory.createForClass(
+  ProductInventoryHistory,
+);
 
 ProductInventoryHistorySchema.index({ productId: 1, date: -1 });
 ProductInventoryHistorySchema.index({ sku: 1, date: -1 });

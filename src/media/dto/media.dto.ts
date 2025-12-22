@@ -1,6 +1,15 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  ValidateNested,
+} from 'class-validator';
 
 export class ImageAssetDto {
   @ApiProperty({ description: 'URL of the image' })
@@ -8,7 +17,10 @@ export class ImageAssetDto {
   @IsNotEmpty()
   url: string;
 
-  @ApiProperty({ description: 'URL of the mobile-optimized image', required: false })
+  @ApiProperty({
+    description: 'URL of the mobile-optimized image',
+    required: false,
+  })
   @IsUrl()
   @IsOptional()
   mobileUrl?: string;

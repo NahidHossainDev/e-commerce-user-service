@@ -1,5 +1,10 @@
 import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -16,7 +21,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User successfully registered' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiResponse({ status: 409, description: 'Conflict (Email/Phone already exists)' })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflict (Email/Phone already exists)',
+  })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
@@ -37,10 +45,10 @@ export class AuthController {
   async logout(@Request() req) {
     return this.authService.logout(req.user._id);
   }
-  
+
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh tokens' })
   async refresh(@Body('refreshToken') refreshToken: string) {
-       return this.authService.refreshTokens(refreshToken);
+    return this.authService.refreshTokens(refreshToken);
   }
 }

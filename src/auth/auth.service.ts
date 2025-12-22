@@ -24,7 +24,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { phoneNumber, password, fullName } = registerDto;
-   
+
     const email = registerDto.email?.trim().toLowerCase();
 
     if (!email && !phoneNumber) {
@@ -39,14 +39,17 @@ export class AuthService {
     }
 
     if (phoneNumber) {
-      const existingUser = await this.userService.findByPhoneNumber(phoneNumber);
+      const existingUser =
+        await this.userService.findByPhoneNumber(phoneNumber);
       if (existingUser) {
         throw new ConflictException('Phone number already exists');
       }
     }
 
     // Generate Verification Token
-    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
+    const verificationToken = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString(); // 6 digit OTP
 
     const newUser = await this.userService.create({
       ...registerDto,
@@ -56,16 +59,22 @@ export class AuthService {
       primaryRole: UserRole.CUSTOMER,
       password,
       verification: {
-          emailVerificationToken: email ? verificationToken : undefined,
-          phoneVerificationToken: phoneNumber ? verificationToken : undefined,
-      }
+        emailVerificationToken: email ? verificationToken : undefined,
+        phoneVerificationToken: phoneNumber ? verificationToken : undefined,
+      },
     } as any);
 
     if (email) {
-        await this.notificationService.sendEmailVerification(email, verificationToken);
+      await this.notificationService.sendEmailVerification(
+        email,
+        verificationToken,
+      );
     }
     if (phoneNumber) {
-        await this.notificationService.sendPhoneVerification(phoneNumber, verificationToken);
+      await this.notificationService.sendPhoneVerification(
+        phoneNumber,
+        verificationToken,
+      );
     }
 
     // Fix #1: Sensitive Data Exposure - Return sanitized object
@@ -95,50 +104,65 @@ export class AuthService {
 
     // Brute Force Protection
     if (user.security.lockUntil && user.security.lockUntil > new Date()) {
-        throw new UnauthorizedException(`Account is locked until ${user.security.lockUntil}`);
+      throw new UnauthorizedException(
+        `Account is locked until ${user.security.lockUntil}`,
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-        // Increment failed attempts
-        const attempts = (user.security.failedLoginAttempts || 0) + 1;
-        const updates: any = { failedLoginAttempts: attempts };
-        
-        if (attempts >= 5) {
-            updates.lockUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-            updates.failedLoginAttempts = 0; // Reset or keep? Usually reset after timeout, but effectively lock resets logic. 
-                                             // Better pattern: keep counting or reset on successful login.
-                                             // Here simply setting lock.
-        }
-        await this.userService.updateSecurity(user._id.toString(), updates);
-        throw new UnauthorizedException('Invalid credentials');
+      // Increment failed attempts
+      const attempts = (user.security.failedLoginAttempts || 0) + 1;
+      const updates: any = { failedLoginAttempts: attempts };
+
+      if (attempts >= 5) {
+        updates.lockUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        updates.failedLoginAttempts = 0; // Reset or keep? Usually reset after timeout, but effectively lock resets logic.
+        // Better pattern: keep counting or reset on successful login.
+        // Here simply setting lock.
+      }
+      await this.userService.updateSecurity(user._id.toString(), updates);
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Reset failed attempts on success
     if (user.security.failedLoginAttempts > 0 || user.security.lockUntil) {
-        await this.userService.updateSecurity(user._id.toString(), {
-            failedLoginAttempts: 0,
-            lockUntil: undefined
-        });
+      await this.userService.updateSecurity(user._id.toString(), {
+        failedLoginAttempts: 0,
+        lockUntil: undefined,
+      });
     }
 
     if (
-        user.accountStatus === AccountStatus.SUSPENDED ||
-        user.accountStatus === AccountStatus.BLOCKED ||
-        user.accountStatus === AccountStatus.DELETED
+      user.accountStatus === AccountStatus.SUSPENDED ||
+      user.accountStatus === AccountStatus.BLOCKED ||
+      user.accountStatus === AccountStatus.DELETED
     ) {
-        throw new UnauthorizedException(`Account is ${user.accountStatus}`);
+      throw new UnauthorizedException(`Account is ${user.accountStatus}`);
     }
 
-    const payload = { sub: user._id, email: user.email, role: user.primaryRole };
+    const payload = {
+      sub: user._id,
+      email: user.email,
+      role: user.primaryRole,
+    };
     const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign({ ...payload, jti: Math.random().toString() }, {
+    const refreshToken = this.jwtService.sign(
+      { ...payload, jti: Math.random().toString() },
+      {
         expiresIn: '7d', // Configurable
         secret: config.jwtSecretKey,
-    });
+      },
+    );
 
-    const refreshTokenHash = await bcrypt.hash(refreshToken, Number(config.saltRound));
-    await this.userService.updateRefreshToken(user._id.toString(), refreshTokenHash);
+    const refreshTokenHash = await bcrypt.hash(
+      refreshToken,
+      Number(config.saltRound),
+    );
+    await this.userService.updateRefreshToken(
+      user._id.toString(),
+      refreshTokenHash,
+    );
 
     // Fix #1: Sensitive Data Exposure
     return {
@@ -149,56 +173,74 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-      return this.userService.updateRefreshToken(userId, null);
+    return this.userService.updateRefreshToken(userId, null);
   }
 
   // Fix #2: Broken Refresh Token Flow
   async refreshTokens(refreshToken: string) {
-      let payload;
-      try {
-          // Manual verification
-          payload = this.jwtService.verify(refreshToken, { secret: config.jwtSecretKey });
-      } catch (e) {
-          throw new UnauthorizedException('Invalid Refresh Token');
-      }
-
-      const user = await this.userService.findOne(payload.sub);
-      if (!user || !user.security.refreshTokenHash) {
-          throw new UnauthorizedException('Access Denied');
-      }
-
-      const refreshTokenMatches = await bcrypt.compare(refreshToken, user.security.refreshTokenHash);
-      if (!refreshTokenMatches) {
-          throw new UnauthorizedException('Access Denied');
-      }
-
-      // Rotate tokens
-      const newPayload = { sub: user._id, email: user.email, role: user.primaryRole };
-      const accessToken = this.jwtService.sign(newPayload);
-      const newRefreshToken = this.jwtService.sign({ ...newPayload, jti: Math.random().toString() }, {
-          expiresIn: '7d', // Configurable
-          secret: config.jwtSecretKey,
+    let payload;
+    try {
+      // Manual verification
+      payload = this.jwtService.verify(refreshToken, {
+        secret: config.jwtSecretKey,
       });
+    } catch (e) {
+      throw new UnauthorizedException('Invalid Refresh Token');
+    }
 
-      const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, Number(config.saltRound));
-      await this.userService.updateRefreshToken(user._id.toString(), newRefreshTokenHash);
+    const user = await this.userService.findOne(payload.sub);
+    if (!user || !user.security.refreshTokenHash) {
+      throw new UnauthorizedException('Access Denied');
+    }
 
-      return {
-          accessToken,
-          refreshToken: newRefreshToken,
-      };
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.security.refreshTokenHash,
+    );
+    if (!refreshTokenMatches) {
+      throw new UnauthorizedException('Access Denied');
+    }
+
+    // Rotate tokens
+    const newPayload = {
+      sub: user._id,
+      email: user.email,
+      role: user.primaryRole,
+    };
+    const accessToken = this.jwtService.sign(newPayload);
+    const newRefreshToken = this.jwtService.sign(
+      { ...newPayload, jti: Math.random().toString() },
+      {
+        expiresIn: '7d', // Configurable
+        secret: config.jwtSecretKey,
+      },
+    );
+
+    const newRefreshTokenHash = await bcrypt.hash(
+      newRefreshToken,
+      Number(config.saltRound),
+    );
+    await this.userService.updateRefreshToken(
+      user._id.toString(),
+      newRefreshTokenHash,
+    );
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
   }
 
   private sanitizeUser(user: any) {
-      const u = user.toObject ? user.toObject() : user;
-      return {
-          _id: u._id,
-          email: u.email,
-          phoneNumber: u.phoneNumber,
-          profile: u.profile,
-          roles: u.roles,
-          primaryRole: u.primaryRole,
-          accountStatus: u.accountStatus,
-      };
+    const u = user.toObject ? user.toObject() : user;
+    return {
+      _id: u._id,
+      email: u.email,
+      phoneNumber: u.phoneNumber,
+      profile: u.profile,
+      roles: u.roles,
+      primaryRole: u.primaryRole,
+      accountStatus: u.accountStatus,
+    };
   }
 }

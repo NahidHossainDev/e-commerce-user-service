@@ -13,7 +13,7 @@ export enum ProductStatus {
   COMING_SOON = 'COMING_SOON',
   DISCONTINUED = 'DISCONTINUED',
   ARCHIVED = 'ARCHIVED',
-  BLOCKED = 'BLOCKED'
+  BLOCKED = 'BLOCKED',
 }
 
 // --- Embedded Sub-Schemas ---
@@ -120,7 +120,6 @@ export class PerishableInfo {
 
   @Prop({ default: true })
   requiresRefrigeration: boolean;
-
 }
 
 // --- Main Product Schema ---
@@ -262,10 +261,10 @@ ProductSchema.index({ isOnOffer: 1, status: 1 });
 ProductSchema.index({ tags: 1, status: 1 });
 ProductSchema.index({ averageRating: -1, reviewCount: -1, status: 1 });
 ProductSchema.index({ stock: 1, status: 1 });
-ProductSchema.index({ 
-  title: 'text', 
+ProductSchema.index({
+  title: 'text',
   keywords: 'text',
-  tags: 'text' 
+  tags: 'text',
 });
 // ProductSchema.index({ createdAt: -1, status: 1 });
 // ProductSchema.index({ salesCount: -1, status: 1 });

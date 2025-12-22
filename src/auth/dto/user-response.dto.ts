@@ -4,35 +4,35 @@ import { AccountStatus, UserRole } from 'src/user/user.schema';
 
 @Exclude()
 export class AuthUserResponseDto {
-    @Expose()
-    @ApiProperty()
-    _id: string;
+  @Expose()
+  @ApiProperty()
+  _id: string;
 
-    @Expose()
-    @ApiProperty()
-    email: string;
+  @Expose()
+  @ApiProperty()
+  email: string;
 
-    @Expose()
-    @ApiProperty()
-    phoneNumber: string;
+  @Expose()
+  @ApiProperty()
+  phoneNumber: string;
 
-    @Expose()
-    @ApiProperty()
-    profile: any; // Ideally define a ProfileDto
+  @Expose()
+  @ApiProperty()
+  profile: any; // Ideally define a ProfileDto
 
-    @Expose()
-    @ApiProperty()
-    roles: any[]; // Ideally RoleDto
+  @Expose()
+  @ApiProperty()
+  roles: any[]; // Ideally RoleDto
 
-    @Expose()
-    @ApiProperty()
-    primaryRole: UserRole;
+  @Expose()
+  @ApiProperty()
+  primaryRole: UserRole;
 
-    @Expose()
-    @ApiProperty()
-    accountStatus: AccountStatus;
+  @Expose()
+  @ApiProperty()
+  accountStatus: AccountStatus;
 
-    constructor(partial: Partial<AuthUserResponseDto>) {
-        Object.assign(this, partial);
-    }
+  constructor(partial: Partial<AuthUserResponseDto>) {
+    Object.assign(this, partial);
+  }
 }

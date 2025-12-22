@@ -11,14 +11,26 @@ import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewQueryOptionsDto } from './dto/review-query-options.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { reviewFilterableFields, reviewSearchableFields } from './review.constants';
-import { RatingSummary, RatingSummaryDocument } from './schemas/rating-summary.schema';
-import { Review, ReviewDocument, ReviewStatus, VoteType } from './schemas/review.schema';
+import {
+  reviewFilterableFields,
+  reviewSearchableFields,
+} from './review.constants';
+import {
+  RatingSummary,
+  RatingSummaryDocument,
+} from './schemas/rating-summary.schema';
+import {
+  Review,
+  ReviewDocument,
+  ReviewStatus,
+  VoteType,
+} from './schemas/review.schema';
 
 @Injectable()
 export class ReviewService {
   constructor(
-    @InjectModel(Review.name) private readonly reviewModel: Model<ReviewDocument>,
+    @InjectModel(Review.name)
+    private readonly reviewModel: Model<ReviewDocument>,
     @InjectModel(RatingSummary.name)
     private readonly ratingSummaryModel: Model<RatingSummaryDocument>,
   ) {}
@@ -44,14 +56,19 @@ export class ReviewService {
       status: ReviewStatus.APPROVED, // Auto-approve for now, or use PENDING
     });
 
-    await this.updateRatingSummary(new Types.ObjectId(createReviewDto.productId));
+    await this.updateRatingSummary(
+      new Types.ObjectId(createReviewDto.productId),
+    );
 
     return review;
   }
 
   async findAll(query: ReviewQueryOptionsDto) {
-    const paginateQueries = pick(query, paginateOptions as (keyof ReviewQueryOptionsDto)[]);
-    const filterQuery: any = pick(query, reviewFilterableFields as (keyof ReviewQueryOptionsDto)[]);
+    const paginateQueries = pick(
+      query,
+      paginateOptions as (keyof ReviewQueryOptionsDto)[],
+    );
+    const filterQuery: any = pick(query, reviewFilterableFields);
 
     if (filterQuery.searchTerm) {
       filterQuery.$or = reviewSearchableFields.map((field) => ({
@@ -101,7 +118,7 @@ export class ReviewService {
     }
 
     // If rating changed or status changed to/from APPROVED, update summary
-    // Since CreateReviewDto rating is immutable in this simple implementation, 
+    // Since CreateReviewDto rating is immutable in this simple implementation,
     // we only need to worry if status changes affects inclusion.
     await this.updateRatingSummary(updatedReview.productId);
 
@@ -120,7 +137,11 @@ export class ReviewService {
     return deletedReview;
   }
 
-  async vote(id: string, userId: string, voteType: VoteType): Promise<ReviewDocument> {
+  async vote(
+    id: string,
+    userId: string,
+    voteType: VoteType,
+  ): Promise<ReviewDocument> {
     const review = await this.reviewModel.findById(id);
     if (!review) {
       throw new NotFoundException(`Review with ID ${id} not found`);
@@ -161,7 +182,9 @@ export class ReviewService {
   async getRatingSummary(productId: string): Promise<RatingSummaryDocument> {
     const summary = await this.ratingSummaryModel.findOne({ productId }).exec();
     if (!summary) {
-      throw new NotFoundException(`Rating summary for product ${productId} not found`);
+      throw new NotFoundException(
+        `Rating summary for product ${productId} not found`,
+      );
     }
     return summary;
   }
@@ -198,8 +221,16 @@ export class ReviewService {
       return;
     }
 
-    const { totalReviews, averageRating, totalRatings, five, four, three, two, one } =
-      stats[0];
+    const {
+      totalReviews,
+      averageRating,
+      totalRatings,
+      five,
+      four,
+      three,
+      two,
+      one,
+    } = stats[0];
 
     await this.ratingSummaryModel.findOneAndUpdate(
       { productId },

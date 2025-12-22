@@ -5,7 +5,13 @@ export type ProductInventoryDocument = ProductInventory & Document;
 
 @Schema({ timestamps: true, collection: 'product_inventories' })
 export class ProductInventory {
-  @Prop({ type: Types.ObjectId, ref: 'Product', required: true, unique: true, index: true })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Product',
+    required: true,
+    unique: true,
+    index: true,
+  })
   productId: Types.ObjectId;
 
   @Prop({ unique: true, lowercase: true, trim: true })
@@ -48,7 +54,8 @@ export class ProductInventory {
   }[];
 }
 
-export const ProductInventorySchema = SchemaFactory.createForClass(ProductInventory);
+export const ProductInventorySchema =
+  SchemaFactory.createForClass(ProductInventory);
 
 ProductInventorySchema.index({ sku: 1 });
 ProductInventorySchema.index({ productId: 1 }, { unique: true });

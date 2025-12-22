@@ -21,8 +21,14 @@ export class UnitController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new measurement unit' })
-  @ApiResponse({ status: 201, description: 'The unit has been successfully created.' })
-  @ApiResponse({ status: 409, description: 'Unit name or symbol already exists.' })
+  @ApiResponse({
+    status: 201,
+    description: 'The unit has been successfully created.',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Unit name or symbol already exists.',
+  })
   create(@Body() createUnitDto: CreateUnitDto) {
     return this.unitService.create(createUnitDto);
   }
@@ -43,7 +49,10 @@ export class UnitController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a unit by ID' })
   @ApiResponse({ status: 404, description: 'Unit not found.' })
-  @ApiResponse({ status: 409, description: 'Unit name or symbol already exists.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Unit name or symbol already exists.',
+  })
   update(@Param('id') id: string, @Body() updateUnitDto: UpdateUnitDto) {
     return this.unitService.update(id, updateUnitDto);
   }

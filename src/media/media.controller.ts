@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateMediaDto, UpdateMediaDto } from './dto/media.dto';
 import { MediaService } from './media.service';
@@ -22,7 +30,10 @@ export class MediaController {
 
   @Patch(':productId')
   @ApiOperation({ summary: 'Update media by product ID' })
-  update(@Param('productId') productId: string, @Body() updateMediaDto: UpdateMediaDto) {
+  update(
+    @Param('productId') productId: string,
+    @Body() updateMediaDto: UpdateMediaDto,
+  ) {
     return this.mediaService.update(productId, updateMediaDto);
   }
 

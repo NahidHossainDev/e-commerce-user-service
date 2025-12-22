@@ -3,7 +3,10 @@ import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 import { ReviewStatus } from '../schemas/review.schema';
 
 export class UpdateReviewDto {
-  @ApiPropertyOptional({ enum: ReviewStatus, description: 'Updated review status' })
+  @ApiPropertyOptional({
+    enum: ReviewStatus,
+    description: 'Updated review status',
+  })
   @IsOptional()
   @IsEnum(ReviewStatus)
   status?: ReviewStatus;

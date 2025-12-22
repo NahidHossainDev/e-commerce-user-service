@@ -6,12 +6,12 @@ export type ReviewDocument = Review & Document;
 export enum ReviewStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
 }
 
 export enum VoteType {
   HELPFUL = 'helpful',
-  UNHELPFUL = 'unhelpful'
+  UNHELPFUL = 'unhelpful',
 }
 
 @Schema()

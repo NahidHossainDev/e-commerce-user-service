@@ -23,7 +23,13 @@ class RatingDistribution {
 
 @Schema({ timestamps: true })
 export class RatingSummary {
-  @Prop({ type: Types.ObjectId, ref: 'Product', required: true, unique: true, index: true })
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Product',
+    required: true,
+    unique: true,
+    index: true,
+  })
   productId: Types.ObjectId;
 
   @Prop({ default: 0 })

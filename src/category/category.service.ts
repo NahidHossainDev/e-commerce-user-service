@@ -1,7 +1,7 @@
 import {
-    ConflictException,
-    Injectable,
-    NotFoundException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -9,8 +9,8 @@ import { paginateOptions } from 'src/common/constants';
 import { createSlug, paginationHelpers, pick } from 'src/utils/helpers';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
 import {
-    categoryFilterableFields,
-    categorySearchableFields,
+  categoryFilterableFields,
+  categorySearchableFields,
 } from './category.constants';
 import { CategoryQueryOptionsDto } from './dto/category-query-options.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -24,7 +24,9 @@ export class CategoryService {
     private readonly categoryModel: Model<CategoryDocument>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<CategoryDocument> {
+  async create(
+    createCategoryDto: CreateCategoryDto,
+  ): Promise<CategoryDocument> {
     const slug = createSlug(createCategoryDto.name);
 
     const existingCategory = await this.categoryModel.findOne({
@@ -205,7 +207,9 @@ export class CategoryService {
       throw new ConflictException('Cannot delete category with sub-categories');
     }
 
-    const deletedCategory = await this.categoryModel.findByIdAndDelete(id).exec();
+    const deletedCategory = await this.categoryModel
+      .findByIdAndDelete(id)
+      .exec();
 
     if (!deletedCategory) {
       throw new NotFoundException(`Category with ID ${id} not found`);

@@ -61,16 +61,19 @@ export class UserService {
   }
 
   async updateRefreshToken(userId: string, hashedToken: string | null) {
-      return this.userModel.findByIdAndUpdate(userId, {
-          'security.refreshTokenHash': hashedToken
-      });
+    return this.userModel.findByIdAndUpdate(userId, {
+      'security.refreshTokenHash': hashedToken,
+    });
   }
-  async updateSecurity(userId: string, securityUpdates: Partial<User['security']>) {
-     const updateQuery = Object.keys(securityUpdates).reduce((acc, key) => {
-         acc[`security.${key}`] = securityUpdates[key];
-         return acc;
-     }, {});
-     
-     return this.userModel.findByIdAndUpdate(userId, updateQuery, { new: true });
+  async updateSecurity(
+    userId: string,
+    securityUpdates: Partial<User['security']>,
+  ) {
+    const updateQuery = Object.keys(securityUpdates).reduce((acc, key) => {
+      acc[`security.${key}`] = securityUpdates[key];
+      return acc;
+    }, {});
+
+    return this.userModel.findByIdAndUpdate(userId, updateQuery, { new: true });
   }
 }

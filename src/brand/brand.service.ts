@@ -21,13 +21,15 @@ export class BrandService {
 
   async create(createBrandDto: CreateBrandDto): Promise<BrandDocument> {
     const slug = createSlug(createBrandDto.name);
-    
+
     const existingBrand = await this.brandModel.findOne({
       $or: [{ name: createBrandDto.name }, { slug }],
     });
 
     if (existingBrand) {
-      throw new ConflictException('Brand with this name or slug already exists');
+      throw new ConflictException(
+        'Brand with this name or slug already exists',
+      );
     }
 
     return this.brandModel.create({
@@ -62,21 +64,26 @@ export class BrandService {
     return brand;
   }
 
-  async update(id: string, updateBrandDto: UpdateBrandDto): Promise<BrandDocument> {
+  async update(
+    id: string,
+    updateBrandDto: UpdateBrandDto,
+  ): Promise<BrandDocument> {
     const updateData: any = { ...updateBrandDto };
-    
+
     if (updateBrandDto.name) {
       const slug = createSlug(updateBrandDto.name);
-      
+
       const existingBrand = await this.brandModel.findOne({
         $or: [{ name: updateBrandDto.name }, { slug }],
         _id: { $ne: id },
       });
 
       if (existingBrand) {
-        throw new ConflictException('Brand with this name or slug already exists');
+        throw new ConflictException(
+          'Brand with this name or slug already exists',
+        );
       }
-      
+
       updateData.slug = slug;
     }
 
