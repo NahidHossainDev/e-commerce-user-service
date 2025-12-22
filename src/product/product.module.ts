@@ -1,24 +1,19 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ProductInventoryHistory, ProductInventoryHistorySchema } from './schemas/inventory-history.schema';
-import { ProductInventory, ProductInventorySchema } from './schemas/inventory.schema';
-import { ProductMedia, ProductMediaSchema } from './schemas/media.schema';
+import { InventoryModule } from '../inventory/inventory.module';
+import { MediaModule } from '../media/media.module';
+import { ProductController } from './product.controller';
+import { ProductService } from './product.service';
 import { Product, ProductSchema } from './schemas/product.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: Product.name,
-        schema: ProductSchema,
-      },
-      { name: ProductInventory.name, schema: ProductInventorySchema },
-      { name: ProductInventoryHistory.name, schema: ProductInventoryHistorySchema },
-      { name: ProductMedia.name, schema: ProductMediaSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+    MediaModule,
+    InventoryModule,
   ],
-  controllers: [],
-  providers: [],
-  exports: [MongooseModule],
+  controllers: [ProductController],
+  providers: [ProductService],
+  exports: [ProductService, MongooseModule],
 })
 export class ProductModule {}

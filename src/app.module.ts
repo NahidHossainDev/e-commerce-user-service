@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { BrandModule } from './brand/brand.module';
 import { CategoryModule } from './category/category.module';
 import { config } from './config';
+import { InventoryModule } from './inventory/inventory.module';
+import { MediaModule } from './media/media.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
 import { UserModule } from './user/user.module';
@@ -25,6 +27,8 @@ import { UserModule } from './user/user.module';
     BrandModule,
     CategoryModule,
     ReviewModule,
+    MediaModule,
+    InventoryModule,
     ProductModule,
   ],
   controllers: [AppController],

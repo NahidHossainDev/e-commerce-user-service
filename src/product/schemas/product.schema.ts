@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { AppCurrency, DEFAULT_CURRENCY } from 'src/common/constants';
 
 export type ProductDocument = Product & Document;
 
@@ -15,11 +16,6 @@ export enum ProductStatus {
   BLOCKED = 'BLOCKED'
 }
 
-export enum Currency {
-  USD = 'USD',
-  BDT = 'BDT',
-}
-
 // --- Embedded Sub-Schemas ---
 @Schema({ _id: false })
 export class Price {
@@ -32,7 +28,7 @@ export class Price {
   @Prop({ min: 0, max: 100 })
   discountRate: number;
 
-  @Prop({ required: true, enum: Currency, default: Currency.BDT })
+  @Prop({ required: true, enum: AppCurrency, default: DEFAULT_CURRENCY })
   currency: string;
 }
 
