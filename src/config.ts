@@ -49,7 +49,7 @@ const getConfig = (): Config => {
     env,
     natsURL,
     jwtSecretKey,
-    jwtExpire,
+    jwtExpire: jwtExpire || '1h',
     redisHost,
     redisPort: Number(redisPort),
     saltRound: Number(saltRound),

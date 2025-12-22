@@ -19,7 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
-    // Check if account is active/not blocked etc. if needed here or in Guard
     return user;
   }
 }
