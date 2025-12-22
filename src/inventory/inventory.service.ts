@@ -1,9 +1,26 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, Types } from 'mongoose';
-import { AdjustStockDto, CreateInventoryDto, UpdateInventoryDto } from './dto/inventory.dto';
-import { InventoryTransactionType, ProductInventoryHistory, ProductInventoryHistoryDocument } from './schemas/inventory-history.schema';
-import { ProductInventory, ProductInventoryDocument } from './schemas/inventory.schema';
+import { Product, ProductDocument } from '../product/schemas/product.schema';
+import {
+  AdjustStockDto,
+  CreateInventoryDto,
+  UpdateInventoryDto,
+} from './dto/inventory.dto';
+import {
+  InventoryTransactionType,
+  ProductInventoryHistory,
+  ProductInventoryHistoryDocument,
+} from './schemas/inventory-history.schema';
+import {
+  ProductInventory,
+  ProductInventoryDocument,
+} from './schemas/inventory.schema';
 
 @Injectable()
 export class InventoryService {
@@ -12,24 +29,32 @@ export class InventoryService {
     private inventoryModel: Model<ProductInventoryDocument>,
     @InjectModel(ProductInventoryHistory.name)
     private historyModel: Model<ProductInventoryHistoryDocument>,
+    @InjectModel(Product.name)
+    private productModel: Model<ProductDocument>,
   ) {}
 
-  async create(createInventoryDto: CreateInventoryDto, session: ClientSession | null = null): Promise<ProductInventoryDocument> {
-    const existing = await this.inventoryModel.findOne({ 
-      $or: [
-        { productId: new Types.ObjectId(createInventoryDto.productId) },
-        { sku: createInventoryDto.sku.toLowerCase() }
-      ]
-    }).session(session);
+  async create(
+    createInventoryDto: CreateInventoryDto,
+    session: ClientSession | null = null,
+  ): Promise<ProductInventoryDocument> {
+    const existing = await this.inventoryModel
+      .findOne({
+        $or: [
+          { productId: new Types.ObjectId(createInventoryDto.productId) },
+          { sku: createInventoryDto.sku.toLowerCase() },
+        ],
+      })
+      .session(session);
 
     if (existing) {
       throw new ConflictException('Inventory or SKU already exists');
     }
 
+    const normalizedSku = createInventoryDto.sku.toLowerCase();
     const inventory = new this.inventoryModel({
       ...createInventoryDto,
       productId: new Types.ObjectId(createInventoryDto.productId),
-      sku: createInventoryDto.sku.toLowerCase(),
+      sku: normalizedSku,
     });
 
     const savedInventory = await inventory.save({ session: session as any });
@@ -47,37 +72,67 @@ export class InventoryService {
     });
     await history.save({ session: session as any });
 
+    // Sync with Product Collection
+    await this.productModel.updateOne(
+      { _id: savedInventory.productId },
+      {
+        $set: {
+          stock: savedInventory.stockQuantity,
+          isInStock: savedInventory.stockQuantity > 0,
+          lastStockSyncAt: new Date(),
+        },
+      },
+      { session: session as any },
+    );
+
     return savedInventory;
   }
 
   async findByProductId(productId: string): Promise<ProductInventoryDocument> {
-    const inventory = await this.inventoryModel.findOne({ productId: new Types.ObjectId(productId) });
+    const inventory = await this.inventoryModel.findOne({
+      productId: new Types.ObjectId(productId),
+    });
     if (!inventory) {
-      throw new NotFoundException(`Inventory for product ${productId} not found`);
+      throw new NotFoundException(
+        `Inventory for product ${productId} not found`,
+      );
     }
     return inventory;
   }
 
-  async adjustStock(productId: string, adjustStockDto: AdjustStockDto, session: ClientSession | null = null): Promise<ProductInventoryDocument> {
-    const { quantity, type, variantSku, referenceId, reason, note } = adjustStockDto;
-    
-    const inventory = await this.inventoryModel.findOne({ productId: new Types.ObjectId(productId) }).session(session);
+  async adjustStock(
+    productId: string,
+    adjustStockDto: AdjustStockDto,
+    session: ClientSession | null = null,
+  ): Promise<ProductInventoryDocument> {
+    const { quantity, type, variantSku, referenceId, reason, note } =
+      adjustStockDto;
+
+    const inventory = await this.inventoryModel
+      .findOne({ productId: new Types.ObjectId(productId) })
+      .session(session);
     if (!inventory) {
-      throw new NotFoundException(`Inventory for product ${productId} not found`);
+      throw new NotFoundException(
+        `Inventory for product ${productId} not found`,
+      );
     }
 
     let quantityBefore: number;
     let quantityAfter: number;
 
     if (variantSku) {
-      const variantIdx = inventory.variantStock.findIndex(v => v.variantSku === variantSku);
+      const variantIdx = inventory.variantStock.findIndex(
+        (v) => v.variantSku === variantSku,
+      );
       if (variantIdx === -1) {
-        throw new NotFoundException(`Variant SKU ${variantSku} not found in inventory`);
+        throw new NotFoundException(
+          `Variant SKU ${variantSku} not found in inventory`,
+        );
       }
-      
+
       quantityBefore = inventory.variantStock[variantIdx].stockQuantity;
       quantityAfter = quantityBefore + quantity;
-      
+
       if (quantityAfter < 0) {
         throw new BadRequestException('Insufficient stock for variant');
       }
@@ -103,6 +158,19 @@ export class InventoryService {
 
     await inventory.save({ session: session as any });
 
+    // Sync with Product Collection
+    await this.productModel.updateOne(
+      { _id: inventory.productId },
+      {
+        $set: {
+          stock: inventory.stockQuantity,
+          isInStock: inventory.stockQuantity > 0,
+          lastStockSyncAt: new Date(),
+        },
+      },
+      { session: session as any },
+    );
+
     // Log history
     const history = new this.historyModel({
       productId: inventory.productId,
@@ -122,11 +190,18 @@ export class InventoryService {
     return inventory;
   }
 
-  async getHistory(productId: string): Promise<ProductInventoryHistoryDocument[]> {
-    return this.historyModel.find({ productId: new Types.ObjectId(productId) }).sort({ createdAt: -1 });
+  async getHistory(
+    productId: string,
+  ): Promise<ProductInventoryHistoryDocument[]> {
+    return this.historyModel
+      .find({ productId: new Types.ObjectId(productId) })
+      .sort({ createdAt: -1 });
   }
 
-  async update(productId: string, updateInventoryDto: UpdateInventoryDto): Promise<ProductInventoryDocument> {
+  async update(
+    productId: string,
+    updateInventoryDto: UpdateInventoryDto,
+  ): Promise<ProductInventoryDocument> {
     const inventory = await this.inventoryModel.findOneAndUpdate(
       { productId: new Types.ObjectId(productId) },
       { $set: updateInventoryDto },
@@ -134,7 +209,9 @@ export class InventoryService {
     );
 
     if (!inventory) {
-      throw new NotFoundException(`Inventory for product ${productId} not found`);
+      throw new NotFoundException(
+        `Inventory for product ${productId} not found`,
+      );
     }
     return inventory;
   }

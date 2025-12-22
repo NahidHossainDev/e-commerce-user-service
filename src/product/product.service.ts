@@ -1,11 +1,27 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Connection, Model, Types } from 'mongoose';
+import { Connection, FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
+import { paginateOptions } from '../common/constants';
 import { InventoryService } from '../inventory/inventory.service';
+import { InventoryTransactionType } from '../inventory/schemas/inventory-history.schema';
 import { MediaService } from '../media/media.service';
+import { paginationHelpers, pick } from '../utils/helpers';
+import { getPaginatedData } from '../utils/mongodb/getPaginatedData';
 import { generateSKU, generateSlug } from '../utils/product-helper';
-import { CreateProductDto, ProductQueryDto, UpdateProductDto } from './dto/product.dto';
-import { PRODUCT_FILTER_FIELDS, PRODUCT_SEARCH_FIELDS, PRODUCT_SORT_OPTIONS } from './product.constants';
+import {
+  CreateProductDto,
+  ProductQueryDto,
+  UpdateProductDto,
+} from './dto/product.dto';
+import {
+  PRODUCT_FILTER_FIELDS,
+  PRODUCT_SEARCH_FIELDS,
+  PRODUCT_SORT_OPTIONS,
+} from './product.constants';
 import { Product, ProductDocument } from './schemas/product.schema';
 
 @Injectable()
@@ -24,12 +40,19 @@ export class ProductService {
 
     try {
       const slug = generateSlug(createProductDto.title);
-      const existing = await this.productModel.findOne({ slug }).session(session);
+      const existing = await this.productModel
+        .findOne({ slug })
+        .session(session);
       if (existing) {
         throw new ConflictException('Product with this title already exists');
       }
 
-      const sku = createProductDto.sku || generateSKU(createProductDto.brand?.name || 'GEN', createProductDto.category.name);
+      const sku =
+        createProductDto.sku ||
+        generateSKU(
+          createProductDto.brand?.name || 'GEN',
+          createProductDto.category.name,
+        );
 
       const product = new this.productModel({
         ...createProductDto,
@@ -42,23 +65,32 @@ export class ProductService {
       const savedProduct = await product.save({ session: session || null });
 
       // Create Inventory
-      await this.inventoryService.create({
-        productId: (savedProduct._id as Types.ObjectId).toString(),
-        sku: savedProduct.sku,
-        stockQuantity: createProductDto.initialStock || 0,
-        lowStockThreshold: 5,
-        variantStock: createProductDto.variants?.map(v => ({
-          variantSku: v.sku || `${savedProduct.sku}-${v.name.substring(0, 3).toUpperCase()}`,
-          stockQuantity: 0,
-        })) || [],
-      }, session);
+      await this.inventoryService.create(
+        {
+          productId: (savedProduct._id as Types.ObjectId).toString(),
+          sku: savedProduct.sku,
+          stockQuantity: createProductDto.initialStock || 0,
+          lowStockThreshold: 5,
+          variantStock:
+            createProductDto.variants?.map((v) => ({
+              variantSku:
+                v.sku ||
+                `${savedProduct.sku}-${v.name.substring(0, 3).toUpperCase()}`,
+              stockQuantity: 0,
+            })) || [],
+        },
+        session,
+      );
 
       // Create dummy Media entry (can be updated later)
-      await this.mediaService.create({
-        productId: (savedProduct._id as Types.ObjectId).toString(),
-        primaryImage: createProductDto.thumbnail,
-        images: [],
-      }); // Media service doesn't support session yet, but it's a separate collection.
+      await this.mediaService.create(
+        {
+          productId: (savedProduct._id as Types.ObjectId).toString(),
+          primaryImage: createProductDto.thumbnail,
+          images: [],
+        },
+        session,
+      );
 
       await session.commitTransaction();
       return savedProduct;
@@ -66,98 +98,97 @@ export class ProductService {
       await session.abortTransaction();
       throw error;
     } finally {
-      session.endSession();
+      await session.endSession();
     }
   }
 
   async findAll(queryDto: ProductQueryDto) {
-    const { 
-      page = 1, 
-      limit = 10, 
-      sortBy, 
-      sortOrder, 
-      search, 
-      minPrice, 
+    const paginateQueries = pick(queryDto, paginateOptions);
+    const filters = pick(queryDto, PRODUCT_FILTER_FIELDS);
+
+    const {
+      searchTerm,
+      categoryId,
+      brandId,
+      vendorId,
+      minPrice,
       maxPrice,
-      ...filters 
-    } = queryDto;
+      ...remainingFilters
+    } = filters;
 
-    const query: any = { isDeleted: false };
+    const filterQuery: FilterQuery<ProductDocument> = {
+      isDeleted: false,
+      ...remainingFilters,
+    };
 
-    // Apply Search
-    if (search) {
-      query.$or = PRODUCT_SEARCH_FIELDS.map(field => ({
-        [field]: { $regex: search, $options: 'i' }
+    // 1. Search Logic
+    if (searchTerm) {
+      filterQuery.$or = PRODUCT_SEARCH_FIELDS.map((field) => ({
+        [field]: { $regex: searchTerm, $options: 'i' },
       }));
     }
 
-    // Apply Filters
-    Object.keys(filters).forEach(key => {
-      if (filters[key] !== undefined && PRODUCT_FILTER_FIELDS.includes(key)) {
-        if (key === 'category.id' || key === 'brand.id' || key === 'vendorId') {
-          query[key] = new Types.ObjectId(filters[key]);
-        } else {
-          query[key] = filters[key];
-        }
-      }
-    });
+    // 2. ID Mapping
+    if (categoryId) filterQuery['category.id'] = new Types.ObjectId(categoryId);
+    if (brandId) filterQuery['brand.id'] = new Types.ObjectId(brandId);
+    if (vendorId) filterQuery.vendorId = new Types.ObjectId(vendorId);
 
-    // Price Range Filter
+    // 3. Price Range
     if (minPrice !== undefined || maxPrice !== undefined) {
-      query['price.basePrice'] = {};
-      if (minPrice !== undefined) query['price.basePrice'].$gte = minPrice;
-      if (maxPrice !== undefined) query['price.basePrice'].$lte = maxPrice;
+      filterQuery['price.basePrice'] = {
+        ...(minPrice !== undefined && { $gte: minPrice }),
+        ...(maxPrice !== undefined && { $lte: maxPrice }),
+      };
     }
 
-    // Sorting
-    let sort: any = { createdAt: -1 };
-    if (sortBy && PRODUCT_SORT_OPTIONS[sortBy]) {
-      sort = PRODUCT_SORT_OPTIONS[sortBy];
-    } else if (sortBy) {
-      sort = { [sortBy]: sortOrder || -1 };
+    const pagination = paginationHelpers.calculatePagination(paginateQueries);
+
+    // 4. Sort Mapping (Presets)
+    if (pagination.sortBy && (PRODUCT_SORT_OPTIONS as any)[pagination.sortBy]) {
+      const sortOption = (PRODUCT_SORT_OPTIONS as any)[pagination.sortBy];
+      const field = Object.keys(sortOption)[0];
+      pagination.sortBy = field;
+      pagination.sortOrder = sortOption[field];
     }
 
-    const total = await this.productModel.countDocuments(query);
-    const products = await this.productModel.find(query)
-      .sort(sort)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec();
-
-    return {
-      data: products,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      }
-    };
+    return await getPaginatedData<ProductDocument>({
+      model: this.productModel,
+      paginationQuery: pagination,
+      filterQuery,
+    });
   }
 
   async findOne(idOrSlug: string): Promise<ProductDocument> {
-    const query = Types.ObjectId.isValid(idOrSlug) 
-      ? { _id: new Types.ObjectId(idOrSlug) } 
+    const query = Types.ObjectId.isValid(idOrSlug)
+      ? { _id: new Types.ObjectId(idOrSlug) }
       : { slug: idOrSlug };
 
-    const product = await this.productModel.findOne({ ...query, isDeleted: false });
+    const product = await this.productModel.findOne({
+      ...query,
+      isDeleted: false,
+    });
     if (!product) {
       throw new NotFoundException('Product not found');
     }
     return product;
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto): Promise<ProductDocument> {
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<ProductDocument> {
+    const updateData: UpdateProductDto & { slug?: string } = {
+      ...updateProductDto,
+    };
+
     if (updateProductDto.title) {
-       // Slug update is usually risky if it changes, maybe only for DRAFT products?
-       // For now, let's allow it but be careful.
-       (updateProductDto as any).slug = generateSlug(updateProductDto.title);
+      updateData.slug = generateSlug(updateProductDto.title);
     }
 
     const product = await this.productModel.findOneAndUpdate(
       { _id: new Types.ObjectId(id), isDeleted: false },
-      { $set: updateProductDto },
-      { new: true }
+      { $set: updateData as UpdateQuery<ProductDocument> },
+      { new: true },
     );
 
     if (!product) {
@@ -169,7 +200,7 @@ export class ProductService {
   async remove(id: string): Promise<void> {
     const result = await this.productModel.updateOne(
       { _id: new Types.ObjectId(id) },
-      { $set: { isDeleted: true, deletedAt: new Date() } }
+      { $set: { isDeleted: true, deletedAt: new Date() } },
     );
 
     if (result.matchedCount === 0) {
@@ -178,12 +209,13 @@ export class ProductService {
   }
 
   async updateStock(productId: string, quantityChange: number): Promise<void> {
-    const product = await this.productModel.findById(new Types.ObjectId(productId));
-    if (!product) return;
-
-    product.stock += quantityChange;
-    product.isInStock = product.stock > 0;
-    product.lastStockSyncAt = new Date();
-    await product.save();
+    await this.inventoryService.adjustStock(productId, {
+      quantity: quantityChange,
+      type:
+        quantityChange > 0
+          ? InventoryTransactionType.RESTOCK
+          : InventoryTransactionType.SALE,
+      reason: 'Manual adjustment via Product Service',
+    });
   }
 }
