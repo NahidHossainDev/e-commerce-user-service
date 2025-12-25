@@ -9,11 +9,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  CreateProductDto,
-  ProductQueryDto,
-  UpdateProductDto,
-} from './dto/product.dto';
+import { ProductQueryDto } from './dto/product-query-options.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { ProductService } from './product.service';
 
 @ApiTags('Products')

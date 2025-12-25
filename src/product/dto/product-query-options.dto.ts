@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
-    IsBoolean,
-    IsEnum,
-    IsMongoId,
-    IsNumber,
-    IsOptional,
-    IsString
+  IsBoolean,
+  IsEnum,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
 } from 'class-validator';
 import { QueryOptions } from '../../common/dto';
 import { ProductStatus } from '../schemas/product.schema';

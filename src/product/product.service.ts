@@ -13,10 +13,7 @@ import { paginationHelpers, pick } from '../utils/helpers';
 import { getPaginatedData } from '../utils/mongodb/getPaginatedData';
 import { generateSKU, generateSlug } from '../utils/product-helper';
 import { ProductQueryDto } from './dto/product-query-options.dto';
-import {
-  CreateProductDto,
-  UpdateProductDto,
-} from './dto/product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import {
   PRODUCT_FILTER_FIELDS,
   PRODUCT_SEARCH_FIELDS,
@@ -123,7 +120,7 @@ export class ProductService {
 
     // 1. Search Logic
     if (searchTerm) {
-      filterQuery.$or = PRODUCT_SEARCH_FIELDS.map((field) => ({
+      filterQuery['$or'] = PRODUCT_SEARCH_FIELDS.map((field) => ({
         [field]: { $regex: searchTerm, $options: 'i' },
       }));
     }
