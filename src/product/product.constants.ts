@@ -1,4 +1,4 @@
-import { ProductQueryDto } from './dto/product.dto';
+import { ProductQueryDto } from './dto/product-query-options.dto';
 export const PRODUCT_FILTER_FIELDS: (keyof ProductQueryDto)[] = [
   'searchTerm',
   'status',

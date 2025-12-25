@@ -12,9 +12,9 @@ import { MediaService } from '../media/media.service';
 import { paginationHelpers, pick } from '../utils/helpers';
 import { getPaginatedData } from '../utils/mongodb/getPaginatedData';
 import { generateSKU, generateSlug } from '../utils/product-helper';
+import { ProductQueryDto } from './dto/product-query-options.dto';
 import {
   CreateProductDto,
-  ProductQueryDto,
   UpdateProductDto,
 } from './dto/product.dto';
 import {
