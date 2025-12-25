@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
-export type CategoryDocument = Category & Document;
+export type CategoryDocument = HydratedDocument<Category>;
 
 @Schema({ timestamps: true })
 export class Category {
+  _id: Types.ObjectId;
+
   @Prop({ required: true, unique: true })
   name: string;
 
@@ -31,6 +33,11 @@ export class Category {
 
   @Prop({ default: 0 })
   productCount: number;
+
+  @Prop({ default: 0 })
+  sortOrder: number;
+
+  children: Category[];
 
   @Prop({ type: Object })
   meta: {

@@ -12,6 +12,7 @@ import {
   categoryFilterableFields,
   categorySearchableFields,
 } from './category.constants';
+import { buildCategoryTree } from './category.utils';
 import { CategoryQueryOptionsDto } from './dto/category-query-options.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -119,6 +120,10 @@ export class CategoryService {
       updateData.slug = slug;
     }
 
+    if (updateCategoryDto.sortOrder !== undefined) {
+      updateData.sortOrder = updateCategoryDto.sortOrder;
+    }
+
     if (updateCategoryDto.parentCategory !== undefined) {
       let newLevel = 0;
       let newPath = ',';
@@ -216,5 +221,26 @@ export class CategoryService {
     }
 
     return deletedCategory;
+  }
+
+  async findAllPublic(): Promise<CategoryDocument[]> {
+    return this.categoryModel.find({ isActive: true }).sort({ sortOrder: 1 }).exec();
+  }
+
+  async getPublicCategoryTree(): Promise<Category[]> {
+    const categories = await this.categoryModel
+      .find({ isActive: true })
+      .sort({ sortOrder: 1 })
+      .exec();
+
+    return buildCategoryTree(categories);
+  }
+
+  async getBySlug(slug: string): Promise<CategoryDocument> {
+    const category = await this.categoryModel.findOne({ slug }).exec();
+    if (!category) {
+      throw new NotFoundException(`Category with slug ${slug} not found`);
+    }
+    return category;
   }
 }
