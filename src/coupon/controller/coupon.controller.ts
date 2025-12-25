@@ -6,15 +6,15 @@ import { CouponValidationDto } from '../dto/coupon.dto';
 
 @ApiTags('Private / Coupons')
 @Controller('coupons')
-export class PrivateCouponController {
+export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
   @Post('validate')
   @UseGuards(OptionalJwtAuthGuard)
-  validateCoupon(@Body() payload: CouponValidationDto, @Req() req) {
+  validateCoupon(@Body() body: CouponValidationDto, @Req() req) {
     if (req.user && req.user._id) {
-      payload.userId = req.user._id.toString();
+      body.userId = req.user._id.toString();
     }
-    return this.couponService.validateCoupon(payload);
+    return this.couponService.validateCoupon(body);
   }
 }

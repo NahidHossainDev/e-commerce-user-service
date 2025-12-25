@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AdminCouponController, PrivateCouponController } from './controller';
+import { AdminCouponController, CouponController } from './controller';
 import { CouponService } from './coupon.service';
 import { CouponUsage, CouponUsageSchema } from './schemas/coupon-usage.schema';
 import { Coupon, CouponSchema } from './schemas/coupon.schema';
@@ -12,7 +12,7 @@ import { Coupon, CouponSchema } from './schemas/coupon.schema';
       { name: CouponUsage.name, schema: CouponUsageSchema },
     ]),
   ],
-  controllers: [AdminCouponController, PrivateCouponController],
+  controllers: [AdminCouponController, CouponController],
   providers: [CouponService],
   exports: [CouponService],
 })
