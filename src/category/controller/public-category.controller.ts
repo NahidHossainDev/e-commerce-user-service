@@ -1,6 +1,6 @@
-import { Controller, Get, Param } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
-import { CategoryService } from "../category.service";
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { CategoryService } from '../category.service';
 
 @ApiTags('Categories')
 @Controller('categories')
