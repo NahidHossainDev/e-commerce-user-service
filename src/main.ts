@@ -22,8 +22,9 @@ function setupSwagger(app: INestApplication) {
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('api/v1/docs', app, document, {
     swaggerOptions: { persistAuthorization: true },
+    useGlobalPrefix: true,
   });
 }
 
@@ -43,13 +44,15 @@ async function bootstrap() {
   // app.startAllMicroservices()
 
   setupSwagger(app);
+  app.setGlobalPrefix('api/v1');
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new GlobalResponseTransformer());
 
   await app.listen(config.port);
 
-  logger.log(`App Started on http://localhost:${config.port}/api`);
+  logger.log(`App Started on http://localhost:${config.port}/api/v1`);
+  logger.log(`Swagger Docs on http://localhost:${config.port}/api/v1/docs`);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
