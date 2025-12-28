@@ -24,3 +24,34 @@ export class AddToCartDto {
   @IsOptional()
   variantSku?: string;
 }
+
+export class UpdateCartItemDto {
+  @ApiProperty()
+  @IsNumber()
+  @Min(1)
+  quantity: number;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  variantSku?: string;
+}
+
+export class ApplyCouponDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  code: string;
+}
+
+export class CheckoutPreviewDto {
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  shippingAddressId?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  paymentMethod?: string;
+}

@@ -20,19 +20,20 @@ export class ProductEventsController {
     const product = await this.productService.findOne(payload.productId);
 
     if (!product || product.status !== ProductStatus.ACTIVE) {
-      return new ProductAvailabilityResult(
-        payload.productId,
-        false,
-        {
+      return new ProductAvailabilityResult({
+        productId: payload.productId,
+        isAvailable: false,
+        price: {
           basePrice: 0,
           discountPrice: 0,
           discountRate: 0,
           currency: DEFAULT_CURRENCY,
         },
-        '',
-        '',
-        'Product not found or inactive',
-      );
+        title: '',
+        thumbnail: '',
+        availableStock: 0,
+        error: 'Product not found or inactive',
+      });
     }
 
     // Check specific variant if requested
@@ -41,72 +42,76 @@ export class ProductEventsController {
         (v) => v.sku === payload.variantSku,
       );
       if (!variant) {
-        return new ProductAvailabilityResult(
-          payload.productId,
-          false,
-          {
+        return new ProductAvailabilityResult({
+          productId: payload.productId,
+          isAvailable: false,
+          price: {
             basePrice: 0,
             discountPrice: 0,
             discountRate: 0,
             currency: DEFAULT_CURRENCY,
           },
-          product.title,
-          product.thumbnail,
-          'Variant not found',
-        );
+          title: product.title,
+          thumbnail: product.thumbnail,
+          availableStock: 0,
+          error: 'Variant not found',
+        });
       }
 
       if (variant.stock < payload.quantity) {
-        return new ProductAvailabilityResult(
-          payload.productId,
-          false,
-          {
+        return new ProductAvailabilityResult({
+          productId: payload.productId,
+          isAvailable: false,
+          price: {
             ...product.price,
             basePrice: variant.additionalPrice
               ? product.price.basePrice + variant.additionalPrice
               : product.price.basePrice,
           },
-          product.title,
-          product.thumbnail,
-          'Not enough stock for variant',
-          payload.variantSku,
-        );
+          title: product.title,
+          thumbnail: product.thumbnail,
+          availableStock: variant.stock,
+          error: 'Not enough stock for variant',
+          variantSku: payload.variantSku,
+        });
       }
 
-      return new ProductAvailabilityResult(
-        payload.productId,
-        true,
-        {
+      return new ProductAvailabilityResult({
+        productId: payload.productId,
+        isAvailable: true,
+        price: {
           ...product.price,
           basePrice: variant.additionalPrice
             ? product.price.basePrice + variant.additionalPrice
             : product.price.basePrice,
         },
-        product.title,
-        product.thumbnail,
-        undefined,
-        payload.variantSku,
-      );
+        title: product.title,
+        thumbnail: product.thumbnail,
+        availableStock: variant.stock,
+        variantSku: payload.variantSku,
+      });
     }
 
     // Check main product stock
     if (product.stock < payload.quantity) {
-      return new ProductAvailabilityResult(
-        payload.productId,
-        false,
-        product.price,
-        product.title,
-        product.thumbnail,
-        'Not enough stock',
-      );
+      return new ProductAvailabilityResult({
+        productId: payload.productId,
+        isAvailable: false,
+        price: product.price,
+        title: product.title,
+        thumbnail: product.thumbnail,
+        availableStock: product.stock,
+        error: 'Not enough stock',
+      });
     }
 
-    return new ProductAvailabilityResult(
-      payload.productId,
-      true,
-      product.price,
-      product.title,
-      product.thumbnail,
-    );
+    return new ProductAvailabilityResult({
+      productId: payload.productId,
+      isAvailable: true,
+      price: product.price,
+      title: product.title,
+      thumbnail: product.thumbnail,
+      availableStock: product.stock,
+    });
   }
 }
