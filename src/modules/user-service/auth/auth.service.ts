@@ -7,12 +7,13 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { config } from 'src/config';
-import { AccountStatus, UserRole } from 'src/modules/user-service/user/user.schema';
 import { UserService } from 'src/modules/user-service/user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
 import { NotificationService } from 'src/modules/communication-service/notification/notification.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
+import { AccountStatus, UserRole } from '../user/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -22,10 +23,10 @@ export class AuthService {
     private notificationService: NotificationService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
-    const { phoneNumber, password, fullName } = registerDto;
+  async register(payload: RegisterDto) {
+    const { phoneNumber, password, fullName } = payload;
 
-    const email = registerDto.email?.trim().toLowerCase();
+    const email = payload.email?.trim().toLowerCase();
 
     if (!email && !phoneNumber) {
       throw new BadRequestException('Email or Phone Number is required');
@@ -51,18 +52,21 @@ export class AuthService {
       100000 + Math.random() * 900000,
     ).toString(); // 6 digit OTP
 
-    const newUser = await this.userService.create({
-      ...registerDto,
-      email,
+    const userPayload = {
+      ...payload,
+      email: email || '',
+      phoneNumber: phoneNumber || '',
+      password,
       profile: { fullName },
       accountStatus: AccountStatus.PENDING,
       primaryRole: UserRole.CUSTOMER,
-      password,
       verification: {
         emailVerificationToken: email ? verificationToken : undefined,
         phoneVerificationToken: phoneNumber ? verificationToken : undefined,
       },
-    } as any);
+    };
+
+    const newUser = await this.userService.create(userPayload as CreateUserDto);
 
     if (email) {
       await this.notificationService.sendEmailVerification(

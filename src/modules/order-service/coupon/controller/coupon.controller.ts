@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { OptionalJwtAuthGuard } from 'src/modules/user-service/auth/guards/optional-jwt-auth.guard';
+import { OptionalJwtAuthGuard } from 'src/common/guards/optional-jwt-auth.guard';
 import { CouponService } from '../coupon.service';
 import { CouponValidationDto } from '../dto/coupon.dto';
 

@@ -8,8 +8,10 @@ import {
   Post,
   Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { OptionalJwtAuthGuard } from 'src/common/guards/optional-jwt-auth.guard';
 import { CartService } from '../cart.service';
 import {
   AddToCartDto,
@@ -20,6 +22,8 @@ import {
 
 @ApiTags('Cart')
 @Controller('cart')
+@ApiBearerAuth()
+@UseGuards(OptionalJwtAuthGuard)
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 

@@ -1,9 +1,24 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/modules/user-service/auth/decorators/roles.decorator';
+import { UserRole } from 'src/modules/user-service/user/user.schema';
 import { CartService } from '../cart.service';
 import { UpdateCartItemDto } from '../dto/cart.dto';
 
 @ApiTags('Admin-Cart')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
 @Controller('admin/carts')
 export class AdminCartController {
   constructor(private readonly cartService: CartService) {}

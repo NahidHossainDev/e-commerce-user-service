@@ -10,9 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/modules/user-service/auth/decorators/roles.decorator';
-import { JwtAuthGuard } from 'src/modules/user-service/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/modules/user-service/auth/guards/roles.guard';
 import { UserRole } from 'src/modules/user-service/user/user.schema';
 import { CouponService } from '../coupon.service';
 import { CreateCouponDto } from '../dto/coupon.dto';
