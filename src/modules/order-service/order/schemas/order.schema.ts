@@ -31,6 +31,9 @@ export class OrderItem {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true })
+  thumbnail: string;
+
   @Prop()
   variantSku: string;
 
@@ -66,6 +69,12 @@ export class BillingInfo {
 
   @Prop({ default: PaymentStatus.PENDING, enum: PaymentStatus })
   paymentStatus: string;
+
+  @Prop({ required: true })
+  paymentMethod: string;
+
+  @Prop({ default: 0 })
+  walletCashAppliedAmount: number;
 }
 
 @Schema({ timestamps: true, collection: 'orders' })
@@ -110,6 +119,15 @@ export class Order {
 
   @Prop()
   cancellationReason: string;
+
+  @Prop({ default: false })
+  hasRefund: boolean;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Refund' }], default: [] })
+  refundIds: Types.ObjectId[];
+
+  @Prop({ default: 0, min: 0 })
+  totalRefundedAmount: number;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
