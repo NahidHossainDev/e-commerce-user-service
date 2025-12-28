@@ -19,7 +19,7 @@ import {
   CheckoutPreviewDto,
   UpdateCartItemDto,
 } from './dto/cart.dto';
-import { Cart, CartDocument } from './schemas/cart.schema';
+import { Cart, CartDocument, CartItem } from './schemas/cart.schema';
 
 @Injectable()
 export class CartService {
@@ -85,18 +85,18 @@ export class CartService {
       existingItem.quantity += payload.quantity;
       existingItem.availableStock = result.availableStock;
     } else {
-      cart.items.push({
+      const item: CartItem = {
         productId: new Types.ObjectId(payload.productId),
         productName: result.title,
         productThumbnail: result.thumbnail,
+        price: result.price,
+        availableStock: result.availableStock,
         variantSku: payload.variantSku,
         quantity: payload.quantity,
-        price: {
-          ...result.price,
-        },
         addedAt: new Date(),
-        availableStock: result.availableStock,
-      } as any);
+        isOutOfStock: false,
+      };
+      cart.items.push(item);
     }
 
     await this.calculateTotals(cart);
@@ -256,11 +256,10 @@ export class CartService {
 
       if (!result || !result.isAvailable) {
         item.isOutOfStock = true;
-        item.availableStock = 0;
+        item.availableStock = result.availableStock;
       } else {
         item.isOutOfStock = false;
         item.availableStock = result.availableStock;
-        // Update price if changed
         item.price = result.price;
       }
     }
