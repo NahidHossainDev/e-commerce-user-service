@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CategoryService } from './category.service';
-import { AdminCategoryController, PublicCategoryController } from './controller';
+import {
+  AdminCategoryController,
+  PublicCategoryController,
+} from './controller';
 import { Category, CategorySchema } from './schemas/category.schema';
 
 @Module({

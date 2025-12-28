@@ -21,7 +21,6 @@ import { UserServiceModule } from './modules/user-service/user-service.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService<Config>) => ({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         uri: configService.getOrThrow<string>('dbURL'),
       }),
       inject: [ConfigService],

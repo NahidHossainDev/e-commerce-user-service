@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
-import { AccountStatus, UserRole } from 'src/modules/user-service/user/user.schema';
+import {
+  AccountStatus,
+  UserRole,
+} from 'src/modules/user-service/user/user.schema';
 
 @Exclude()
 export class AuthUserResponseDto {

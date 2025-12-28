@@ -3,12 +3,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { InventoryController } from './inventory.controller';
 import { InventoryService } from './inventory.service';
 import {
-    ProductInventoryHistory,
-    ProductInventoryHistorySchema,
+  ProductInventoryHistory,
+  ProductInventoryHistorySchema,
 } from './schemas/inventory-history.schema';
 import {
-    ProductInventory,
-    ProductInventorySchema,
+  ProductInventory,
+  ProductInventorySchema,
 } from './schemas/inventory.schema';
 
 import { Product, ProductSchema } from '../product/schemas/product.schema';

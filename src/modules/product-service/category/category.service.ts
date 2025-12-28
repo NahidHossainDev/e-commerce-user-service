@@ -224,7 +224,10 @@ export class CategoryService {
   }
 
   async findAllPublic(): Promise<CategoryDocument[]> {
-    return this.categoryModel.find({ isActive: true }).sort({ sortOrder: 1 }).exec();
+    return this.categoryModel
+      .find({ isActive: true })
+      .sort({ sortOrder: 1 })
+      .exec();
   }
 
   async getPublicCategoryTree(): Promise<Category[]> {

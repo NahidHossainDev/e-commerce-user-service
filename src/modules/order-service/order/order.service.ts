@@ -27,8 +27,6 @@ export class OrderService {
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
-  // --- Order Placement ---
-
   async checkout(userId: string, payload: CheckoutDto): Promise<OrderDocument> {
     const cart = await this.cartService.getCart(userId);
     if (!cart || cart.items.length === 0) {
