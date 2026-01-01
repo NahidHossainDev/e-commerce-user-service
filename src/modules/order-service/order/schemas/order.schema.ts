@@ -23,6 +23,22 @@ export enum OrderStatus {
   REFUNDED = 'REFUNDED',
 }
 
+export enum PaymentMethod {
+  CASH_ON_DELIVERY = 'CASH_ON_DELIVERY',
+  MFS = 'MFS',
+  SSL = 'SSL',
+  WALLET = 'WALLET',
+}
+
+export enum PaymentProvider {
+  BKASH = 'BKASH',
+  NAGAD = 'NAGAD',
+  ROCKET = 'ROCKET',
+  SSL_COMMERZ = 'SSL_COMMERZ',
+  INTERNAL_WALLET = 'INTERNAL_WALLET',
+  COD = 'COD',
+}
+
 @Schema({ _id: false })
 export class OrderItem {
   @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
@@ -55,8 +71,8 @@ export class BillingInfo {
   @Prop({ default: 0 })
   discount: number;
 
-  @Prop()
-  couponCode: string;
+  @Prop({ type: Types.ObjectId, ref: 'Coupon', required: false })
+  appliedCouponId?: Types.ObjectId;
 
   @Prop({ default: 0 })
   couponDiscount: number;
@@ -67,14 +83,29 @@ export class BillingInfo {
   @Prop({ required: true, min: 0 })
   payableAmount: number;
 
-  @Prop({ default: PaymentStatus.PENDING, enum: PaymentStatus })
-  paymentStatus: string;
-
-  @Prop({ required: true })
-  paymentMethod: string;
+  @Prop({ default: 0 })
+  walletUsed: number;
 
   @Prop({ default: 0 })
-  walletCashAppliedAmount: number;
+  cashbackUsed: number;
+
+  @Prop({ enum: PaymentMethod, required: false })
+  paymentMethod?: PaymentMethod;
+
+  @Prop({ enum: PaymentProvider, required: false })
+  paymentProvider?: PaymentProvider;
+
+  @Prop({ default: PaymentStatus.PENDING, enum: PaymentStatus })
+  paymentStatus: PaymentStatus;
+
+  @Prop()
+  paymentTransactionId?: string;
+
+  @Prop()
+  paymentFailureReason?: string;
+
+  @Prop({ default: 0 })
+  paymentAttempt: number;
 }
 
 @Schema({ timestamps: true, collection: 'orders' })

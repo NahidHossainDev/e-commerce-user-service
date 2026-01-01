@@ -4,8 +4,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, Types } from 'mongoose';
+import {
+  InventoryAdjustEvent,
+  InventoryEvents,
+} from 'src/common/events/inventory.events';
 import { Product, ProductDocument } from '../product/schemas/product.schema';
 import {
   AdjustStockDto,
@@ -214,5 +219,20 @@ export class InventoryService {
       );
     }
     return inventory;
+  }
+
+  @OnEvent(InventoryEvents.ADJUST_STOCK)
+  async handleAdjustStock(payload: InventoryAdjustEvent) {
+    return this.adjustStock(
+      payload.productId,
+      {
+        quantity: payload.quantity,
+        type: payload.type as any,
+        variantSku: payload.variantSku,
+        referenceId: payload.referenceId,
+        reason: payload.reason,
+      },
+      payload.session,
+    );
   }
 }

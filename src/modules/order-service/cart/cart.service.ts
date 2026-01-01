@@ -11,11 +11,8 @@ import {
   ProductCheckAvailabilityEvent,
   ProductEvents,
 } from 'src/common/events/product.events';
-import { CouponService } from '../coupon/coupon.service';
-import { DiscountType } from '../coupon/schemas/coupon.schema';
 import {
   AddToCartDto,
-  ApplyCouponDto,
   CheckoutPreviewDto,
   UpdateCartItemDto,
 } from './dto/cart.dto';
@@ -26,7 +23,6 @@ export class CartService {
   constructor(
     @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
     private readonly eventEmitter: EventEmitter2,
-    private readonly couponService: CouponService,
   ) {}
 
   async getCart(userId: string): Promise<CartDocument> {
@@ -95,11 +91,12 @@ export class CartService {
         quantity: payload.quantity,
         addedAt: new Date(),
         isOutOfStock: false,
+        isSelected: true,
       };
       cart.items.push(item);
     }
 
-    await this.calculateTotals(cart);
+    this.calculateTotals(cart);
     return cart.save();
   }
 
@@ -139,7 +136,7 @@ export class CartService {
     item.quantity = dto.quantity;
     item.isOutOfStock = false;
 
-    await this.calculateTotals(cart);
+    this.calculateTotals(cart);
     return cart.save();
   }
 
@@ -156,35 +153,7 @@ export class CartService {
           (!variantSku || item.variantSku === variantSku)
         ),
     );
-    await this.calculateTotals(cart);
-    return cart.save();
-  }
-
-  async applyCoupon(
-    userId: string,
-    dto: ApplyCouponDto,
-  ): Promise<CartDocument> {
-    const cart = await this.getCart(userId);
-
-    // Validate coupon
-    const coupon = await this.couponService.validateCoupon({
-      code: dto.code,
-      userId,
-      orderAmount: cart.totalAmount,
-    });
-
-    // Apply coupon
-    cart.appliedCouponId = coupon._id;
-
-    await this.calculateTotals(cart);
-    return cart.save();
-  }
-
-  async removeCoupon(userId: string): Promise<CartDocument> {
-    const cart = await this.getCart(userId);
-    cart.appliedCouponId = undefined;
-
-    await this.calculateTotals(cart);
+    this.calculateTotals(cart);
     return cart.save();
   }
 
@@ -221,7 +190,7 @@ export class CartService {
     }
 
     // Recalculate totals to ensure accuracy
-    await this.calculateTotals(cart);
+    this.calculateTotals(cart);
 
     return cart;
   }
@@ -236,7 +205,6 @@ export class CartService {
             totalAmount: 0,
             totalDiscount: 0,
             payableAmount: 0,
-            appliedCouponId: null,
           },
         },
       )
@@ -264,14 +232,14 @@ export class CartService {
       }
     }
 
-    await this.calculateTotals(cart);
+    this.calculateTotals(cart);
     await cart.save();
   }
 
-  private async calculateTotals(cart: CartDocument): Promise<void> {
+  private calculateTotals(cart: CartDocument): void {
     // Calculate subtotal from items
     cart.totalAmount = cart.items.reduce((acc, item) => {
-      if (item.isOutOfStock) return acc; // Don't include out of stock items
+      if (item.isOutOfStock || !item.isSelected) return acc; // Don't include out of stock or unselected items
       return acc + (item.price.basePrice || 0) * item.quantity;
     }, 0);
 
@@ -279,7 +247,7 @@ export class CartService {
 
     // Apply item-level discounts
     const itemDiscountedTotal = cart.items.reduce((acc, item) => {
-      if (item.isOutOfStock) return acc;
+      if (item.isOutOfStock || !item.isSelected) return acc;
       const unitPrice =
         item.price.discountPrice && item.price.discountPrice > 0
           ? item.price.discountPrice
@@ -290,36 +258,7 @@ export class CartService {
     const itemLevelDiscount = cart.totalAmount - itemDiscountedTotal;
     discountedTotal = itemDiscountedTotal;
 
-    // Apply coupon discount if exists
-    let couponDiscount = 0;
-    if (cart.appliedCouponId) {
-      try {
-        const coupon = await this.couponService.findById(
-          cart.appliedCouponId.toString(),
-        );
-
-        if (coupon.discountType === DiscountType.PERCENTAGE.toString()) {
-          couponDiscount = (discountedTotal * coupon.discountValue) / 100;
-          if (
-            coupon.maxDiscountAmount &&
-            couponDiscount > coupon.maxDiscountAmount
-          ) {
-            couponDiscount = coupon.maxDiscountAmount;
-          }
-        } else if (
-          coupon.discountType === DiscountType.FIXED_AMOUNT.toString()
-        ) {
-          couponDiscount = Math.min(coupon.discountValue, discountedTotal);
-        }
-
-        discountedTotal -= couponDiscount;
-      } catch {
-        // If coupon is invalid, remove it
-        cart.appliedCouponId = undefined;
-      }
-    }
-
-    cart.totalDiscount = itemLevelDiscount + couponDiscount;
+    cart.totalDiscount = itemLevelDiscount;
     cart.payableAmount = Math.max(0, discountedTotal);
   }
 }

@@ -37,13 +37,6 @@ export class UpdateCartItemDto {
   variantSku?: string;
 }
 
-export class ApplyCouponDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  code: string;
-}
-
 export class CheckoutPreviewDto {
   @ApiProperty({ required: false })
   @IsString()

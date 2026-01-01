@@ -1,6 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import {
+  AddressValidateEvent,
+  AddressValidationResult,
+  UserEvents,
+} from 'src/common/events/user.events';
 import { Address, AddressDocument } from './address.schema';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -78,5 +84,21 @@ export class AddressService {
 
     if (!updated) throw new Error('Address not found');
     return updated;
+  }
+
+  @OnEvent(UserEvents.VALIDATE_ADDRESS)
+  async validateAddressOwnership(
+    payload: AddressValidateEvent,
+  ): Promise<AddressValidationResult> {
+    const address = await this.addressModel.findById(payload.addressId);
+    if (!address) {
+      return { isValid: false, error: 'Address not found' };
+    }
+
+    if (address.userId.toString() !== payload.userId) {
+      return { isValid: false, error: 'Address does not belong to user' };
+    }
+
+    return { isValid: true };
   }
 }

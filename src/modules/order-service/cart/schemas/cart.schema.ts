@@ -32,6 +32,9 @@ export class CartItem {
 
   @Prop({ default: 0 })
   availableStock: number;
+
+  @Prop({ default: true })
+  isSelected: boolean;
 }
 
 @Schema({ timestamps: true, collection: 'carts' })
@@ -47,9 +50,6 @@ export class Cart {
 
   @Prop({ type: [CartItem], default: [] })
   items: CartItem[];
-
-  @Prop({ type: Types.ObjectId, ref: 'Coupon', required: false })
-  appliedCouponId?: Types.ObjectId;
 
   @Prop({ default: 0 })
   totalAmount: number;

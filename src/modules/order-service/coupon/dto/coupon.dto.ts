@@ -65,10 +65,15 @@ export class CreateCouponDto {
 }
 
 export class CouponValidationDto {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
-  @IsNotEmpty()
-  code: string;
+  @IsOptional()
+  code?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  couponId?: string;
 
   @ApiProperty({ required: false })
   @IsString()

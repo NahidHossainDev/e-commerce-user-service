@@ -79,7 +79,14 @@ export class CouponService {
     return coupon;
   }
 
-  async findByActiveCode(code: string): Promise<CouponDocument> {
+  async findActiveCouponById(id: string): Promise<CouponDocument> {
+    const coupon = await this.couponModel.findById(id);
+    if (!coupon) throw new NotFoundException('Coupon not found');
+    if (!coupon.isActive) throw new NotFoundException('Coupon is inactive');
+    return coupon;
+  }
+
+  async findActiveCouponByCode(code: string): Promise<CouponDocument> {
     const coupon = await this.couponModel.findOne({
       code: code.toUpperCase(),
       isActive: true,
@@ -111,8 +118,15 @@ export class CouponService {
   }
 
   async validateCoupon(payload: CouponValidationDto): Promise<CouponDocument> {
-    const { code, userId, orderAmount } = payload;
-    const coupon = await this.findByActiveCode(code);
+    const { code, couponId, userId, orderAmount } = payload;
+    const coupon = code
+      ? await this.findActiveCouponByCode(code)
+      : couponId
+        ? await this.findActiveCouponById(couponId)
+        : null;
+
+    if (!coupon) throw new NotFoundException('Coupon not found');
+
     const now = new Date();
 
     if (now < coupon.validFrom)
