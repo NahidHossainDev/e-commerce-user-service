@@ -2,11 +2,13 @@ export interface IPaginationQuery {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 1 | -1;
+  sortOrder?: 'asc' | 'desc';
 }
 
-export interface IPaginateCalculateResult extends Required<IPaginationQuery> {
+export interface IPaginateCalculateResult
+  extends Required<Omit<IPaginationQuery, 'sortOrder'>> {
   skip: number;
+  sortOrder: 1 | -1;
 }
 
 export interface IPaginatedResponse<T> {
