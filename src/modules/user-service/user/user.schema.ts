@@ -5,13 +5,10 @@ import { config } from 'src/config';
 
 export type UserDocument = HydratedDocument<User>;
 
+import { UserRole } from 'src/common/interface';
+export { UserRole };
+
 // ---------- ENUMS ----------
-export enum UserRole {
-  CUSTOMER = 'CUSTOMER',
-  SELLER = 'SELLER',
-  ADMIN = 'ADMIN',
-  SUPER_ADMIN = 'SUPER_ADMIN',
-}
 
 export enum RoleStatus {
   ACTIVE = 'ACTIVE',
