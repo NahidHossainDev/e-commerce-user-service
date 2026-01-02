@@ -51,7 +51,7 @@ export class CategoryService {
         throw new NotFoundException('Parent category not found');
       }
       level = parent.level + 1;
-      path = `${parent.path}${parent._id},`;
+      path = `${parent.path}${parent._id.toString()},`;
 
       if (level > 3) {
         throw new ConflictException('Category depth cannot exceed 3 levels');
@@ -147,7 +147,7 @@ export class CategoryService {
         }
 
         newLevel = parent.level + 1;
-        newPath = `${parent.path}${parent._id},`;
+        newPath = `${parent.path}${parent._id.toString()},`;
 
         if (newLevel > 3) {
           throw new ConflictException('Category depth cannot exceed 3 levels');
@@ -158,8 +158,8 @@ export class CategoryService {
       if (
         category.parentCategory?.toString() !== updateCategoryDto.parentCategory
       ) {
-        const oldPath = `${category.path}${category._id},`;
-        const nextPath = `${newPath}${category._id},`;
+        const oldPath = `${category.path}${category._id.toString()},`;
+        const nextPath = `${newPath}${category._id.toString()},`;
 
         // Update current category and all descendants
         await this.categoryModel.updateMany(
