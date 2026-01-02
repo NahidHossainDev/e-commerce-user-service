@@ -9,15 +9,14 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { OrderStatus, PaymentProvider } from '../schemas/order.schema';
+import {
+  OrderStatus,
+  PaymentMethod,
+  PaymentProvider,
+  PaymentStatus,
+} from '../schemas/order.schema';
 
 // --- Order DTOs ---
-
-export enum PaymentMethod {
-  CASH_ON_DELIVERY = 'CASH_ON_DELIVERY',
-  ONLINE = 'ONLINE',
-  WALLET = 'WALLET',
-}
 
 export class PaymentIntentDto {
   @IsEnum(PaymentMethod)
@@ -73,4 +72,27 @@ export class UpdateOrderStatusDto {
   @IsString()
   @IsOptional()
   reason?: string;
+}
+
+export class UpdatePaymentStatusDto {
+  @ApiProperty({ enum: PaymentStatus })
+  @IsEnum(PaymentStatus)
+  status: PaymentStatus;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  transactionId?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  failureReason?: string;
+}
+
+export class CancelOrderDto {
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  reason: string;
 }

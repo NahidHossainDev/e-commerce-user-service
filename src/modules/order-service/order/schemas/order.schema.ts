@@ -128,7 +128,7 @@ export class Order {
     default: OrderStatus.PENDING,
     index: true,
   })
-  status: string;
+  status: OrderStatus;
 
   @Prop({ required: true })
   billingInfo: BillingInfo;

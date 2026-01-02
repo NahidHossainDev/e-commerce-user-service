@@ -6,6 +6,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model, Types } from 'mongoose';
+import { paginateOptions } from 'src/common/constants';
 import {
   InventoryAdjustEvent,
   InventoryEvents,
@@ -16,16 +17,26 @@ import {
   AddressValidationResult,
   UserEvents,
 } from 'src/common/events/user.events';
+import { IPaginatedResponse } from 'src/common/interface';
 import { CartService } from 'src/modules/order-service/cart/cart.service';
 import { CartDocument } from 'src/modules/order-service/cart/schemas/cart.schema';
 import { CouponService } from 'src/modules/order-service/coupon/coupon.service';
 import { CouponDocument } from 'src/modules/order-service/coupon/schemas/coupon.schema';
+import { paginationHelpers, pick } from 'src/utils/helpers';
+import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
 import { DiscountType } from '../coupon/schemas/coupon.schema';
 import {
   ApplyCouponDto,
+  CancelOrderDto,
   CheckoutDto,
   UpdateOrderStatusDto,
+  UpdatePaymentStatusDto,
 } from './dto/order.dto';
+import { OrderQueryOptions } from './dto/order.query-options.dto';
+import {
+  orderFilterableFields,
+  orderSearchableFields,
+} from './order.constants';
 import { OrderCreatedEvent, OrderEvents } from './order.events';
 import {
   BillingInfo,
@@ -106,7 +117,7 @@ export class OrderService {
         status: OrderStatus.PENDING,
         billingInfo: {
           ...billingInfo,
-          paymentMethod: payload.paymentIntent.method as any,
+          paymentMethod: payload.paymentIntent.method,
           paymentProvider: payload.paymentIntent.provider,
         },
         placedAt: new Date(),
@@ -164,7 +175,7 @@ export class OrderService {
         timestamp: new Date(),
       };
 
-      this.eventEmitter.emit(OrderEvents.ORDER_CREATED, event);
+      void this.eventEmitter.emit(OrderEvents.ORDER_CREATED, event);
 
       await session.commitTransaction();
       return savedOrder;
@@ -184,13 +195,28 @@ export class OrderService {
     if (!order) throw new NotFoundException('Order not found');
 
     order.status = dto.status;
-    if (dto.status === OrderStatus.CANCELLED) {
-      order.cancelledAt = new Date();
-      order.cancellationReason = dto.reason || 'No reason provided';
+
+    // Update timestamps based on status
+    const now = new Date();
+    switch (dto.status) {
+      case OrderStatus.CONFIRMED:
+        order.confirmedAt = now;
+        break;
+      case OrderStatus.SHIPPED:
+        order.shippedAt = now;
+        break;
+      case OrderStatus.DELIVERED:
+        order.deliveredAt = now;
+        order.billingInfo.paymentStatus = PaymentStatus.PAID; // Assuming COD becomes PAID on delivery
+        break;
+      case OrderStatus.CANCELLED:
+        order.cancelledAt = now;
+        order.cancellationReason = dto.reason || 'No reason provided';
+        break;
     }
 
     const updatedOrder = await order.save();
-    this.eventEmitter.emit(OrderEvents.ORDER_STATUS_UPDATED, {
+    void this.eventEmitter.emit(OrderEvents.ORDER_STATUS_UPDATED, {
       orderId: updatedOrder.orderId,
       status: updatedOrder.status,
     });
@@ -198,16 +224,192 @@ export class OrderService {
     return updatedOrder;
   }
 
-  async findAllByUser(userId: string): Promise<OrderDocument[]> {
-    return this.orderModel
-      .find({ userId: new Types.ObjectId(userId) })
-      .sort({ createdAt: -1 });
+  async findAll(
+    query: OrderQueryOptions,
+  ): Promise<IPaginatedResponse<OrderDocument>> {
+    const paginateQueries: any = pick(query, paginateOptions);
+    if (paginateQueries.sortOrder) {
+      paginateQueries.sortOrder = paginateQueries.sortOrder === 'asc' ? 1 : -1;
+    }
+
+    const { searchTerm, ...remainingFilters } = query;
+
+    const filterQuery = {};
+
+    if (searchTerm) {
+      filterQuery['$or'] = orderSearchableFields.map((field) => ({
+        [field]: { $regex: searchTerm, $options: 'i' },
+      }));
+    }
+
+    if (Object.keys(remainingFilters).length) {
+      Object.entries(remainingFilters).forEach(([key, value]) => {
+        if (orderFilterableFields.includes(key) && value) {
+          filterQuery[key] = value;
+        }
+      });
+    }
+
+    // Special handling for nested paymentStatus in remainingFilters if passed as such,
+    // but DTO maps it to top level. Let's ensure it maps correctly to billingInfo.paymentStatus
+    if (query.paymentStatus) {
+      delete filterQuery['paymentStatus'];
+      filterQuery['billingInfo.paymentStatus'] = query.paymentStatus;
+    }
+
+    const pagination = paginationHelpers.calculatePagination(paginateQueries);
+
+    const result = await getPaginatedData<OrderDocument>({
+      model: this.orderModel,
+      paginationQuery: pagination,
+      filterQuery,
+    });
+
+    // Populate data
+    result.data = (await this.orderModel.populate(result.data, [
+      { path: 'userId' },
+      { path: 'addressId' },
+    ])) as any;
+
+    return result;
+  }
+
+  async findAllByUser(
+    userId: string,
+    query: OrderQueryOptions,
+  ): Promise<IPaginatedResponse<OrderDocument>> {
+    query.userId = userId;
+    return this.findAll(query);
   }
 
   async findOne(id: string): Promise<OrderDocument> {
-    const order = await this.orderModel.findById(id);
+    const order = await this.orderModel
+      .findById(id)
+      .populate(['userId', 'addressId']);
     if (!order) throw new NotFoundException('Order not found');
     return order;
+  }
+
+  async getOrderByOrderId(
+    userId: string,
+    orderId: string,
+  ): Promise<OrderDocument> {
+    const order = await this.orderModel
+      .findOne({ orderId, userId: new Types.ObjectId(userId) })
+      .populate(['userId', 'addressId']);
+    if (!order) throw new NotFoundException('Order not found');
+    return order;
+  }
+
+  async updatePaymentStatus(
+    id: string,
+    dto: UpdatePaymentStatusDto,
+  ): Promise<OrderDocument> {
+    const order = await this.orderModel.findById(id);
+    if (!order) throw new NotFoundException('Order not found');
+
+    order.billingInfo.paymentStatus = dto.status;
+    if (dto.transactionId) {
+      order.billingInfo.paymentTransactionId = dto.transactionId;
+    }
+    if (dto.failureReason) {
+      order.billingInfo.paymentFailureReason = dto.failureReason;
+    }
+
+    if (dto.status === PaymentStatus.PAID) {
+      // If payment is successful and order is PENDING, we might want to move it to CONFIRMED
+      if (order.status === OrderStatus.PENDING) {
+        order.status = OrderStatus.CONFIRMED;
+        order.confirmedAt = new Date();
+      }
+    }
+
+    const updatedOrder = await order.save();
+    void this.eventEmitter.emit(OrderEvents.ORDER_STATUS_UPDATED, {
+      orderId: updatedOrder.orderId,
+      status: updatedOrder.status,
+      paymentStatus: updatedOrder.billingInfo.paymentStatus,
+    });
+
+    return updatedOrder;
+  }
+
+  async cancelOrder(
+    userId: string,
+    orderId: string,
+    dto: CancelOrderDto,
+  ): Promise<OrderDocument> {
+    const order = await this.orderModel.findOne({
+      orderId,
+      userId: new Types.ObjectId(userId),
+    });
+    if (!order) throw new NotFoundException('Order not found');
+
+    // Only allow cancellation if order is PENDING or CONFIRMED
+    const cancellableStatuses = [OrderStatus.PENDING, OrderStatus.CONFIRMED];
+    if (!cancellableStatuses.includes(order.status)) {
+      throw new BadRequestException(
+        `Order cannot be cancelled in ${order.status} status`,
+      );
+    }
+
+    return this.updateStatus(order._id as string, {
+      status: OrderStatus.CANCELLED,
+      reason: dto.reason,
+    });
+  }
+
+  async getStats(): Promise<any> {
+    const stats = await this.orderModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $eq: ['$billingInfo.paymentStatus', PaymentStatus.PAID] },
+                '$billingInfo.payableAmount',
+                0,
+              ],
+            },
+          },
+          pendingOrders: {
+            $sum: { $cond: [{ $eq: ['$status', OrderStatus.PENDING] }, 1, 0] },
+          },
+          confirmedOrders: {
+            $sum: {
+              $cond: [{ $eq: ['$status', OrderStatus.CONFIRMED] }, 1, 0],
+            },
+          },
+          shippedOrders: {
+            $sum: { $cond: [{ $eq: ['$status', OrderStatus.SHIPPED] }, 1, 0] },
+          },
+          deliveredOrders: {
+            $sum: {
+              $cond: [{ $eq: ['$status', OrderStatus.DELIVERED] }, 1, 0],
+            },
+          },
+          cancelledOrders: {
+            $sum: {
+              $cond: [{ $eq: ['$status', OrderStatus.CANCELLED] }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+
+    return (
+      stats[0] || {
+        totalOrders: 0,
+        totalRevenue: 0,
+        pendingOrders: 0,
+        confirmedOrders: 0,
+        shippedOrders: 0,
+        deliveredOrders: 0,
+        cancelledOrders: 0,
+      }
+    );
   }
 
   async applyCoupon(userId: string, dto: ApplyCouponDto): Promise<BillingInfo> {
@@ -238,7 +440,7 @@ export class OrderService {
     const deliveryCharge = 0; // TODO: Implement delivery charge logic if needed
 
     if (coupon) {
-      if (coupon.discountType === DiscountType.PERCENTAGE.toString()) {
+      if (coupon.discountType === DiscountType.PERCENTAGE) {
         couponDiscount = (totalAmount * coupon.discountValue) / 100;
         if (
           coupon.maxDiscountAmount &&
@@ -246,7 +448,7 @@ export class OrderService {
         ) {
           couponDiscount = coupon.maxDiscountAmount;
         }
-      } else if (coupon.discountType === DiscountType.FIXED_AMOUNT.toString()) {
+      } else if (coupon.discountType === DiscountType.FIXED_AMOUNT) {
         couponDiscount = Math.min(coupon.discountValue, totalAmount);
       }
     }
