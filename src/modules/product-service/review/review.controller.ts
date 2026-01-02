@@ -10,14 +10,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CurrentUser, Roles } from 'src/common/decorators';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { CurrentUser } from 'src/modules/user-service/auth/decorators/current-user.decorator';
-import { Roles } from 'src/modules/user-service/auth/decorators/roles.decorator';
-import {
-  UserDocument,
-  UserRole,
-} from 'src/modules/user-service/user/user.schema';
+import { IAuthUser, UserRole } from 'src/common/interface';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewQueryOptionsDto } from './dto/review-query-options.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -33,13 +29,10 @@ export class ReviewController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async create(
-    @CurrentUser() user: UserDocument,
+    @CurrentUser() user: IAuthUser,
     @Body() createReviewDto: CreateReviewDto,
   ) {
-    return await this.reviewService.create(
-      user._id.toString(),
-      createReviewDto,
-    );
+    return await this.reviewService.create(user.id, createReviewDto);
   }
 
   @Get()
@@ -64,13 +57,9 @@ export class ReviewController {
   async update(
     @Param('id') id: string,
     @Body() updateReviewDto: UpdateReviewDto,
-    @CurrentUser() admin: UserDocument,
+    @CurrentUser() admin: IAuthUser,
   ) {
-    return await this.reviewService.update(
-      id,
-      updateReviewDto,
-      admin._id.toString(),
-    );
+    return await this.reviewService.update(id, updateReviewDto, admin.id);
   }
 
   @Delete(':id')
@@ -86,9 +75,9 @@ export class ReviewController {
   @UseGuards(JwtAuthGuard)
   async vote(
     @Param('id') id: string,
-    @CurrentUser() user: UserDocument,
+    @CurrentUser() user: IAuthUser,
     @Body('voteType') voteType: VoteType,
   ) {
-    return await this.reviewService.vote(id, user._id.toString(), voteType);
+    return await this.reviewService.vote(id, user.id, voteType);
   }
 }
