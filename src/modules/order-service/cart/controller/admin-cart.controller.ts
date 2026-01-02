@@ -8,9 +8,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/modules/user-service/auth/decorators/roles.decorator';
 import { UserRole } from 'src/modules/user-service/user/user.schema';
 import { CartService } from '../cart.service';
 import { UpdateCartItemDto } from '../dto/cart.dto';

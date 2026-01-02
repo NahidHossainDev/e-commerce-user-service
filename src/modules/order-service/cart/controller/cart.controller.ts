@@ -7,15 +7,15 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from 'src/common/decorators';
 import { OptionalJwtAuthGuard } from 'src/common/guards/optional-jwt-auth.guard';
+import { IAuthUser } from 'src/common/interface';
 import { CartService } from '../cart.service';
 import {
   AddToCartDto,
-  ApplyCouponDto,
   CheckoutPreviewDto,
   UpdateCartItemDto,
 } from '../dto/cart.dto';
@@ -29,59 +29,42 @@ export class CartController {
 
   @Get()
   @ApiOperation({ summary: 'Get current user cart' })
-  getCart(@Req() req: any) {
-    const userId = req.user?.id || 'dummy-user-id';
-    return this.cartService.getCart(userId);
+  getCart(@CurrentUser() user: IAuthUser) {
+    return this.cartService.getCart(user.id);
   }
 
   @Post('add')
   @ApiOperation({ summary: 'Add item to cart' })
-  addToCart(@Req() req: any, @Body() dto: AddToCartDto) {
-    const userId = req.user?.id || 'dummy-user-id';
-    return this.cartService.addToCart(userId, dto);
+  addToCart(@CurrentUser() user: IAuthUser, @Body() dto: AddToCartDto) {
+    return this.cartService.addToCart(user.id, dto);
   }
 
   @Patch('update/:itemId')
   @ApiOperation({ summary: 'Update cart item quantity' })
   updateItem(
-    @Req() req: any,
+    @CurrentUser() user: IAuthUser,
     @Param('itemId') itemId: string,
     @Body() dto: UpdateCartItemDto,
   ) {
-    const userId = req.user?.id || 'dummy-user-id';
-    // itemId acts as productId here
-    return this.cartService.updateItemQuantity(userId, itemId, dto);
+    return this.cartService.updateItemQuantity(user.id, itemId, dto);
   }
 
   @Delete('remove/:itemId')
   @ApiOperation({ summary: 'Remove item from cart' })
   removeItem(
-    @Req() req: any,
+    @CurrentUser() user: IAuthUser,
     @Param('itemId') itemId: string,
     @Query('variantSku') variantSku?: string,
   ) {
-    const userId = req.user?.id || 'dummy-user-id';
-    return this.cartService.removeItem(userId, itemId, variantSku);
-  }
-
-  @Post('apply-coupon')
-  @ApiOperation({ summary: 'Apply a coupon to the cart' })
-  applyCoupon(@Req() req: any, @Body() dto: ApplyCouponDto) {
-    const userId = req.user?.id || 'dummy-user-id';
-    return this.cartService.applyCoupon(userId, dto);
-  }
-
-  @Delete('remove-coupon')
-  @ApiOperation({ summary: 'Remove applied coupon from cart' })
-  removeCoupon(@Req() req: any) {
-    const userId = req.user?.id || 'dummy-user-id';
-    return this.cartService.removeCoupon(userId);
+    return this.cartService.removeItem(user.id, itemId, variantSku);
   }
 
   @Post('checkout-preview')
   @ApiOperation({ summary: 'Preview checkout with final calculations' })
-  checkoutPreview(@Req() req: any, @Body() dto: CheckoutPreviewDto) {
-    const userId = req.user?.id || 'dummy-user-id';
-    return this.cartService.checkoutPreview(userId, dto);
+  checkoutPreview(
+    @CurrentUser() user: IAuthUser,
+    @Body() dto: CheckoutPreviewDto,
+  ) {
+    return this.cartService.checkoutPreview(user.id, dto);
   }
 }
