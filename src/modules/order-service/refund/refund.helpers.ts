@@ -82,7 +82,7 @@ export const checkExistingRefund = async (
 };
 
 export const validateRefundItems = (
-  refundItems: any[],
+  refundItems: { productId: string; quantity: number }[],
   order: OrderDocument,
 ): void => {
   for (const refundItem of refundItems) {
@@ -163,13 +163,15 @@ export const calculateRefundAmount = (
   } else if (dto.refundType === RefundType.PARTIAL) {
     const orderTotal = order.billingInfo.totalAmount;
 
-    for (const refundItem of dto.items) {
-      const orderItem = order.items.find(
-        (item) => item.productId.toString() === refundItem.productId,
-      );
-      if (orderItem) {
-        itemsTotal +=
-          orderItem.total * (refundItem.quantity / orderItem.quantity);
+    if (dto.items) {
+      for (const refundItem of dto.items) {
+        const orderItem = order.items.find(
+          (item) => item.productId.toString() === refundItem.productId,
+        );
+        if (orderItem) {
+          itemsTotal +=
+            orderItem.total * (refundItem.quantity / orderItem.quantity);
+        }
       }
     }
 
@@ -186,9 +188,7 @@ export const calculateRefundAmount = (
       ? order.billingInfo.couponDiscount || 0
       : 0;
   const walletRefund =
-    dto.refundType === RefundType.FULL
-      ? order.billingInfo.walletCashAppliedAmount || 0
-      : 0;
+    dto.refundType === RefundType.FULL ? order.billingInfo.walletUsed || 0 : 0;
 
   const totalRefundAmount =
     itemsTotal + shippingRefund + taxRefund + couponRefund + walletRefund;
@@ -223,7 +223,7 @@ export const calculateTotalRefundAmount = (
 export const generateUniqueRefundId = async (
   refundModel: Model<RefundDocument>,
 ): Promise<string> => {
-  let refundId: string;
+  let refundId = '';
   let exists = true;
 
   while (exists) {

@@ -189,7 +189,7 @@ export class Refund {
     enum: RefundType,
     default: RefundType.FULL,
   })
-  refundType: string;
+  refundType: RefundType;
 
   @Prop({
     required: true,
@@ -197,13 +197,13 @@ export class Refund {
     default: RefundStatus.REQUESTED,
     index: true,
   })
-  status: string;
+  status: RefundStatus;
 
   @Prop({
     required: true,
     enum: RefundReason,
   })
-  reason: string;
+  reason: RefundReason;
 
   @Prop()
   reasonDetails: string; // Additional details about the reason
@@ -219,7 +219,7 @@ export class Refund {
     enum: RefundMethod,
     default: RefundMethod.ORIGINAL_PAYMENT,
   })
-  refundMethod: string;
+  refundMethod: RefundMethod;
 
   @Prop({ type: RefundEvidence })
   evidence: RefundEvidence; // Customer-provided evidence

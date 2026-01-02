@@ -23,7 +23,7 @@ export class Coupon {
   description: string;
 
   @Prop({ required: true, enum: DiscountType })
-  discountType: string;
+  discountType: DiscountType;
 
   @Prop({ required: true, min: 0 })
   discountValue: number;

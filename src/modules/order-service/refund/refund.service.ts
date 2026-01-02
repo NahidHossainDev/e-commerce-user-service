@@ -11,7 +11,12 @@ import { paginateOptions } from 'src/common/constants';
 import { IPaginatedResponse } from 'src/common/interface';
 import { paginationHelpers, pick } from 'src/utils/helpers';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
-import { Order, OrderDocument } from '../order/schemas/order.schema';
+import {
+  Order,
+  OrderDocument,
+  OrderStatus,
+  PaymentStatus,
+} from '../order/schemas/order.schema';
 import {
   isValidStatusTransition,
   REFUND_ERROR_MESSAGES,
@@ -182,7 +187,7 @@ export class RefundService {
 
     if (
       ![RefundStatus.REQUESTED, RefundStatus.PENDING_APPROVAL].includes(
-        refund.status as RefundStatus,
+        refund.status,
       )
     ) {
       throw new BadRequestException('Cannot cancel refund in current status');
@@ -214,7 +219,7 @@ export class RefundService {
       throw new NotFoundException(REFUND_ERROR_MESSAGES.REFUND_NOT_FOUND);
     }
 
-    if ((refund.status as RefundStatus) !== RefundStatus.PENDING_APPROVAL) {
+    if (refund.status !== RefundStatus.PENDING_APPROVAL) {
       throw new BadRequestException('Refund is not pending approval');
     }
 
@@ -289,7 +294,7 @@ export class RefundService {
       throw new NotFoundException(REFUND_ERROR_MESSAGES.REFUND_NOT_FOUND);
     }
 
-    if ((refund.status as RefundStatus) !== RefundStatus.APPROVED) {
+    if (refund.status !== RefundStatus.APPROVED) {
       throw new BadRequestException(
         'Refund must be approved before processing',
       );
@@ -459,15 +464,16 @@ export class RefundService {
 
   private async emitCouponRestoreEvent(refund: RefundDocument): Promise<void> {
     const order = await this.orderModel.findById(refund.orderId);
-    if (order?.billingInfo.couponCode) {
+    if (order?.billingInfo.appliedCouponId) {
       this.eventEmitter.emit('refund.coupon.restore', {
         refundId: refund.refundId,
-        couponCode: order.billingInfo.couponCode,
+        couponId: order.billingInfo.appliedCouponId,
         userId: refund.userId.toString(),
       });
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   private async processPaymentGateway(
     refund: RefundDocument,
   ): Promise<{ success: boolean; error?: string; gatewayResponse?: any }> {
@@ -527,8 +533,8 @@ export class RefundService {
     order.totalRefundedAmount += refund.refundAmount.totalRefundAmount;
 
     if (refund.refundType === RefundType.FULL) {
-      order.status = 'REFUNDED';
-      order.billingInfo.paymentStatus = 'REFUNDED';
+      order.status = OrderStatus.REFUNDED;
+      order.billingInfo.paymentStatus = PaymentStatus.REFUNDED;
     }
 
     await order.save();
