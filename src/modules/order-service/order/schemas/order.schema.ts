@@ -1,43 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import {
+  OrderStatus,
+  PaymentMethod,
+  PaymentProvider,
+  PaymentStatus,
+} from 'src/common/interface';
 import { Price } from '../../../../common/schemas';
+export { OrderStatus, PaymentMethod, PaymentProvider, PaymentStatus };
 
 export type OrderDocument = Order & Document;
-
-export enum PaymentStatus {
-  PENDING = 'PENDING',
-  PAID = 'PAID',
-  FAILED = 'FAILED',
-  REFUNDED = 'REFUNDED',
-}
-
-export enum OrderStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  PACKED = 'PACKED',
-  SHIPPED = 'SHIPPED',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED',
-  RETURN_REQUESTED = 'RETURN_REQUESTED',
-  RETURNED = 'RETURNED',
-  REFUNDED = 'REFUNDED',
-}
-
-export enum PaymentMethod {
-  CASH_ON_DELIVERY = 'CASH_ON_DELIVERY',
-  MFS = 'MFS',
-  SSL = 'SSL',
-  WALLET = 'WALLET',
-}
-
-export enum PaymentProvider {
-  BKASH = 'BKASH',
-  NAGAD = 'NAGAD',
-  ROCKET = 'ROCKET',
-  SSL_COMMERZ = 'SSL_COMMERZ',
-  INTERNAL_WALLET = 'INTERNAL_WALLET',
-  COD = 'COD',
-}
 
 @Schema({ _id: false })
 export class OrderItem {
