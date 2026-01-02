@@ -10,9 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/modules/user-service/auth/decorators/roles.decorator';
 import { UserRole } from 'src/modules/user-service/user/user.schema';
 import { CategoryService } from '../category.service';
 import { CategoryQueryOptionsDto } from '../dto/category-query-options.dto';
