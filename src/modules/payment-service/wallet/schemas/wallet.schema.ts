@@ -9,7 +9,6 @@ export type WalletDocument = Wallet & Document;
 export class Wallet {
   @Prop({
     type: Types.ObjectId,
-    ref: 'User',
     required: true,
     unique: true,
     index: true,

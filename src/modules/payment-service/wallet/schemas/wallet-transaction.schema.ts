@@ -14,7 +14,7 @@ export class WalletTransaction {
   @Prop({ type: Types.ObjectId, ref: 'Wallet', required: true, index: true })
   walletId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
+  @Prop({ type: Types.ObjectId, required: true, index: true })
   userId: Types.ObjectId;
 
   @Prop({ required: true, unique: true, index: true })
