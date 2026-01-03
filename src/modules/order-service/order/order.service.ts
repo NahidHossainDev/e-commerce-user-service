@@ -24,6 +24,12 @@ import { CouponService } from 'src/modules/order-service/coupon/coupon.service';
 import { CouponDocument } from 'src/modules/order-service/coupon/schemas/coupon.schema';
 import { paginationHelpers, pick } from 'src/utils/helpers';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
+import {
+  OrderCreatedEvent,
+  OrderEvents,
+  OrderPaymentRequestEvent,
+  PaymentRequestResult,
+} from '../../../common/events/order.events';
 import { DiscountType } from '../coupon/schemas/coupon.schema';
 import {
   ApplyCouponDto,
@@ -37,7 +43,6 @@ import {
   orderFilterableFields,
   orderSearchableFields,
 } from './order.constants';
-import { OrderCreatedEvent, OrderEvents } from './order.events';
 import {
   BillingInfo,
   Order,
@@ -144,20 +149,52 @@ export class OrderService {
       // Clear Cart
       await this.cartService.clearCart(userId, session);
 
+      // --- Payment Delegation ---
+      const [paymentResult] = (await this.eventEmitter.emitAsync(
+        OrderEvents.REQUEST_PAYMENT,
+        new OrderPaymentRequestEvent({
+          orderId: savedOrder.orderId,
+          userId,
+          totalAmount: billingInfo.totalAmount,
+          paymentIntent: payload.paymentIntent,
+          session: session as any,
+        }),
+      )) as PaymentRequestResult[];
+
+      if (!paymentResult || paymentResult.status === 'FAILED') {
+        throw new BadRequestException('Payment initiation failed');
+      }
+
+      // Update Order with payment result
+      savedOrder.billingInfo.paymentStatus =
+        paymentResult.status === 'PAID'
+          ? PaymentStatus.PAID
+          : PaymentStatus.PENDING;
+
+      if (paymentResult.transactionId) {
+        savedOrder.billingInfo.paymentTransactionId =
+          paymentResult.transactionId;
+      }
+
+      const checkoutOrder = await savedOrder.save({ session: session as any });
+
       // Increment Coupon usage if applicable
       if (billingInfo.appliedCouponId) {
         const coupon = await this.couponService.findActiveCouponById(
           billingInfo.appliedCouponId.toString(),
+          session as any,
         );
-        await this.couponService.incrementUsage(
-          {
-            couponId: coupon._id.toString(),
-            userId: userId,
-            orderId: savedOrder.orderId,
-            discountAmount: billingInfo.couponDiscount,
-          },
-          session,
-        );
+        if (coupon) {
+          await this.couponService.incrementUsage(
+            {
+              couponId: coupon._id.toString(),
+              userId: userId,
+              orderId: savedOrder.orderId,
+              discountAmount: billingInfo.couponDiscount,
+            },
+            session as any,
+          );
+        }
       }
 
       // Publish Event
@@ -178,7 +215,10 @@ export class OrderService {
       void this.eventEmitter.emit(OrderEvents.ORDER_CREATED, event);
 
       await session.commitTransaction();
-      return savedOrder;
+      return {
+        ...checkoutOrder.toObject(),
+        paymentResult,
+      } as any;
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -259,19 +299,11 @@ export class OrderService {
 
     const pagination = paginationHelpers.calculatePagination(paginateQueries);
 
-    const result = await getPaginatedData<OrderDocument>({
+    return await getPaginatedData<OrderDocument>({
       model: this.orderModel,
       paginationQuery: pagination,
       filterQuery,
     });
-
-    // Populate data
-    result.data = (await this.orderModel.populate(result.data, [
-      { path: 'userId' },
-      { path: 'addressId' },
-    ])) as any;
-
-    return result;
   }
 
   async findAllByUser(
@@ -283,9 +315,7 @@ export class OrderService {
   }
 
   async findOne(id: string): Promise<OrderDocument> {
-    const order = await this.orderModel
-      .findById(id)
-      .populate(['userId', 'addressId']);
+    const order = await this.orderModel.findById(id);
     if (!order) throw new NotFoundException('Order not found');
     return order;
   }
@@ -294,9 +324,10 @@ export class OrderService {
     userId: string,
     orderId: string,
   ): Promise<OrderDocument> {
-    const order = await this.orderModel
-      .findOne({ orderId, userId: new Types.ObjectId(userId) })
-      .populate(['userId', 'addressId']);
+    const order = await this.orderModel.findOne({
+      orderId,
+      userId: new Types.ObjectId(userId),
+    });
     if (!order) throw new NotFoundException('Order not found');
     return order;
   }

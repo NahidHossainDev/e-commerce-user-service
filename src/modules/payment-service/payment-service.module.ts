@@ -2,13 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { Payment, PaymentSchema } from './payment/schemas/payment.schema';
-import {
-  WalletTransaction,
-  WalletTransactionSchema,
-} from './wallet/schemas/wallet-transaction.schema';
-import { Wallet, WalletSchema } from './wallet/schemas/wallet.schema';
 
+import { PaymentListener } from './payment/listeners/payment.listener';
 import { PaymentService } from './payment/payment.service';
+import { WalletModule } from './wallet/wallet.module';
 
 import {
   AdminPaymentController,
@@ -17,14 +14,11 @@ import {
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Payment.name, schema: PaymentSchema },
-      { name: Wallet.name, schema: WalletSchema },
-      { name: WalletTransaction.name, schema: WalletTransactionSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Payment.name, schema: PaymentSchema }]),
+    WalletModule,
   ],
   controllers: [PaymentController, AdminPaymentController],
-  providers: [PaymentService],
-  exports: [MongooseModule, PaymentService],
+  providers: [PaymentService, PaymentListener],
+  exports: [MongooseModule, PaymentService, WalletModule],
 })
 export class PaymentServiceModule {}

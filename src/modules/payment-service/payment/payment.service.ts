@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Types } from 'mongoose';
+import { ClientSession, FilterQuery, Model, Types } from 'mongoose';
 import { AppCurrency, paginateOptions } from 'src/common/constants';
 import { IPaginatedResponse, PaymentStatus } from 'src/common/interface';
 import { paginationHelpers, pick } from 'src/utils/helpers';
@@ -35,7 +35,10 @@ export class PaymentService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async initiatePayment(dto: InitiatePaymentDto): Promise<PaymentDocument> {
+  async initiatePayment(
+    dto: InitiatePaymentDto,
+    session?: ClientSession,
+  ): Promise<PaymentDocument> {
     const { userId, orderId, amount, paymentMethod, currency, metadata } = dto;
 
     const transactionId = generateTransactionId();
@@ -52,7 +55,7 @@ export class PaymentService {
     });
 
     try {
-      const savedPayment = await payment.save();
+      const savedPayment = await payment.save({ session: session as any });
       // Logic to communicate with the payment gateway would go here.
       return savedPayment;
     } catch (error: any) {
