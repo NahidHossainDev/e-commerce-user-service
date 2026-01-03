@@ -11,10 +11,10 @@ export type PaymentDocument = Payment & Document;
 
 @Schema({ timestamps: true, collection: 'payments' })
 export class Payment {
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
+  @Prop({ type: Types.ObjectId, required: true, index: true })
   userId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Order', required: true, index: true })
+  @Prop({ type: Types.ObjectId, required: true, index: true })
   orderId: Types.ObjectId;
 
   @Prop({ required: true, unique: true, index: true })

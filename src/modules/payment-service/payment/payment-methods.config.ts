@@ -19,7 +19,7 @@ export interface PaymentCategoryConfig {
   methods: PaymentMethodConfig[];
 }
 
-export const PAYMENT_METHODS: PaymentCategoryConfig[] = [
+export const AVAILABLE_PAYMENT_METHODS: PaymentCategoryConfig[] = [
   {
     category: 'mobile_wallet',
     label: 'Mobile Wallet',

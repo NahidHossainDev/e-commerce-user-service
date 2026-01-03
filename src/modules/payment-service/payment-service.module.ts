@@ -8,6 +8,13 @@ import {
 } from './wallet/schemas/wallet-transaction.schema';
 import { Wallet, WalletSchema } from './wallet/schemas/wallet.schema';
 
+import { PaymentService } from './payment/payment.service';
+
+import {
+  AdminPaymentController,
+  PaymentController,
+} from './payment/controller';
+
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -16,6 +23,8 @@ import { Wallet, WalletSchema } from './wallet/schemas/wallet.schema';
       { name: WalletTransaction.name, schema: WalletTransactionSchema },
     ]),
   ],
-  exports: [MongooseModule],
+  controllers: [PaymentController, AdminPaymentController],
+  providers: [PaymentService],
+  exports: [MongooseModule, PaymentService],
 })
 export class PaymentServiceModule {}
