@@ -1,3 +1,5 @@
+import { PaymentMethod } from '../interface';
+
 export enum OrderEvents {
   ORDER_CREATED = 'order.created',
   ORDER_CANCELLED = 'order.cancelled',
@@ -42,7 +44,7 @@ export class OrderPaymentRequestEvent {
       userId: string;
       totalAmount: number;
       paymentIntent: {
-        method: string;
+        method: PaymentMethod;
         useWallet?: boolean;
         useCashback?: boolean;
       };

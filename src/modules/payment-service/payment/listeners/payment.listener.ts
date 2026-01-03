@@ -7,7 +7,7 @@ import {
   OrderPaymentRequestEvent,
   PaymentRequestResult,
 } from 'src/common/events/order.events';
-import { PaymentStatus } from 'src/common/interface';
+import { PaymentMethod, PaymentStatus } from 'src/common/interface';
 import { WalletBalanceType } from '../../wallet/interface/wallet.interface';
 import { WalletService } from '../../wallet/wallet.service';
 import { PaymentService } from '../payment.service';
@@ -67,14 +67,37 @@ export class PaymentListener {
         return { status: PaymentStatus.PAID };
       }
 
-      // 4. Initiate External Payment for remaining balance
-      const payment = await this.paymentService.initiatePayment({
-        userId,
-        orderId,
-        amount: remainingAmount,
-        paymentMethod: paymentIntent.method as any,
-        metadata: { source: 'checkout' },
-      });
+      // 4. Handle COD for remaining balance
+      if (paymentIntent.method === PaymentMethod.COD) {
+        const payment = await this.paymentService.initiatePayment(
+          {
+            userId,
+            orderId,
+            amount: remainingAmount,
+            paymentMethod: paymentIntent.method,
+            metadata: { source: 'checkout', type: PaymentMethod.COD },
+          },
+          session,
+        );
+
+        return {
+          status: PaymentStatus.PENDING,
+          transactionId: payment.transactionId,
+          gatewayUrl: undefined, // No redirect for COD
+        };
+      }
+
+      // 5. Initiate External Payment for remaining balance (Online Payment)
+      const payment = await this.paymentService.initiatePayment(
+        {
+          userId,
+          orderId,
+          amount: remainingAmount,
+          paymentMethod: paymentIntent.method,
+          metadata: { source: 'checkout' },
+        },
+        session,
+      );
 
       return {
         status: PaymentStatus.PENDING,
