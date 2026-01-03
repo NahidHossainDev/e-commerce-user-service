@@ -25,9 +25,10 @@ import {
   RefundType,
 } from './schemas/refund.schema';
 
+import { generateRefundId as generateRefundIdUtil } from './utils/refund.utils';
+
 export const generateRefundId = (): string => {
-  const randomDigits = Math.floor(10000000 + Math.random() * 90000000);
-  return `REF-${randomDigits}`;
+  return generateRefundIdUtil();
 };
 
 export const validateOrderOwnership = async (

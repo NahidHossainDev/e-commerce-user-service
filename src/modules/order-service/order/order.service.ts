@@ -45,6 +45,7 @@ import {
   OrderStatus,
   PaymentStatus,
 } from './schemas/order.schema';
+import { generateOrderId } from './utils/order.utils';
 
 @Injectable()
 export class OrderService {
@@ -91,7 +92,7 @@ export class OrderService {
     session.startTransaction();
 
     try {
-      const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const orderId = generateOrderId();
 
       const orderItems = cart.items.map((item) => {
         const unitPrice =

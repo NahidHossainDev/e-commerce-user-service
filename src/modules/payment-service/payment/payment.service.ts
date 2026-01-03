@@ -26,7 +26,7 @@ import {
   RefundInitiatedEvent,
 } from './payment.events';
 import { Payment, PaymentDocument } from './schemas/payment.schema';
-import { PaymentUtils } from './utils/payment.utils';
+import { generateTransactionId } from './utils/payment.utils';
 
 @Injectable()
 export class PaymentService {
@@ -35,9 +35,6 @@ export class PaymentService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  /**
-   * 1. Core Transaction Lifecycle: Initiate Payment
-   */
   async initiatePayment(dto: InitiatePaymentDto): Promise<PaymentDocument> {
     const {
       userId,
@@ -49,7 +46,7 @@ export class PaymentService {
       metadata,
     } = dto;
 
-    const transactionId = PaymentUtils.generateTransactionId();
+    const transactionId = generateTransactionId();
 
     const payment = new this.paymentModel({
       userId: new Types.ObjectId(userId),
@@ -74,9 +71,6 @@ export class PaymentService {
     }
   }
 
-  /**
-   * 1. Core Transaction Lifecycle: Verify Payment
-   */
   async verifyPayment(transactionId: string): Promise<PaymentDocument> {
     const payment = await this.paymentModel.findOne({ transactionId });
     if (!payment) {
@@ -90,9 +84,6 @@ export class PaymentService {
     return payment;
   }
 
-  /**
-   * 1. Core Transaction Lifecycle: Process Success
-   */
   async processPaymentSuccess(
     transactionId: string,
     gatewayResponse: Record<string, any>,
@@ -141,9 +132,6 @@ export class PaymentService {
     }
   }
 
-  /**
-   * 1. Core Transaction Lifecycle: Process Failure
-   */
   async processPaymentFailure(
     transactionId: string,
     reason: string,
@@ -185,9 +173,6 @@ export class PaymentService {
     }
   }
 
-  /**
-   * 2. Gateway Handlers: SSLCommerz Callback
-   */
   async handleSSLCommerzCallback(payload: Record<string, any>): Promise<void> {
     // Ideally validate signature here
     const transactionId = payload.tran_id;
@@ -205,54 +190,37 @@ export class PaymentService {
     }
   }
 
-  /**
-   * 3. Public/Customer APIs: Get My Payments
-   */
   async getMyPayments(
     userId: string,
     query: PaymentQueryOptions,
   ): Promise<IPaginatedResponse<PaymentDocument>> {
+    const paginateQueries = pick(query, paginateOptions);
     const { limit, page, skip, sortBy, sortOrder } =
-      paginationHelpers.calculatePagination(query);
+      paginationHelpers.calculatePagination(paginateQueries);
 
-    const match: FilterQuery<PaymentDocument> = {
+    const filterQuery: FilterQuery<PaymentDocument> = {
       userId: new Types.ObjectId(userId),
     };
 
-    if (query.status) match.status = query.status;
-    if (query.paymentMethod) match.paymentMethod = query.paymentMethod;
-    if (query.transactionId) match.transactionId = query.transactionId;
+    if (query.status) filterQuery.status = query.status;
+    if (query.paymentMethod) filterQuery.paymentMethod = query.paymentMethod;
+    if (query.transactionId) filterQuery.transactionId = query.transactionId;
     if (query.startDate && query.endDate) {
-      match.createdAt = {
+      filterQuery.createdAt = {
         $gte: new Date(query.startDate),
         $lte: new Date(query.endDate),
       };
     }
 
-    const result = await this.paymentModel
-      .find(match)
-      .sort({ [sortBy]: sortOrder })
-      .skip(skip)
-      .limit(limit)
-      .exec();
+    const pagination = { limit, page, skip, sortBy, sortOrder };
 
-    const total = await this.paymentModel.countDocuments(match);
-
-    return {
-      data: result,
-      meta: {
-        page,
-        limit,
-        totalCount: total,
-        totalPages: Math.ceil(total / limit),
-        nextPage: page * limit < total ? page + 1 : null,
-      },
-    };
+    return await getPaginatedData<PaymentDocument>({
+      model: this.paymentModel,
+      paginationQuery: pagination,
+      filterQuery,
+    });
   }
 
-  /**
-   * 3. Public/Customer APIs: Get Payment By Transaction ID
-   */
   async getPaymentByTransactionId(
     transactionId: string,
     userId: string,
@@ -267,9 +235,6 @@ export class PaymentService {
     return payment;
   }
 
-  /**
-   * 4. Admin Panel APIs: Find All Payments
-   */
   async findAll(
     query: PaymentQueryOptions,
   ): Promise<IPaginatedResponse<PaymentDocument>> {
