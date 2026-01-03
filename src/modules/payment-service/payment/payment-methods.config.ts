@@ -1,6 +1,8 @@
-export type PaymentMethodCode = 'BKASH' | 'NAGAD' | 'ROCKET' | 'SSL' | 'COD';
+import { PaymentMethod } from 'src/common/interface';
 
-export type PaymentCategoryCode = 'wallet' | 'mobile_wallet' | 'card' | 'cod';
+export type PaymentMethodCode = PaymentMethod;
+
+export type PaymentCategoryCode = 'mobile_wallet' | 'card' | 'cod' | 'wallet';
 
 export interface PaymentMethodConfig {
   code: PaymentMethodCode;
@@ -25,7 +27,7 @@ export const AVAILABLE_PAYMENT_METHODS: PaymentCategoryConfig[] = [
     label: 'Mobile Wallet',
     methods: [
       {
-        code: 'BKASH',
+        code: PaymentMethod.BKASH,
         label: 'bKash',
         icon: 'https://cdn.yoursite.com/payments/bkash.svg',
         redirectUrl: '/pay/bkash',
@@ -35,7 +37,7 @@ export const AVAILABLE_PAYMENT_METHODS: PaymentCategoryConfig[] = [
         enabled: true,
       },
       {
-        code: 'NAGAD',
+        code: PaymentMethod.NAGAD,
         label: 'Nagad',
         icon: 'https://cdn.yoursite.com/payments/nagad.svg',
         redirectUrl: '/pay/nagad',
@@ -45,7 +47,7 @@ export const AVAILABLE_PAYMENT_METHODS: PaymentCategoryConfig[] = [
         enabled: true,
       },
       {
-        code: 'ROCKET',
+        code: PaymentMethod.ROCKET,
         label: 'Rocket',
         icon: 'https://cdn.yoursite.com/payments/rocket.svg',
         redirectUrl: '/pay/rocket',
@@ -61,7 +63,7 @@ export const AVAILABLE_PAYMENT_METHODS: PaymentCategoryConfig[] = [
     label: 'Card / Net Banking',
     methods: [
       {
-        code: 'SSL',
+        code: PaymentMethod.SSL,
         label: 'Visa / MasterCard / DBBL / AMEX (SSLCommerz)',
         icon: 'https://cdn.yoursite.com/payments/card.svg',
         redirectUrl: '/pay/ssl',
@@ -76,7 +78,7 @@ export const AVAILABLE_PAYMENT_METHODS: PaymentCategoryConfig[] = [
     label: 'Cash on Delivery',
     methods: [
       {
-        code: 'COD',
+        code: PaymentMethod.COD,
         label: 'Cash on Delivery',
         icon: 'https://cdn.yoursite.com/payments/cod.svg',
         redirectUrl: null,

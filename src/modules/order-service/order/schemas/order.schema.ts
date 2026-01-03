@@ -3,11 +3,10 @@ import { Document, Types } from 'mongoose';
 import {
   OrderStatus,
   PaymentMethod,
-  PaymentProvider,
   PaymentStatus,
 } from 'src/common/interface';
 import { Price } from '../../../../common/schemas';
-export { OrderStatus, PaymentMethod, PaymentProvider, PaymentStatus };
+export { OrderStatus, PaymentMethod, PaymentStatus };
 
 export type OrderDocument = Order & Document;
 
@@ -63,9 +62,6 @@ export class BillingInfo {
 
   @Prop({ enum: PaymentMethod, required: false })
   paymentMethod?: PaymentMethod;
-
-  @Prop({ enum: PaymentProvider, required: false })
-  paymentProvider?: PaymentProvider;
 
   @Prop({ default: PaymentStatus.PENDING, enum: PaymentStatus })
   paymentStatus: PaymentStatus;

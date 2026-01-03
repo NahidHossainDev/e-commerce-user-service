@@ -1,11 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { AppCurrency } from 'src/common/constants';
-import {
-  PaymentMethod,
-  PaymentProvider,
-  PaymentStatus,
-} from 'src/common/interface';
+import { PaymentMethod, PaymentStatus } from 'src/common/interface';
 
 export type PaymentDocument = Payment & Document;
 
@@ -35,13 +31,6 @@ export class Payment {
     index: true,
   })
   paymentMethod: PaymentMethod;
-
-  @Prop({
-    required: true,
-    enum: PaymentProvider,
-    index: true,
-  })
-  paymentProvider: PaymentProvider;
 
   @Prop({
     required: true,

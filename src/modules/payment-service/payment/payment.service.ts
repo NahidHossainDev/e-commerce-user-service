@@ -36,15 +36,7 @@ export class PaymentService {
   ) {}
 
   async initiatePayment(dto: InitiatePaymentDto): Promise<PaymentDocument> {
-    const {
-      userId,
-      orderId,
-      amount,
-      paymentMethod,
-      paymentProvider,
-      currency,
-      metadata,
-    } = dto;
+    const { userId, orderId, amount, paymentMethod, currency, metadata } = dto;
 
     const transactionId = generateTransactionId();
 
@@ -55,7 +47,6 @@ export class PaymentService {
       amount,
       currency: currency || AppCurrency.BDT,
       paymentMethod,
-      paymentProvider,
       status: PaymentStatus.PENDING,
       metadata,
     });
@@ -119,7 +110,6 @@ export class PaymentService {
           updatedPayment.userId.toString(),
           updatedPayment.amount,
           updatedPayment.paymentMethod,
-          updatedPayment.paymentProvider,
           updatedPayment.paidAt!,
         ),
       );

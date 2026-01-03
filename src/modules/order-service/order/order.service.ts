@@ -119,7 +119,6 @@ export class OrderService {
         billingInfo: {
           ...billingInfo,
           paymentMethod: payload.paymentIntent.method,
-          paymentProvider: payload.paymentIntent.provider,
         },
         placedAt: new Date(),
       });

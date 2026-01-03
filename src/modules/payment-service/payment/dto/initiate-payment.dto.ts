@@ -7,7 +7,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { PaymentMethod, PaymentProvider } from 'src/common/interface';
+import { PaymentMethod } from 'src/common/interface';
 
 export class InitiatePaymentDto {
   @IsMongoId()
@@ -26,10 +26,6 @@ export class InitiatePaymentDto {
   @IsEnum(PaymentMethod)
   @IsNotEmpty()
   paymentMethod: PaymentMethod;
-
-  @IsEnum(PaymentProvider)
-  @IsNotEmpty()
-  paymentProvider: PaymentProvider;
 
   @IsOptional()
   @IsString()

@@ -2,11 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { QueryOptions } from 'src/common/dto/queryOptions.dto';
-import {
-  PaymentMethod,
-  PaymentProvider,
-  PaymentStatus,
-} from 'src/common/interface';
+import { PaymentMethod, PaymentStatus } from 'src/common/interface';
 
 export class PaymentQueryOptions extends QueryOptions {
   @ApiPropertyOptional()
@@ -23,11 +19,6 @@ export class PaymentQueryOptions extends QueryOptions {
   @IsOptional()
   @IsEnum(PaymentMethod)
   paymentMethod?: PaymentMethod;
-
-  @ApiPropertyOptional({ enum: PaymentProvider })
-  @IsOptional()
-  @IsEnum(PaymentProvider)
-  paymentProvider?: PaymentProvider;
 
   @ApiPropertyOptional()
   @IsOptional()

@@ -12,7 +12,6 @@ import {
 import {
   OrderStatus,
   PaymentMethod,
-  PaymentProvider,
   PaymentStatus,
 } from '../schemas/order.schema';
 
@@ -21,9 +20,6 @@ import {
 export class PaymentIntentDto {
   @IsEnum(PaymentMethod)
   method: PaymentMethod;
-
-  @IsEnum(PaymentProvider)
-  provider: PaymentProvider;
 
   @IsOptional()
   @IsBoolean()

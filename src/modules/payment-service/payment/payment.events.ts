@@ -12,7 +12,6 @@ export class PaymentCompletedEvent {
     public readonly userId: string,
     public readonly amount: number,
     public readonly method: string,
-    public readonly provider: string,
     public readonly paidAt: Date,
   ) {}
 }
