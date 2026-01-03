@@ -9,6 +9,7 @@ export enum WalletTransactionSource {
   CASHBACK = 'CASHBACK',
   REFUND = 'REFUND',
   WITHDRAWAL = 'WITHDRAWAL',
+  ADMIN_ADJUSTMENT = 'ADMIN_ADJUSTMENT',
 }
 
 export enum WalletBalanceType {

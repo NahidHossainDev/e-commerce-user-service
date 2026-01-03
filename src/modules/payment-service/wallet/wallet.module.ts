@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AdminWalletController } from './admin-wallet.controller';
 import {
   WalletTransaction,
   WalletTransactionSchema,
 } from './schemas/wallet-transaction.schema';
 import { Wallet, WalletSchema } from './schemas/wallet.schema';
+import { WalletController } from './wallet.controller';
 import { WalletService } from './wallet.service';
 
 @Module({
@@ -14,6 +16,7 @@ import { WalletService } from './wallet.service';
       { name: WalletTransaction.name, schema: WalletTransactionSchema },
     ]),
   ],
+  controllers: [WalletController, AdminWalletController],
   providers: [WalletService],
   exports: [WalletService],
 })
