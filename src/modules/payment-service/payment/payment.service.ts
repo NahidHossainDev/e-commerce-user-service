@@ -7,7 +7,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, Types } from 'mongoose';
-import { paginateOptions } from 'src/common/constants';
+import { AppCurrency, paginateOptions } from 'src/common/constants';
 import { IPaginatedResponse, PaymentStatus } from 'src/common/interface';
 import { paginationHelpers, pick } from 'src/utils/helpers';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
@@ -56,7 +56,7 @@ export class PaymentService {
       orderId: new Types.ObjectId(orderId),
       transactionId,
       amount,
-      currency: currency || 'BDT',
+      currency: currency || AppCurrency.BDT,
       paymentMethod,
       paymentProvider,
       status: PaymentStatus.PENDING,

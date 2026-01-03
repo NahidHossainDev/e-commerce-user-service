@@ -8,7 +8,7 @@ export class CouponUsage {
   @Prop({ type: Types.ObjectId, ref: 'Coupon', required: true, index: true })
   couponId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
+  @Prop({ type: Types.ObjectId, required: true, index: true })
   userId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Order', required: true })
