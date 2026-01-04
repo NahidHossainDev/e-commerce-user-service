@@ -3,10 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
 import { paginateOptions } from '../../../common/constants';
+import {
+  ImageAttachedEvent,
+  ImageDetachedEvent,
+  MediaEvent,
+} from '../../../common/events/media.events';
 import { paginationHelpers, pick } from '../../../utils/helpers';
+import { extractMediaIdFromUrl } from '../../../utils/helpers/media-helper';
 import { getPaginatedData } from '../../../utils/mongodb/getPaginatedData';
 import { generateSKU, generateSlug } from '../../../utils/product-helper';
 import { InventoryService } from '../inventory/inventory.service';
@@ -27,6 +34,7 @@ export class ProductService {
     @InjectModel(Product.name)
     private productModel: Model<ProductDocument>,
     private readonly inventoryService: InventoryService,
+    private readonly eventEmitter: EventEmitter2,
 
     @InjectConnection() private readonly connection: Connection,
   ) {}
@@ -79,6 +87,29 @@ export class ProductService {
         session,
       );
       await session.commitTransaction();
+
+      // --- Emit Media Events ---
+      const productId = (savedProduct._id as Types.ObjectId).toString();
+      const thumbnailId = extractMediaIdFromUrl(savedProduct.thumbnail);
+      if (thumbnailId) {
+        this.eventEmitter.emit(
+          MediaEvent.IMAGE_ATTACHED,
+          new ImageAttachedEvent(thumbnailId, productId, 'product'),
+        );
+      }
+      // 2. Media Gallery (if any)
+      if (savedProduct.media && savedProduct.media.length > 0) {
+        savedProduct.media.forEach((m) => {
+          const mediaId = extractMediaIdFromUrl(m.url);
+          if (mediaId) {
+            this.eventEmitter.emit(
+              MediaEvent.IMAGE_ATTACHED,
+              new ImageAttachedEvent(mediaId, productId, 'product'),
+            );
+          }
+        });
+      }
+
       return savedProduct;
     } catch (error) {
       await session.abortTransaction();
@@ -168,6 +199,7 @@ export class ProductService {
     id: string,
     updateProductDto: UpdateProductDto,
   ): Promise<ProductDocument> {
+    const oldProduct = await this.findOne(id);
     const updateData: UpdateProductDto & { slug?: string } = {
       ...updateProductDto,
     };
@@ -185,10 +217,35 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException('Product not found');
     }
+
+    // --- Media Events ---
+    if (
+      updateProductDto.thumbnail &&
+      updateProductDto.thumbnail !== oldProduct.thumbnail
+    ) {
+      const oldId = extractMediaIdFromUrl(oldProduct.thumbnail);
+      const newId = extractMediaIdFromUrl(updateProductDto.thumbnail);
+      const productId = (product._id as Types.ObjectId).toString();
+
+      if (oldId) {
+        this.eventEmitter.emit(
+          MediaEvent.IMAGE_DETACHED,
+          new ImageDetachedEvent(oldId),
+        );
+      }
+      if (newId) {
+        this.eventEmitter.emit(
+          MediaEvent.IMAGE_ATTACHED,
+          new ImageAttachedEvent(newId, productId, 'product'),
+        );
+      }
+    }
+
     return product;
   }
 
   async remove(id: string): Promise<void> {
+    const product = await this.findOne(id);
     const result = await this.productModel.updateOne(
       { _id: new Types.ObjectId(id) },
       { $set: { isDeleted: true, deletedAt: new Date() } },
@@ -196,6 +253,26 @@ export class ProductService {
 
     if (result.matchedCount === 0) {
       throw new NotFoundException('Product not found');
+    }
+
+    // --- Media Events ---
+    const thumbnailId = extractMediaIdFromUrl(product.thumbnail);
+    if (thumbnailId) {
+      this.eventEmitter.emit(
+        MediaEvent.IMAGE_DETACHED,
+        new ImageDetachedEvent(thumbnailId),
+      );
+    }
+    if (product.media && product.media.length > 0) {
+      product.media.forEach((m) => {
+        const mediaId = extractMediaIdFromUrl(m.url);
+        if (mediaId) {
+          this.eventEmitter.emit(
+            MediaEvent.IMAGE_DETACHED,
+            new ImageDetachedEvent(mediaId),
+          );
+        }
+      });
     }
   }
 

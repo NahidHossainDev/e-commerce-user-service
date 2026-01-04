@@ -8,8 +8,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Connection, Model, Types } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
+import { ImageAttachedEvent, MediaEvent } from 'src/common/events/media.events';
 import { IPaginatedResponse } from 'src/common/interface';
 import { paginationHelpers, pick } from 'src/utils/helpers';
+import { extractMediaIdFromUrl } from 'src/utils/helpers/media-helper';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
 import {
   Order,
@@ -108,6 +110,41 @@ export class RefundService {
     });
 
     const savedRefund = await refund.save();
+
+    // --- Media Events ---
+    const refundIdStr = (savedRefund._id as Types.ObjectId).toString();
+    if (savedRefund.evidence) {
+      // 1. Images
+      if (
+        savedRefund.evidence.images &&
+        savedRefund.evidence.images.length > 0
+      ) {
+        savedRefund.evidence.images.forEach((url) => {
+          const mediaId = extractMediaIdFromUrl(url);
+          if (mediaId) {
+            this.eventEmitter.emit(
+              MediaEvent.IMAGE_ATTACHED,
+              new ImageAttachedEvent(mediaId, refundIdStr, 'refund'),
+            );
+          }
+        });
+      }
+      // 2. Videos
+      if (
+        savedRefund.evidence.videos &&
+        savedRefund.evidence.videos.length > 0
+      ) {
+        savedRefund.evidence.videos.forEach((url) => {
+          const mediaId = extractMediaIdFromUrl(url);
+          if (mediaId) {
+            this.eventEmitter.emit(
+              MediaEvent.IMAGE_ATTACHED,
+              new ImageAttachedEvent(mediaId, refundIdStr, 'refund'),
+            );
+          }
+        });
+      }
+    }
 
     await this.orderModel.findByIdAndUpdate(order._id, {
       hasRefund: true,

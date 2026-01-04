@@ -3,10 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
+import {
+  ImageAttachedEvent,
+  ImageDetachedEvent,
+  MediaEvent,
+} from 'src/common/events/media.events';
 import { createSlug, paginationHelpers, pick } from 'src/utils/helpers';
+import { extractMediaIdFromUrl } from 'src/utils/helpers/media-helper';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
 import {
   categoryFilterableFields,
@@ -23,6 +30,7 @@ export class CategoryService {
   constructor(
     @InjectModel(Category.name)
     private readonly categoryModel: Model<CategoryDocument>,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(
@@ -58,12 +66,28 @@ export class CategoryService {
       }
     }
 
-    return this.categoryModel.create({
+    const savedCategory = await this.categoryModel.create({
       ...createCategoryDto,
       slug,
       level,
       path,
     });
+
+    if (savedCategory.image) {
+      const mediaId = extractMediaIdFromUrl(savedCategory.image);
+      if (mediaId) {
+        this.eventEmitter.emit(
+          MediaEvent.IMAGE_ATTACHED,
+          new ImageAttachedEvent(
+            mediaId,
+            savedCategory._id.toString(),
+            'category',
+          ),
+        );
+      }
+    }
+
+    return savedCategory;
   }
 
   async findAll(query: CategoryQueryOptionsDto) {
@@ -195,6 +219,26 @@ export class CategoryService {
       throw new NotFoundException(`Category with ID ${id} not found`);
     }
 
+    // --- Media Events ---
+    if (updateCategoryDto.image && updateCategoryDto.image !== category.image) {
+      const oldId = extractMediaIdFromUrl(category.image);
+      const newId = extractMediaIdFromUrl(updateCategoryDto.image);
+      const categoryId = updatedCategory._id.toString();
+
+      if (oldId) {
+        this.eventEmitter.emit(
+          MediaEvent.IMAGE_DETACHED,
+          new ImageDetachedEvent(oldId),
+        );
+      }
+      if (newId) {
+        this.eventEmitter.emit(
+          MediaEvent.IMAGE_ATTACHED,
+          new ImageAttachedEvent(newId, categoryId, 'category'),
+        );
+      }
+    }
+
     return updatedCategory;
   }
 
@@ -218,6 +262,16 @@ export class CategoryService {
 
     if (!deletedCategory) {
       throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+
+    if (deletedCategory.image) {
+      const mediaId = extractMediaIdFromUrl(deletedCategory.image);
+      if (mediaId) {
+        this.eventEmitter.emit(
+          MediaEvent.IMAGE_DETACHED,
+          new ImageDetachedEvent(mediaId),
+        );
+      }
     }
 
     return deletedCategory;
