@@ -16,6 +16,11 @@ export enum ProductStatus {
   BLOCKED = 'BLOCKED',
 }
 
+export enum ProductMediaType {
+  IMAGE = 'IMAGE',
+  VIDEO = 'VIDEO',
+}
+
 // MINIMAL denormalization - only what changes very rarely
 @Schema({ _id: false })
 export class ProductUnit {
@@ -109,6 +114,21 @@ export class PerishableInfo {
   requiresRefrigeration: boolean;
 }
 
+// Media
+@Schema({ _id: false })
+export class ProductMedia {
+  @Prop({ required: true })
+  url: string;
+
+  @Prop({ required: true })
+  altText: string;
+
+  @Prop({ required: true })
+  format: string;
+
+  @Prop({ required: true, enum: ProductMediaType })
+  type: ProductMediaType;
+}
 // --- Main Product Schema ---
 @Schema({
   timestamps: true,
@@ -130,6 +150,9 @@ export class Product {
 
   @Prop({ required: true })
   thumbnail: string;
+
+  @Prop({ type: [ProductMedia], default: [] })
+  media: ProductMedia[];
 
   @Prop({ type: CategoryRef, required: true })
   category: CategoryRef;
