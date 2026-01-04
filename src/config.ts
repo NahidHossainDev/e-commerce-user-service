@@ -28,6 +28,7 @@ export interface Config {
   media: {
     maxFileSize: number;
     allowedMimeTypes: string[];
+    tempFileExpirationHours: number;
   };
 }
 
@@ -88,6 +89,8 @@ const getConfig = (): Config => {
     },
     media: {
       maxFileSize: Number(process.env.MEDIA_MAX_FILE_SIZE) || 50 * 1024 * 1024, // 50MB
+      tempFileExpirationHours:
+        Number(process.env.MEDIA_TEMP_FILE_EXPIRATION_HOURS) || 24,
       allowedMimeTypes: process.env.MEDIA_ALLOWED_MIME_TYPES
         ? process.env.MEDIA_ALLOWED_MIME_TYPES.split(',')
         : [

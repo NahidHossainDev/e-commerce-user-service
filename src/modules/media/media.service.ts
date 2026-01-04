@@ -198,6 +198,66 @@ export class MediaService {
     }
   }
 
+  async cleanupTempFiles(): Promise<{
+    deletedCount: number;
+    deletedIds: string[];
+  }> {
+    try {
+      const expirationHours = config.media.tempFileExpirationHours || 24;
+      const expirationDate = new Date();
+      expirationDate.setHours(expirationDate.getHours() - expirationHours);
+
+      // Find TEMP media older than X hours that have 'tmp/' storageKey
+      const tempMedia = await this.mediaModel
+        .find({
+          status: MediaStatus.TEMP,
+          createdAt: { $lt: expirationDate },
+          storageKey: { $regex: /^tmp\// },
+        })
+        .exec();
+
+      if (tempMedia.length === 0) {
+        return { deletedCount: 0, deletedIds: [] };
+      }
+
+      const deletedIds: string[] = [];
+
+      for (const media of tempMedia) {
+        try {
+          // Delete from R2
+          const m = media as Media;
+          const storageKey = m.storageKey;
+          await this.r2Adapter.deleteFile(storageKey);
+          deletedIds.push(m.id);
+        } catch (err) {
+          const errMsg = err instanceof Error ? err.message : 'Unknown error';
+          this.logger.error(
+            `Failed to delete R2 file for media ID ${media.id}: ${errMsg}`,
+          );
+        }
+      }
+
+      // Bulk remove from DB
+      if (deletedIds.length > 0) {
+        await this.mediaModel.deleteMany({ id: { $in: deletedIds } }).exec();
+      }
+
+      this.logger.log(
+        `Cleaned up ${deletedIds.length} expired temporary media files.`,
+      );
+
+      return {
+        deletedCount: deletedIds.length,
+        deletedIds,
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Temp media cleanup failed: ${errorMessage}`);
+      throw new BadRequestException(`Temp cleanup failed: ${errorMessage}`);
+    }
+  }
+
   @OnEvent(MediaEvent.IMAGE_ATTACHED)
   async handleImageAttached(event: ImageAttachedEvent) {
     try {
