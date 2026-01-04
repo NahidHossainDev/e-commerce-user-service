@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
   ListObjectsV2Command,
   ObjectCannedACL,
@@ -85,6 +86,24 @@ export class R2StorageAdapter {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Failed to list objects from R2: ${errorMessage}`);
+      throw error;
+    }
+  }
+
+  async copyFile(sourceKey: string, destinationKey: string): Promise<void> {
+    try {
+      const command = new CopyObjectCommand({
+        Bucket: config.r2.bucketName,
+        CopySource: `${config.r2.bucketName}/${sourceKey}`,
+        Key: destinationKey,
+        ACL: 'public-read',
+      });
+
+      await this.client.send(command);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to copy file in R2: ${errorMessage}`);
       throw error;
     }
   }

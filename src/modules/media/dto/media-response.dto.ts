@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MediaType } from '../domain/media.types';
+import { MediaStatus, MediaType } from '../domain/media.types';
 
 export class MediaResponseDto {
   @ApiProperty()
@@ -8,11 +8,23 @@ export class MediaResponseDto {
   @ApiProperty()
   url: string;
 
-  @ApiProperty({ enum: MediaType })
-  type: MediaType;
+  @ApiProperty({ required: false })
+  storageKey?: string;
 
-  @ApiProperty()
-  format: string;
+  @ApiProperty({ enum: MediaStatus, required: false })
+  status?: MediaStatus;
+
+  @ApiProperty({ required: false })
+  ownerId?: string;
+
+  @ApiProperty({ required: false })
+  ownerType?: string;
+
+  @ApiProperty({ enum: MediaType, required: false })
+  type?: MediaType;
+
+  @ApiProperty({ required: false })
+  format?: string;
 
   @ApiProperty({ required: false })
   width?: number;
@@ -20,12 +32,12 @@ export class MediaResponseDto {
   @ApiProperty({ required: false })
   height?: number;
 
-  @ApiProperty()
-  size: number;
+  @ApiProperty({ required: false })
+  size?: number;
 
-  @ApiProperty()
-  originalName: string;
+  @ApiProperty({ required: false })
+  originalName?: string;
 
-  @ApiProperty()
-  createdAt: Date;
+  @ApiProperty({ required: false })
+  createdAt?: Date;
 }

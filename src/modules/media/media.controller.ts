@@ -20,6 +20,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { CleanupResponseDto } from './dto/cleanup-response.dto';
 import { MediaResponseDto } from './dto/media-response.dto';
 import { MediaService } from './media.service';
 
@@ -72,5 +73,13 @@ export class MediaController {
   @ApiOperation({ summary: 'Delete a file' })
   async deleteFile(@Param('id') id: string): Promise<void> {
     return this.mediaService.deleteFile(id);
+  }
+
+  @Post('cleanup/orphans')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete orphan files from storage' })
+  @ApiResponse({ type: CleanupResponseDto })
+  async cleanupOrphans(): Promise<CleanupResponseDto> {
+    return this.mediaService.cleanupOrphanFiles();
   }
 }

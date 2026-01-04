@@ -20,9 +20,18 @@ export enum FileFormat {
   CSV = 'csv',
 }
 
+export enum MediaStatus {
+  TEMP = 'temp',
+  ACTIVE = 'active',
+}
+
 export interface FileMetadata {
   id: string;
   url: string;
+  storageKey: string;
+  status: MediaStatus;
+  ownerId?: string;
+  ownerType?: string;
   type: MediaType;
   format: string;
   size: number;

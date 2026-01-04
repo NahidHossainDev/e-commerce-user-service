@@ -4,12 +4,20 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as path from 'path';
 import { Stream } from 'stream';
 import { v4 as uuidv4 } from 'uuid';
-import { MediaType } from './domain/media.types';
+import {
+  ImageAttachedEvent,
+  ImageDetachedEvent,
+  MediaEvent,
+} from '../../common/events/media.events';
+import { config } from '../../config';
+import { MediaStatus, MediaType } from './domain/media.types';
+import { CleanupResponseDto } from './dto/cleanup-response.dto';
 import { MediaResponseDto } from './dto/media-response.dto';
 import { ImageOptimizerService } from './infrastructure/image-optimizer.service';
 import { R2StorageAdapter } from './infrastructure/r2-storage.adapter';
@@ -40,6 +48,21 @@ export class MediaService {
 
   async uploadFile(file: any): Promise<MediaResponseDto> {
     const multerFile = file as MulterFile;
+
+    // 1. Validate
+    if (multerFile.size > config.media.maxFileSize) {
+      throw new BadRequestException(
+        `File too large. Max size is ${
+          config.media.maxFileSize / 1024 / 1024
+        }MB`,
+      );
+    }
+    if (!config.media.allowedMimeTypes.includes(multerFile.mimetype)) {
+      throw new BadRequestException(
+        `Invalid file type: ${multerFile.mimetype}`,
+      );
+    }
+
     const id = uuidv4();
     const originalExtension = path
       .extname(multerFile.originalname)
@@ -51,6 +74,7 @@ export class MediaService {
     let finalFormat = originalExtension.replace('.', '');
     let width: number | undefined;
     let height: number | undefined;
+    let finalMimeType = mimeType;
 
     if (this.imageOptimizer.isImage(mimeType)) {
       type = MediaType.IMAGE;
@@ -62,11 +86,10 @@ export class MediaService {
         finalFormat = 'webp';
         width = info.width;
         height = info.height;
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+        finalMimeType = 'image/webp';
+      } catch {
         this.logger.warn(
-          `Optimization failed for image ${multerFile.originalname}, uploading original. Error: ${errorMessage}`,
+          `Optimization failed for image ${multerFile.originalname}, using original.`,
         );
       }
     } else if (this.imageOptimizer.isVideo(mimeType)) {
@@ -75,30 +98,43 @@ export class MediaService {
       type = MediaType.DOCUMENT;
     }
 
-    const key = `${type}s/${id}.${finalFormat}`;
+    const storageKey = `tmp/${type}s/${id}.${finalFormat}`;
 
     try {
+      // 2. Upload to R2
       const url = await this.r2Adapter.uploadFile(
         finalBuffer,
-        key,
-        `image/${finalFormat}`,
+        storageKey,
+        finalMimeType,
       );
 
+      // 3. Save to DB
       const media = new this.mediaModel({
         id,
         url,
+        storageKey,
+        status: MediaStatus.TEMP,
+        ownerId: null,
+        ownerType: null,
         type,
         format: finalFormat,
         size: finalBuffer.length,
         width,
         height,
-        originalName: file.originalname,
-        mimeType: type === MediaType.IMAGE ? `image/${finalFormat}` : mimeType,
+        originalName: multerFile.originalname,
+        mimeType: finalMimeType,
       });
 
-      await media.save();
+      try {
+        await media.save();
+      } catch (dbError) {
+        // 4. Cleanup R2 if DB save fails
+        await this.r2Adapter.deleteFile(storageKey);
+        throw dbError;
+      }
 
-      return this.mapToResponseDto(media);
+      // 5. Return minimal response (id + url only)
+      return { id: media.id as string, url: media.url };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
@@ -121,19 +157,108 @@ export class MediaService {
       throw new NotFoundException(`Media with ID ${id} not found`);
     }
 
-    const key = media.url.split('/').pop();
-    if (key) {
-      const fullKey = `${media.type}s/${key}`;
-      await this.r2Adapter.deleteFile(fullKey);
-    }
-
+    await this.r2Adapter.deleteFile(media.storageKey);
     await this.mediaModel.deleteOne({ id }).exec();
+  }
+
+  async cleanupOrphanFiles(): Promise<CleanupResponseDto> {
+    try {
+      // 1. List all files from R2
+      const allR2Keys = await this.r2Adapter.listObjects();
+
+      // 2. Get all file URLs from DB
+      const allDbMedia = await this.mediaModel
+        .find({}, { storageKey: 1 })
+        .exec();
+      const dbKeys = new Set(allDbMedia.map((m) => m.storageKey));
+
+      // 3. Find orphans (Keys in R2 but NOT in DB)
+      const orphanKeys = allR2Keys.filter((key) => !dbKeys.has(key));
+
+      // 4. Delete orphans
+      if (orphanKeys.length > 0) {
+        await Promise.all(
+          orphanKeys.map((key) => this.r2Adapter.deleteFile(key)),
+        );
+      }
+
+      return {
+        deletedCount: orphanKeys.length,
+        deletedKeys: orphanKeys,
+        message:
+          orphanKeys.length > 0
+            ? `Successfully deleted ${orphanKeys.length} orphan files.`
+            : 'No orphan files found.',
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Orphan cleanup failed: ${errorMessage}`);
+      throw new BadRequestException(`Cleanup failed: ${errorMessage}`);
+    }
+  }
+
+  @OnEvent(MediaEvent.IMAGE_ATTACHED)
+  async handleImageAttached(event: ImageAttachedEvent) {
+    try {
+      const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
+      if (!media || media.status === MediaStatus.ACTIVE) return;
+
+      const oldKey = media.storageKey;
+      if (!oldKey.startsWith('tmp/')) return;
+
+      const newKey = oldKey.replace('tmp/', '');
+
+      // 1. Copy in R2
+      await this.r2Adapter.copyFile(oldKey, newKey);
+      // 2. Delete old from R2
+      await this.r2Adapter.deleteFile(oldKey);
+
+      // 3. Update DB
+      media.status = MediaStatus.ACTIVE;
+      media.ownerId = event.ownerId;
+      media.ownerType = event.ownerType;
+      media.storageKey = newKey;
+      media.url = `${config.r2.publicUrl}/${newKey}`;
+
+      await media.save();
+      this.logger.log(
+        `Media ${media.id} attached to ${event.ownerType}:${event.ownerId}`,
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to handle image attachment: ${errorMessage}`);
+    }
+  }
+
+  @OnEvent(MediaEvent.IMAGE_DETACHED)
+  async handleImageDetached(event: ImageDetachedEvent) {
+    try {
+      const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
+      if (!media || media.status === MediaStatus.TEMP) return;
+
+      media.status = MediaStatus.TEMP;
+      media.ownerId = undefined;
+      media.ownerType = undefined;
+
+      await media.save();
+      this.logger.log(`Media ${media.id} detached`);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Failed to handle image detachment: ${errorMessage}`);
+    }
   }
 
   private mapToResponseDto(media: Media): MediaResponseDto {
     return {
       id: media.id,
       url: media.url,
+      storageKey: media.storageKey,
+      status: media.status,
+      ownerId: media.ownerId,
+      ownerType: media.ownerType,
       type: media.type,
       format: media.format,
       width: media.width,

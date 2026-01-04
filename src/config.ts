@@ -25,6 +25,10 @@ export interface Config {
     bucketName: string;
     publicUrl: string;
   };
+  media: {
+    maxFileSize: number;
+    allowedMimeTypes: string[];
+  };
 }
 
 dotenv.config();
@@ -81,6 +85,24 @@ const getConfig = (): Config => {
       secretAccessKey: r2SecretAccessKey,
       bucketName: r2BucketName,
       publicUrl: r2PublicUrl,
+    },
+    media: {
+      maxFileSize: Number(process.env.MEDIA_MAX_FILE_SIZE) || 50 * 1024 * 1024, // 50MB
+      allowedMimeTypes: process.env.MEDIA_ALLOWED_MIME_TYPES
+        ? process.env.MEDIA_ALLOWED_MIME_TYPES.split(',')
+        : [
+            'image/jpeg',
+            'image/jpg',
+            'image/png',
+            'image/webp',
+            'video/mp4',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/csv',
+          ],
     },
   };
 };

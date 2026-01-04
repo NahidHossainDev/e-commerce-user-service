@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { MediaType } from '../../domain/media.types';
+import { MediaStatus, MediaType } from '../../domain/media.types';
 
 @Schema({ timestamps: true, collection: 'media' })
 export class Media extends Document {
@@ -9,6 +9,18 @@ export class Media extends Document {
 
   @Prop({ required: true })
   url: string;
+
+  @Prop({ required: true, unique: true })
+  declare storageKey: string;
+
+  @Prop({ required: true, enum: MediaStatus, default: MediaStatus.TEMP })
+  declare status: MediaStatus;
+
+  @Prop()
+  declare ownerId?: string;
+
+  @Prop()
+  declare ownerType?: string;
 
   @Prop({ required: true, enum: MediaType })
   type: MediaType;
