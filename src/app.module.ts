@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { config, Config } from './config';
 import { CommunicationServiceModule } from './modules/communication-service/communication-service.module';
+import { MediaModule } from './modules/media/media.module';
 import { OrderServiceModule } from './modules/order-service/order-service.module';
 import { PaymentServiceModule } from './modules/payment-service/payment-service.module';
 import { ProductServiceModule } from './modules/product-service/product-service.module';
@@ -43,6 +44,7 @@ import { UserServiceModule } from './modules/user-service/user-service.module';
     OrderServiceModule,
     CommunicationServiceModule,
     PaymentServiceModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [

@@ -11,7 +11,7 @@ import { getPaginatedData } from '../../../utils/mongodb/getPaginatedData';
 import { generateSKU, generateSlug } from '../../../utils/product-helper';
 import { InventoryService } from '../inventory/inventory.service';
 import { InventoryTransactionType } from '../inventory/schemas/inventory-history.schema';
-import { MediaService } from '../media/media.service';
+
 import { ProductQueryDto } from './dto/product-query-options.dto';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import {
@@ -27,7 +27,7 @@ export class ProductService {
     @InjectModel(Product.name)
     private productModel: Model<ProductDocument>,
     private readonly inventoryService: InventoryService,
-    private readonly mediaService: MediaService,
+
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
@@ -78,17 +78,6 @@ export class ProductService {
         },
         session,
       );
-
-      // Create dummy Media entry (can be updated later)
-      await this.mediaService.create(
-        {
-          productId: (savedProduct._id as Types.ObjectId).toString(),
-          primaryImage: createProductDto.thumbnail,
-          images: [],
-        },
-        session,
-      );
-
       await session.commitTransaction();
       return savedProduct;
     } catch (error) {

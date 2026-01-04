@@ -18,6 +18,13 @@ export interface Config {
   redisHost: string;
   redisPort: number;
   saltRound: number;
+  r2: {
+    accountId: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+    bucketName: string;
+    publicUrl: string;
+  };
 }
 
 dotenv.config();
@@ -33,6 +40,11 @@ const getConfig = (): Config => {
     REDIS_HOST: redisHost,
     NATS_URL: natsURL,
     SALT_ROUND: saltRound,
+    R2_ACCOUNT_ID: r2AccountId,
+    R2_ACCESS_KEY_ID: r2AccessKeyId,
+    R2_SECRET_ACCESS_KEY: r2SecretAccessKey,
+    R2_BUCKET_NAME: r2BucketName,
+    R2_PUBLIC_URL: r2PublicUrl,
   } = process.env;
 
   if (!dbURL) throw new Error('DataBase url is required');
@@ -42,6 +54,16 @@ const getConfig = (): Config => {
   if (!jwtExpire) throw new Error('jwtExpire is required');
   if (!redisHost) throw new Error('Redis Host is missing');
   if (!redisPort) throw new Error('Redis Port is missing');
+
+  if (
+    !r2AccountId ||
+    !r2AccessKeyId ||
+    !r2SecretAccessKey ||
+    !r2BucketName ||
+    !r2PublicUrl
+  ) {
+    throw new Error('R2 configuration is incomplete');
+  }
 
   return {
     dbURL,
@@ -53,6 +75,13 @@ const getConfig = (): Config => {
     redisHost,
     redisPort: Number(redisPort),
     saltRound: Number(saltRound),
+    r2: {
+      accountId: r2AccountId,
+      accessKeyId: r2AccessKeyId,
+      secretAccessKey: r2SecretAccessKey,
+      bucketName: r2BucketName,
+      publicUrl: r2PublicUrl,
+    },
   };
 };
 
