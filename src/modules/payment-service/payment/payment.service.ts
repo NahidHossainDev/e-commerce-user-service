@@ -8,9 +8,19 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, FilterQuery, Model, Types } from 'mongoose';
 import { AppCurrency, paginateOptions } from 'src/common/constants';
-import { IPaginatedResponse, PaymentStatus } from 'src/common/interface';
+import {
+  OrderPaymentRequestEvent,
+  PaymentRequestResult,
+} from 'src/common/events/order.events';
+import {
+  IPaginatedResponse,
+  PaymentMethod,
+  PaymentStatus,
+} from 'src/common/interface';
 import { paginationHelpers, pick } from 'src/utils/helpers';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
+import { WalletBalanceType } from '../wallet/interface/wallet.interface';
+import { WalletService } from '../wallet/wallet.service';
 import { InitiatePaymentDto } from './dto/initiate-payment.dto';
 import { PaymentQueryOptions } from './dto/payment.query-options.dto';
 import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
@@ -32,6 +42,7 @@ import { generateTransactionId } from './utils/payment.utils';
 export class PaymentService {
   constructor(
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
+    private readonly walletService: WalletService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
@@ -359,5 +370,96 @@ export class PaymentService {
 
   getAvailablePaymentMethods(): PaymentCategoryConfig[] {
     return AVAILABLE_PAYMENT_METHODS;
+  }
+
+  async paymentRequest(
+    event: OrderPaymentRequestEvent,
+  ): Promise<PaymentRequestResult> {
+    const { orderId, userId, totalAmount, paymentIntent, session } =
+      event.payload;
+
+    let remainingAmount = totalAmount;
+
+    try {
+      // 1. Deduct Cashback if requested
+      if (paymentIntent.useCashback && remainingAmount > 0) {
+        const wallet = await this.walletService.getWallet(userId);
+        const deductAmount = Math.min(wallet.cashbackBalance, remainingAmount);
+        if (deductAmount > 0) {
+          await this.walletService.deductFunds(
+            userId,
+            deductAmount,
+            WalletBalanceType.CASHBACK,
+            orderId,
+            session,
+          );
+          remainingAmount -= deductAmount;
+        }
+      }
+
+      // 2. Deduct Wallet Balance if requested
+      if (paymentIntent.useWallet && remainingAmount > 0) {
+        const wallet = await this.walletService.getWallet(userId);
+        const deductAmount = Math.min(wallet.depositBalance, remainingAmount);
+        if (deductAmount > 0) {
+          await this.walletService.deductFunds(
+            userId,
+            deductAmount,
+            WalletBalanceType.DEPOSIT,
+            orderId,
+            session,
+          );
+          remainingAmount -= deductAmount;
+        }
+      }
+
+      // 3. Handle Remaining Amount
+      if (remainingAmount <= 0) {
+        return { status: PaymentStatus.PAID };
+      }
+
+      // 4. Handle COD for remaining balance
+      if (paymentIntent.method === PaymentMethod.COD) {
+        const payment = await this.initiatePayment(
+          {
+            userId,
+            orderId,
+            amount: remainingAmount,
+            paymentMethod: paymentIntent.method,
+            metadata: { source: 'checkout', type: PaymentMethod.COD },
+          },
+          session,
+        );
+
+        return {
+          status: PaymentStatus.PENDING,
+          transactionId: payment.transactionId,
+          gatewayUrl: undefined, // No redirect for COD
+        };
+      }
+
+      // 5. Initiate External Payment for remaining balance (Online Payment)
+      const payment = await this.initiatePayment(
+        {
+          userId,
+          orderId,
+          amount: remainingAmount,
+          paymentMethod: paymentIntent.method,
+          metadata: { source: 'checkout' },
+        },
+        session,
+      );
+
+      return {
+        status: PaymentStatus.PENDING,
+        transactionId: payment.transactionId,
+        gatewayUrl:
+          (payment as any).gatewayUrl ||
+          `/pay/${payment.paymentMethod.toLowerCase()}/${payment.transactionId}`,
+      };
+    } catch (error) {
+      console.error('Payment delegation failed:', error);
+      return { status: PaymentStatus.FAILED };
+    }
   }
 }
