@@ -4,7 +4,6 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as path from 'path';
@@ -13,7 +12,6 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   ImageAttachedEvent,
   ImageDetachedEvent,
-  MediaEvent,
 } from '../../common/events/media.events';
 import { config } from '../../config';
 import { MediaStatus, MediaType } from './domain/media.types';
@@ -258,8 +256,11 @@ export class MediaService {
     }
   }
 
-  @OnEvent(MediaEvent.IMAGE_ATTACHED)
-  async handleImageAttached(event: ImageAttachedEvent) {
+  /**
+   * Processes a media attachment by moving the file from temporary to permanent storage
+   * and updating the media document with owner information.
+   */
+  async attachImage(event: ImageAttachedEvent) {
     try {
       const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
       if (!media || media.status === MediaStatus.ACTIVE) return;
@@ -292,8 +293,11 @@ export class MediaService {
     }
   }
 
-  @OnEvent(MediaEvent.IMAGE_DETACHED)
-  async handleImageDetached(event: ImageDetachedEvent) {
+  /**
+   * Processes a media detachment by reverting its status to temporary
+   * and clearing owner information.
+   */
+  async detachImage(event: ImageDetachedEvent) {
     try {
       const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
       if (!media || media.status === MediaStatus.TEMP) return;
