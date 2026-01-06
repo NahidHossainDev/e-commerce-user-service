@@ -30,6 +30,14 @@ export interface Config {
     allowedMimeTypes: string[];
     tempFileExpirationHours: number;
   };
+  mail: {
+    provider: 'nodemailer' | 'sendgrid' | 'ses';
+    host: string;
+    port: number;
+    user: string;
+    pass: string;
+    from: string;
+  };
 }
 
 dotenv.config();
@@ -50,6 +58,12 @@ const getConfig = (): Config => {
     R2_SECRET_ACCESS_KEY: r2SecretAccessKey,
     R2_BUCKET_NAME: r2BucketName,
     R2_PUBLIC_URL: r2PublicUrl,
+    SMTP_HOST: smtpHost,
+    SMTP_PORT: smtpPort,
+    SMTP_USER: smtpUser,
+    SMTP_PASS: smtpPass,
+    SMTP_FROM: smtpFrom,
+    MAIL_PROVIDER: mailProvider,
   } = process.env;
 
   if (!dbURL) throw new Error('DataBase url is required');
@@ -106,6 +120,15 @@ const getConfig = (): Config => {
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'text/csv',
           ],
+    },
+    mail: {
+      provider:
+        (mailProvider as 'nodemailer' | 'sendgrid' | 'ses') || 'nodemailer',
+      host: smtpHost || '',
+      port: Number(smtpPort) || 587,
+      user: smtpUser || '',
+      pass: smtpPass || '',
+      from: smtpFrom || '"E-Commerce Support" <support@example.com>',
     },
   };
 };
