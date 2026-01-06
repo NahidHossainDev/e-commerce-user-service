@@ -24,6 +24,7 @@ export enum AccountStatus {
   BLOCKED = 'BLOCKED',
   DELETED = 'DELETED',
   PENDING = 'PENDING',
+  PENDING_VERIFICATION = 'PENDING_VERIFICATION',
 }
 
 export enum Gender {

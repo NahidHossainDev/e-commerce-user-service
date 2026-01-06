@@ -11,7 +11,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Gender, UserRole } from '../user.schema';
+import { AccountStatus, Gender, UserRole } from '../user.schema';
 
 export class CreateProfileDto {
   @IsNotEmpty()
@@ -49,15 +49,24 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @IsPhoneNumber('BD')
-  @ApiProperty({ type: String, required: true, example: '+880123456789' })
-  phoneNumber: string;
+  @ApiProperty({ type: String, required: false, example: '+880123456789' })
+  phoneNumber?: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, example: 'secrete-password' })
   password: string;
+
+  @IsOptional()
+  @IsEnum(AccountStatus)
+  @ApiProperty({
+    type: String,
+    enum: AccountStatus,
+    example: AccountStatus.PENDING_VERIFICATION,
+  })
+  accountStatus?: AccountStatus;
 
   @IsOptional()
   @IsArray()

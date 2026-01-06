@@ -12,7 +12,7 @@ export class NodemailerEmailProvider implements EmailProvider {
   private transporter: Transporter;
 
   constructor(private readonly config: Config) {
-    this.transporter = createTransport({
+    const transporterOptions = {
       host: config.mail.host,
       port: config.mail.port,
       secure: config.mail.port === 465,
@@ -20,18 +20,19 @@ export class NodemailerEmailProvider implements EmailProvider {
         user: config.mail.user,
         pass: config.mail.pass,
       },
-    }) as Transporter;
+    };
+    this.transporter = createTransport(transporterOptions);
   }
 
   async send(options: EmailOptions): Promise<void> {
     try {
-      await (this.transporter.sendMail({
+      await this.transporter.sendMail({
         from: options.from || this.config.mail.from,
         to: options.to,
         subject: options.subject,
         html: options.html,
         text: options.text,
-      }) as Promise<any>);
+      });
       this.logger.log(`Email sent successfully to ${options.to}`);
     } catch (error) {
       this.logger.error(`Failed to send email to ${options.to}`, error);

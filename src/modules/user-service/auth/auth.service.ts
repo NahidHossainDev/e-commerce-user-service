@@ -11,9 +11,24 @@ import { UserService } from 'src/modules/user-service/user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InjectModel } from '@nestjs/mongoose';
+import * as crypto from 'crypto';
+import { Model } from 'mongoose';
 import { NotificationService } from 'src/modules/communication-service/notification/notification.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { AccountStatus, UserRole } from '../user/user.schema';
+import { AccountStatus, UserDocument, UserRole } from '../user/user.schema';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import {
+  AUTH_EVENTS,
+  UserRegisteredEvent,
+  UserResendVerificationEvent,
+} from './events/auth.events';
+import {
+  VerificationToken,
+  VerificationTokenDocument,
+  VerificationTokenType,
+} from './schemas/verification-token.schema';
 
 @Injectable()
 export class AuthService {
@@ -21,69 +36,138 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private notificationService: NotificationService,
+    private eventEmitter: EventEmitter2,
+    @InjectModel(VerificationToken.name)
+    private verificationTokenModel: Model<VerificationTokenDocument>,
   ) {}
 
   async register(payload: RegisterDto) {
-    const { phoneNumber, password, fullName } = payload;
+    const { password, fullName } = payload;
+    const email = payload.email.trim().toLowerCase();
 
-    const email = payload.email?.trim().toLowerCase();
-
-    if (!email && !phoneNumber) {
-      throw new BadRequestException('Email or Phone Number is required');
+    const existingUser = await this.userService.findByEmail(email);
+    if (existingUser) {
+      throw new ConflictException('Email already exists');
     }
 
-    if (email) {
-      const existingUser = await this.userService.findByEmail(email);
-      if (existingUser) {
-        throw new ConflictException('Email already exists');
-      }
-    }
-
-    if (phoneNumber) {
-      const existingUser =
-        await this.userService.findByPhoneNumber(phoneNumber);
-      if (existingUser) {
-        throw new ConflictException('Phone number already exists');
-      }
-    }
-
-    // Generate Verification Token
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000,
-    ).toString(); // 6 digit OTP
-
-    const userPayload = {
+    const userPayload: Partial<CreateUserDto> = {
       ...payload,
-      email: email || '',
-      phoneNumber: phoneNumber || '',
+      email,
       password,
       profile: { fullName },
-      accountStatus: AccountStatus.PENDING,
+      accountStatus: AccountStatus.PENDING_VERIFICATION,
       primaryRole: UserRole.CUSTOMER,
-      verification: {
-        emailVerificationToken: email ? verificationToken : undefined,
-        phoneVerificationToken: phoneNumber ? verificationToken : undefined,
-      },
     };
 
     const newUser = await this.userService.create(userPayload as CreateUserDto);
 
-    if (email) {
-      await this.notificationService.sendEmailVerification(
+    // Generate Verification Token (32+ bytes)
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    // Store hashed token
+    await this.verificationTokenModel.create({
+      userId: newUser._id,
+      tokenHash,
+      type: VerificationTokenType.EMAIL_VERIFICATION,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
+    });
+
+    // Emit Event
+    this.eventEmitter.emit(
+      AUTH_EVENTS.USER_REGISTERED,
+      new UserRegisteredEvent(
+        newUser._id.toString(),
         email,
-        verificationToken,
-      );
+        rawToken,
+        fullName,
+      ),
+    );
+
+    return this.sanitizeUser(newUser);
+  }
+
+  async verifyEmail(payload: VerifyEmailDto) {
+    const { token } = payload;
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    const tokenRecord = await this.verificationTokenModel.findOne({
+      tokenHash,
+      type: VerificationTokenType.EMAIL_VERIFICATION,
+      used: false,
+      expiresAt: { $gt: new Date() },
+    });
+
+    if (!tokenRecord) {
+      throw new BadRequestException('Invalid or expired verification token');
     }
-    if (phoneNumber) {
-      await this.notificationService.sendPhoneVerification(
-        phoneNumber,
-        verificationToken,
+
+    // Mark token as used
+    tokenRecord.used = true;
+    await tokenRecord.save();
+
+    // Update user status
+    await this.userService.update(tokenRecord.userId.toString(), {
+      accountStatus: AccountStatus.ACTIVE,
+      verification: {
+        emailVerified: true,
+        emailVerifiedAt: new Date(),
+        phoneVerified: false,
+      },
+    } as any);
+    return { message: 'Email verified successfully' };
+  }
+
+  async resendVerification(email: string) {
+    const user = await this.userService.findByEmail(email.trim().toLowerCase());
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (user.verification.emailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    // Throttling: Check if there's a recent token (within 2 minutes)
+    const recentToken = await this.verificationTokenModel.findOne({
+      userId: user._id,
+      type: VerificationTokenType.EMAIL_VERIFICATION,
+      createdAt: { $gt: new Date(Date.now() - 2 * 60 * 1000) },
+    });
+
+    if (recentToken) {
+      throw new BadRequestException(
+        'Please wait a moment before requesting another link',
       );
     }
 
-    // Fix #1: Sensitive Data Exposure - Return sanitized object
-    // Using simple object mapping here for simplicity, or could use class-transformer
-    return this.sanitizeUser(newUser);
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    await this.verificationTokenModel.create({
+      userId: user._id,
+      tokenHash,
+      type: VerificationTokenType.EMAIL_VERIFICATION,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+    });
+
+    this.eventEmitter.emit(
+      AUTH_EVENTS.USER_RESEND_VERIFICATION,
+      new UserResendVerificationEvent(
+        user._id.toString(),
+        user.email!,
+        rawToken,
+        user.profile.fullName,
+      ),
+    );
+
+    return { message: 'Verification email resent' };
   }
 
   async login(loginDto: LoginDto) {
@@ -95,7 +179,7 @@ export class AuthService {
       throw new BadRequestException('Email or Phone Number is required');
     }
 
-    let user;
+    let user: UserDocument | null = null;
     if (email) {
       user = await this.userService.findByEmail(email);
     } else if (phoneNumber) {
@@ -109,7 +193,7 @@ export class AuthService {
     // Brute Force Protection
     if (user.security.lockUntil && user.security.lockUntil > new Date()) {
       throw new UnauthorizedException(
-        `Account is locked until ${user.security.lockUntil}`,
+        `Account is locked until ${user.security.lockUntil.toISOString()}`,
       );
     }
 
@@ -140,9 +224,14 @@ export class AuthService {
     if (
       user.accountStatus === AccountStatus.SUSPENDED ||
       user.accountStatus === AccountStatus.BLOCKED ||
-      user.accountStatus === AccountStatus.DELETED
+      user.accountStatus === AccountStatus.DELETED ||
+      user.accountStatus === AccountStatus.PENDING_VERIFICATION
     ) {
-      throw new UnauthorizedException(`Account is ${user.accountStatus}`);
+      const message =
+        user.accountStatus === AccountStatus.PENDING_VERIFICATION
+          ? 'Please verify your email to login'
+          : `Account is ${user.accountStatus}`;
+      throw new UnauthorizedException(message);
     }
 
     const payload = {
@@ -188,7 +277,7 @@ export class AuthService {
       payload = this.jwtService.verify(refreshToken, {
         secret: config.jwtSecretKey,
       });
-    } catch (e) {
+    } catch {
       throw new UnauthorizedException('Invalid Refresh Token');
     }
 
@@ -235,8 +324,8 @@ export class AuthService {
     };
   }
 
-  private sanitizeUser(user: any) {
-    const u = user.toObject ? user.toObject() : user;
+  private sanitizeUser(user: UserDocument) {
+    const u = user.toObject();
     return {
       _id: u._id,
       email: u.email,

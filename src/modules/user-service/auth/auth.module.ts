@@ -7,13 +7,21 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
+import { MongooseModule } from '@nestjs/mongoose';
 import { NotificationModule } from 'src/modules/communication-service/notification/notification.module';
+import {
+  VerificationToken,
+  VerificationTokenSchema,
+} from './schemas/verification-token.schema';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
     NotificationModule,
+    MongooseModule.forFeature([
+      { name: VerificationToken.name, schema: VerificationTokenSchema },
+    ]),
     JwtModule.register({
       secret: config.jwtSecretKey,
       signOptions: { expiresIn: config.jwtExpire as any },
