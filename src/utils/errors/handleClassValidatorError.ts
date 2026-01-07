@@ -1,13 +1,19 @@
 import { ValidationError } from 'class-validator';
 import { IErrorMsg, IGenericError } from 'src/common/interface';
 
-export const isClassValidatorError = (
-  errors: unknown,
-): errors is ValidationError[] => {
+export const isClassValidatorError = (errors: unknown): boolean => {
   return (
     Array.isArray(errors) &&
     errors.length > 0 &&
-    errors.every((e) => e instanceof ValidationError)
+    errors.every((e) => typeof e === 'object' && e !== null && 'property' in e)
+  );
+};
+
+export const isStringArray = (errors: unknown): errors is string[] => {
+  return (
+    Array.isArray(errors) &&
+    errors.length > 0 &&
+    errors.every((e) => typeof e === 'string')
   );
 };
 

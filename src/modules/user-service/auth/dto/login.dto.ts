@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 
 export class LoginDto {
-  @ApiProperty({ example: 'user@example.com', required: false })
+  @ApiProperty({ example: 'superadmin@gmail.com', required: false })
   @IsOptional()
   @IsEmail()
   email?: string;
@@ -18,7 +18,7 @@ export class LoginDto {
   @IsString()
   phoneNumber?: string;
 
-  @ApiProperty({ example: 'password123' })
+  @ApiProperty({ example: '12345678' })
   @IsNotEmpty()
   @IsString()
   @MinLength(6)

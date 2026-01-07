@@ -11,6 +11,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { ValidationError } from 'class-validator';
 import { Response } from 'express';
 import { map, Observable } from 'rxjs';
 import { IGenericError } from 'src/common/interface';
@@ -25,6 +26,7 @@ import {
   isDuplicateKeyError,
   isMongooseCastError,
   isMongooseValidationError,
+  isStringArray,
 } from '../errors';
 
 @Catch()
@@ -55,7 +57,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         const msg = (response as { message: unknown }).message;
 
         if (isClassValidatorError(msg)) {
-          errorResponse = handleValidationError(msg);
+          errorResponse = handleValidationError(msg as ValidationError[]);
+        } else if (isStringArray(msg)) {
+          errorResponse = {
+            statusCode: HttpStatus.BAD_REQUEST,
+            message: 'Validation Error',
+            errorMsg: msg.map((m) => ({ path: 'unknown', message: m })),
+          };
         } else {
           errorResponse = {
             statusCode: HttpStatus.BAD_REQUEST,

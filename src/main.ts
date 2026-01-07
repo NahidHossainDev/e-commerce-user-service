@@ -1,4 +1,9 @@
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  INestApplication,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -44,9 +49,15 @@ async function bootstrap() {
   // app.startAllMicroservices()
 
   setupSwagger(app);
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('/');
   app.useGlobalFilters(new GlobalExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      exceptionFactory: (errors) => new BadRequestException(errors),
+    }),
+  );
   app.useGlobalInterceptors(new GlobalResponseTransformer());
 
   await app.listen(config.port);
