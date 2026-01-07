@@ -7,7 +7,7 @@ import {
   IsOptional,
   ValidateNested,
 } from 'class-validator';
-import { RoleStatus } from '../user.schema';
+import { AccountStatus } from '../user.schema';
 import {
   CreateProfileDto,
   CreateRoleDto,
@@ -16,9 +16,13 @@ import {
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
-  @IsEnum(RoleStatus)
-  @ApiProperty({ type: String, example: RoleStatus.ACTIVE })
-  accountStatus?: string;
+  @IsEnum(AccountStatus)
+  @ApiProperty({
+    type: String,
+    enum: AccountStatus,
+    example: AccountStatus.PENDING_VERIFICATION,
+  })
+  accountStatus?: AccountStatus;
 
   @IsOptional()
   @IsArray()

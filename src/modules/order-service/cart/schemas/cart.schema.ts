@@ -15,8 +15,8 @@ export class CartItem {
   @Prop({ required: true })
   productThumbnail: string;
 
-  @Prop()
-  variantSku: string | undefined;
+  @Prop({ type: String })
+  variantSku?: string;
 
   @Prop({ required: true, min: 1 })
   quantity: number;
