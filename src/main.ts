@@ -24,6 +24,7 @@ function setupSwagger(app: INestApplication) {
       bearerFormat: 'JWT',
     })
     .setVersion('1.0')
+    .addServer('/api/v1')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
@@ -49,7 +50,7 @@ async function bootstrap() {
   // app.startAllMicroservices()
 
   setupSwagger(app);
-  app.setGlobalPrefix('/');
+  app.setGlobalPrefix('api/v1');
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
