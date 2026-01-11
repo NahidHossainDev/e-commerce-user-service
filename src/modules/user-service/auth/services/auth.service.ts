@@ -16,7 +16,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
 import { Model } from 'mongoose';
-import { NotificationService } from 'src/modules/communication-service/notification/notification.service';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { AccountStatus, UserDocument, UserRole } from '../../user/user.schema';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
@@ -36,7 +35,6 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-    private notificationService: NotificationService,
     private eventEmitter: EventEmitter2,
     @InjectModel(VerificationToken.name)
     private verificationTokenModel: Model<VerificationTokenDocument>,
@@ -62,25 +60,11 @@ export class AuthService {
 
     const newUser = await this.userService.create(userPayload as CreateUserDto);
 
-    // Generate Verification Token (32+ bytes)
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(rawToken)
-      .digest('hex');
+    const rawToken = await this.createVerificationToken(
+      newUser._id,
+      VerificationTokenType.EMAIL_VERIFICATION,
+    );
 
-    // Store hashed token
-    await this.verificationTokenModel.create({
-      userId: newUser._id,
-      tokenHash,
-      type: VerificationTokenType.EMAIL_VERIFICATION,
-      expiresAt: new Date(
-        Date.now() +
-          AUTH_CONSTANTS.EMAIL_VERIFICATION_EXPIRY_MINUTES * 60 * 1000,
-      ), // 30 minutes
-    });
-
-    // Emit Event
     this.eventEmitter.emit(
       AUTH_EVENTS.USER_REGISTERED,
       new UserRegisteredEvent(
@@ -154,21 +138,10 @@ export class AuthService {
       );
     }
 
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(rawToken)
-      .digest('hex');
-
-    await this.verificationTokenModel.create({
-      userId: user._id,
-      tokenHash,
-      type: VerificationTokenType.EMAIL_VERIFICATION,
-      expiresAt: new Date(
-        Date.now() +
-          AUTH_CONSTANTS.EMAIL_VERIFICATION_EXPIRY_MINUTES * 60 * 1000,
-      ),
-    });
+    const rawToken = await this.createVerificationToken(
+      user._id,
+      VerificationTokenType.EMAIL_VERIFICATION,
+    );
 
     this.eventEmitter.emit(
       AUTH_EVENTS.USER_RESEND_VERIFICATION,
@@ -349,5 +322,28 @@ export class AuthService {
       primaryRole: u.primaryRole,
       accountStatus: u.accountStatus,
     };
+  }
+
+  private async createVerificationToken(
+    userId: any,
+    type: VerificationTokenType,
+  ) {
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    await this.verificationTokenModel.create({
+      userId,
+      tokenHash,
+      type,
+      expiresAt: new Date(
+        Date.now() +
+          AUTH_CONSTANTS.EMAIL_VERIFICATION_EXPIRY_MINUTES * 60 * 1000,
+      ),
+    });
+
+    return rawToken;
   }
 }
