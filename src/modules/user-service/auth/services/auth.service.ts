@@ -25,6 +25,7 @@ import {
   UserRegisteredEvent,
   UserResendVerificationEvent,
 } from '../events/auth.events';
+import { generateHash } from '../helper/helper';
 import {
   VerificationToken,
   VerificationTokenDocument,
@@ -79,14 +80,13 @@ export class AuthService {
     );
 
     return {
-      message:
-        'We have sent an email to verify your email address. Please verify your email address to complete the registration process.',
+      message: 'We sent you a verification email. Please verify to continue.',
     };
   }
 
   async verifyEmail(payload: VerifyEmailDto) {
     const { token } = payload;
-    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const tokenHash = generateHash(token);
 
     const tokenRecord = await this.verificationTokenModel.findOne({
       tokenHash,
@@ -334,10 +334,7 @@ export class AuthService {
     type: VerificationTokenType,
   ) {
     const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(rawToken)
-      .digest('hex');
+    const tokenHash = generateHash(rawToken);
 
     await this.verificationTokenModel.create({
       userId,

@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import axios from 'axios';
-import * as crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import { config } from 'src/config';
 import {
@@ -14,6 +13,7 @@ import {
 } from 'src/modules/user-service/user/user.schema';
 import { UserService } from 'src/modules/user-service/user/user.service';
 import { FacebookLoginDto, GoogleLoginDto } from '../dto/social-auth.dto';
+import { generateRandomPassword } from '../helper/helper';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -44,13 +44,13 @@ export class SocialAuthService {
           provider: AuthProvider.GOOGLE,
           verification: { ...user.verification, emailVerified: true },
         };
-        await this.userService.update(user._id.toString(), updatedUser as any);
+        await this.userService.update(user._id.toString(), updatedUser);
       }
     } else {
       const newUser = {
         email,
-        password: crypto.randomBytes(16).toString('hex'),
-        profile: { fullName: name },
+        password: generateRandomPassword(),
+        profile: { fullName: name as string },
         googleId,
         provider: AuthProvider.GOOGLE,
         accountStatus: AccountStatus.ACTIVE,
@@ -60,7 +60,7 @@ export class SocialAuthService {
           phoneVerified: false,
         },
       };
-      user = await this.userService.create(newUser as any);
+      user = await this.userService.create(newUser);
     }
 
     return this.authService.issueTokens(user);
@@ -91,12 +91,12 @@ export class SocialAuthService {
           provider: AuthProvider.FACEBOOK,
           verification: { ...user.verification, emailVerified: true },
         };
-        await this.userService.update(user._id.toString(), updatedUser as any);
+        await this.userService.update(user._id.toString(), updatedUser);
       }
     } else {
       const newUser = {
         email,
-        password: crypto.randomBytes(16).toString('hex'),
+        password: generateRandomPassword(),
         profile: { fullName: name },
         facebookId,
         provider: AuthProvider.FACEBOOK,
@@ -107,7 +107,7 @@ export class SocialAuthService {
           phoneVerified: false,
         },
       };
-      user = await this.userService.create(newUser as any);
+      user = await this.userService.create(newUser);
     }
 
     return this.authService.issueTokens(user);

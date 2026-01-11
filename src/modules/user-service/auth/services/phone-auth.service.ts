@@ -1,15 +1,20 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import * as crypto from 'crypto';
 import { Model } from 'mongoose';
 import {
   AccountStatus,
   AuthProvider,
 } from 'src/modules/user-service/user/user.schema';
 import { UserService } from 'src/modules/user-service/user/user.service';
+import { AUTH_CONSTANTS } from '../constants/auth.constants';
 import { PhoneStartDto, PhoneVerifyDto } from '../dto/phone-auth.dto';
 import { AUTH_EVENTS, PhoneOtpRequestedEvent } from '../events/auth.events';
+import {
+  generateHash,
+  generateOtp,
+  generateRandomPassword,
+} from '../helper/helper';
 import { OtpLog, OtpLogDocument } from '../schemas/otp-log.schema';
 import { Otp, OtpDocument } from '../schemas/otp.schema';
 import { AuthService } from './auth.service';
@@ -48,8 +53,8 @@ export class PhoneAuthService {
     }
 
     // Generate 6-digit numeric OTP
-    const rawOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpHash = crypto.createHash('sha256').update(rawOtp).digest('hex');
+    const rawOtp = generateOtp();
+    const otpHash = generateHash(rawOtp);
 
     // Store hashed OTP
     await this.otpModel.findOneAndUpdate(
@@ -57,7 +62,9 @@ export class PhoneAuthService {
       {
         phoneNumber,
         otpHash,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+        expiresAt: new Date(
+          Date.now() + AUTH_CONSTANTS.PHONE_OTP_EXPIRY_MINUTES * 60 * 1000,
+        ),
         attempts: 0,
         verified: false,
       },
@@ -84,7 +91,7 @@ export class PhoneAuthService {
 
   async phoneVerify(payload: PhoneVerifyDto) {
     const { phoneNumber, otp } = payload;
-    const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
+    const otpHash = generateHash(otp);
 
     const otpRecord = await this.otpModel.findOne({
       phoneNumber,
@@ -117,7 +124,7 @@ export class PhoneAuthService {
     if (!user) {
       const newUser = {
         phoneNumber,
-        password: crypto.randomBytes(16).toString('hex'),
+        password: generateRandomPassword(),
         profile: { fullName: `User ${phoneNumber.slice(-4)}` },
         accountStatus: AccountStatus.ACTIVE,
         provider: AuthProvider.LOCAL,
@@ -127,7 +134,7 @@ export class PhoneAuthService {
           emailVerified: false,
         },
       };
-      user = await this.userService.create(newUser as any);
+      user = await this.userService.create(newUser);
     } else {
       const updatedUser = {
         accountStatus: AccountStatus.ACTIVE,
@@ -137,7 +144,7 @@ export class PhoneAuthService {
           phoneVerifiedAt: new Date(),
         },
       };
-      await this.userService.update(user._id.toString(), updatedUser as any);
+      await this.userService.update(user._id.toString(), updatedUser);
     }
 
     return this.authService.issueTokens(user);
