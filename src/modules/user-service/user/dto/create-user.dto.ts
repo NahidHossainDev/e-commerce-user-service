@@ -11,7 +11,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { AccountStatus, Gender, UserRole } from '../user.schema';
+import { AccountStatus, AuthProvider, Gender, UserRole } from '../user.schema';
 
 export class CreateProfileDto {
   @IsNotEmpty()
@@ -44,9 +44,9 @@ export class CreateRoleDto {
 
 export class CreateUserDto {
   @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty({ type: String, required: true, example: 'example@email.com' })
-  email: string;
+  @IsOptional()
+  @ApiProperty({ type: String, required: false, example: 'example@email.com' })
+  email?: string;
 
   @IsString()
   @IsOptional()
@@ -58,6 +58,25 @@ export class CreateUserDto {
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, example: 'secrete-password' })
   password: string;
+
+  @IsOptional()
+  @IsEnum(AuthProvider)
+  @ApiProperty({
+    type: String,
+    enum: AuthProvider,
+    example: AuthProvider.LOCAL,
+  })
+  provider?: AuthProvider;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ type: String, required: false })
+  googleId?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ type: String, required: false })
+  facebookId?: string;
 
   @IsOptional()
   @IsEnum(AccountStatus)

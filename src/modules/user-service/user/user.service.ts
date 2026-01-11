@@ -120,6 +120,14 @@ export class UserService {
     return this.userModel.findOne({ phoneNumber });
   }
 
+  async findByGoogleId(googleId: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ googleId });
+  }
+
+  async findByFacebookId(facebookId: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ facebookId });
+  }
+
   async updateRefreshToken(userId: string, hashedToken: string | null) {
     return this.userModel.findByIdAndUpdate(userId, {
       'security.refreshTokenHash': hashedToken,

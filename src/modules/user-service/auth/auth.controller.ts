@@ -18,7 +18,13 @@ import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { UserDocument } from '../user/user.schema';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import {
+  PhoneResendDto,
+  PhoneStartDto,
+  PhoneVerifyDto,
+} from './dto/phone-auth.dto';
 import { RegisterDto } from './dto/register.dto';
+import { FacebookLoginDto, GoogleLoginDto } from './dto/social-auth.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -73,5 +79,42 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Verification email resent' })
   async resendVerification(@Body('email') email: string) {
     return this.authService.resendVerification(email);
+  }
+
+  // --- Phone Auth ---
+
+  @Post('phone/start')
+  @ApiOperation({ summary: 'Start phone registration/OTP request' })
+  @ApiResponse({ status: 200, description: 'OTP sent' })
+  async phoneStart(@Body() phoneStartDto: PhoneStartDto) {
+    return this.authService.phoneStart(phoneStartDto);
+  }
+
+  @Post('phone/verify')
+  @ApiOperation({ summary: 'Verify phone OTP and login/register' })
+  @ApiResponse({ status: 200, description: 'Phone verified and logged in' })
+  async phoneVerify(@Body() phoneVerifyDto: PhoneVerifyDto) {
+    return this.authService.phoneVerify(phoneVerifyDto);
+  }
+
+  @Post('phone/resend')
+  @ApiOperation({ summary: 'Resend phone OTP' })
+  @ApiResponse({ status: 200, description: 'OTP resent' })
+  async phoneResend(@Body() phoneResendDto: PhoneResendDto) {
+    return this.authService.resendPhoneOtp(phoneResendDto.phoneNumber);
+  }
+
+  // --- Social Auth ---
+
+  @Post('google')
+  @ApiOperation({ summary: 'Google OAuth login' })
+  async googleLogin(@Body() googleLoginDto: GoogleLoginDto) {
+    return this.authService.googleLogin(googleLoginDto);
+  }
+
+  @Post('facebook')
+  @ApiOperation({ summary: 'Facebook OAuth login' })
+  async facebookLogin(@Body() facebookLoginDto: FacebookLoginDto) {
+    return this.authService.facebookLogin(facebookLoginDto);
   }
 }

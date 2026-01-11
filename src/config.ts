@@ -38,6 +38,15 @@ export interface Config {
     pass: string;
     from: string;
   };
+  social: {
+    google: {
+      clientId: string;
+    };
+    facebook: {
+      appId: string;
+      appSecret: string;
+    };
+  };
 }
 
 dotenv.config();
@@ -64,6 +73,9 @@ const getConfig = (): Config => {
     SMTP_PASS: smtpPass,
     SMTP_FROM: smtpFrom,
     MAIL_PROVIDER: mailProvider,
+    GOOGLE_CLIENT_ID: googleClientId,
+    FACEBOOK_APP_ID: facebookAppId,
+    FACEBOOK_APP_SECRET: facebookAppSecret,
   } = process.env;
 
   if (!dbURL) throw new Error('DataBase url is required');
@@ -129,6 +141,15 @@ const getConfig = (): Config => {
       user: smtpUser || '',
       pass: smtpPass || '',
       from: smtpFrom || '"E-Commerce Support" <support@example.com>',
+    },
+    social: {
+      google: {
+        clientId: googleClientId || '',
+      },
+      facebook: {
+        appId: facebookAppId || '',
+        appSecret: facebookAppSecret || '',
+      },
     },
   };
 };

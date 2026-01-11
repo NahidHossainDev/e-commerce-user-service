@@ -16,7 +16,15 @@ export class UserResendVerificationEvent {
   ) {}
 }
 
+export class PhoneOtpRequestedEvent {
+  constructor(
+    public readonly phoneNumber: string,
+    public readonly rawOtp: string,
+  ) {}
+}
+
 export const AUTH_EVENTS = {
   USER_REGISTERED: 'user.registered',
   USER_RESEND_VERIFICATION: 'user.resend_verification',
+  PHONE_OTP_REQUESTED: 'auth.phone_otp_requested',
 };

@@ -38,6 +38,12 @@ export enum Language {
   BN = 'BN',
 }
 
+export enum AuthProvider {
+  LOCAL = 'local',
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+}
+
 // ---------- SUB_DOCUMENTS ----------
 @Schema({ _id: false })
 class Role {
@@ -149,6 +155,19 @@ export class User {
 
   @Prop({ required: false, unique: true, sparse: true })
   phoneNumber?: string;
+
+  @Prop({
+    type: String,
+    enum: AuthProvider,
+    default: AuthProvider.LOCAL,
+  })
+  provider: AuthProvider;
+
+  @Prop({ required: false, unique: true, sparse: true })
+  googleId?: string;
+
+  @Prop({ required: false, unique: true, sparse: true })
+  facebookId?: string;
 
   @Prop({ required: true })
   password: string;
