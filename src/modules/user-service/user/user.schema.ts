@@ -81,10 +81,10 @@ class Verification {
   @Prop({ default: false })
   phoneVerified: boolean;
 
-  @Prop()
+  @Prop({ select: false })
   emailVerificationToken?: string;
 
-  @Prop()
+  @Prop({ select: false })
   phoneVerificationToken?: string;
 
   @Prop()
@@ -169,7 +169,7 @@ export class User {
   @Prop({ required: false, unique: true, sparse: true })
   facebookId?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, select: false })
   password: string;
 
   @Prop({ type: [Role], default: [] })
@@ -195,7 +195,7 @@ export class User {
   @Prop({ type: Verification, default: {} })
   verification: Verification;
 
-  @Prop({ type: Security, default: {} })
+  @Prop({ type: Security, default: {}, select: false })
   security: Security;
 
   @Prop({ type: Preferences, default: {} })

@@ -51,8 +51,16 @@ export class UserService {
     });
   }
 
-  async findOne(id: string) {
-    const user = await this.userModel.findById(id);
+  async findOne(id: string, includeSensitive = false) {
+    if (includeSensitive) {
+      const user = await (this.userModel
+        .findById(id)
+        .select('+password +security')
+        .exec() as Promise<UserDocument | null>);
+      if (!user) throw new NotFoundException('User not found');
+      return user;
+    }
+    const user = await this.userModel.findById(id).exec();
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
@@ -112,12 +120,30 @@ export class UserService {
     return deleted;
   }
 
-  async findByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email });
+  async findByEmail(
+    email: string,
+    includeSensitive = false,
+  ): Promise<UserDocument | null> {
+    if (includeSensitive) {
+      return this.userModel
+        .findOne({ email })
+        .select('+password +security')
+        .exec() as Promise<UserDocument | null>;
+    }
+    return this.userModel.findOne({ email }).exec();
   }
 
-  async findByPhoneNumber(phoneNumber: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ phoneNumber });
+  async findByPhoneNumber(
+    phoneNumber: string,
+    includeSensitive = false,
+  ): Promise<UserDocument | null> {
+    if (includeSensitive) {
+      return this.userModel
+        .findOne({ phoneNumber })
+        .select('+password +security')
+        .exec() as Promise<UserDocument | null>;
+    }
+    return this.userModel.findOne({ phoneNumber }).exec();
   }
 
   async findByGoogleId(googleId: string): Promise<UserDocument | null> {
@@ -133,6 +159,7 @@ export class UserService {
       'security.refreshTokenHash': hashedToken,
     });
   }
+
   async updateSecurity(
     userId: string,
     securityUpdates: Partial<User['security']>,

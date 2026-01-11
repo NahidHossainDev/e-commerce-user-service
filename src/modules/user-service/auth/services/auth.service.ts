@@ -170,9 +170,9 @@ export class AuthService {
 
     let user: UserDocument | null = null;
     if (email) {
-      user = await this.userService.findByEmail(email);
+      user = await this.userService.findByEmail(email, true);
     } else if (phoneNumber) {
-      user = await this.userService.findByPhoneNumber(phoneNumber);
+      user = await this.userService.findByPhoneNumber(phoneNumber, true);
     }
 
     if (!user) {
@@ -242,7 +242,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Refresh Token');
     }
 
-    const user = await this.userService.findOne(payload.sub);
+    const user = await this.userService.findOne(payload.sub, true);
     if (!user || !user.security.refreshTokenHash) {
       throw new UnauthorizedException('Access Denied');
     }
