@@ -13,7 +13,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { UserDocument } from '../user/user.schema';
 import { LoginDto } from './dto/login.dto';
@@ -51,6 +51,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -90,6 +91,7 @@ export class AuthController {
   // --- Phone Auth ---
 
   @Post('phone/start')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @ApiOperation({ summary: 'Start phone registration/OTP request' })
   @ApiResponse({ status: 200, description: 'OTP sent' })
   async phoneStart(@Body() phoneStartDto: PhoneStartDto) {

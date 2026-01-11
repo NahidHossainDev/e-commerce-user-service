@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import axios from 'axios';
@@ -17,6 +18,8 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class SocialAuthService {
+  private readonly logger = new Logger(SocialAuthService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
@@ -27,6 +30,7 @@ export class SocialAuthService {
     const googleUser = await this.verifyGoogleToken(googleIdToken);
 
     if (!googleUser) {
+      this.logger.warn('Invalid Google Token attempt');
       throw new UnauthorizedException('Invalid Google Token');
     }
 
@@ -67,6 +71,7 @@ export class SocialAuthService {
     const fbUser = await this.verifyFacebookToken(facebookAccessToken);
 
     if (!fbUser) {
+      this.logger.warn('Invalid Facebook Token attempt');
       throw new UnauthorizedException('Invalid Facebook Token');
     }
 

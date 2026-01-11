@@ -11,6 +11,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { NotificationModule } from 'src/modules/communication-service/notification/notification.module';
+import { OtpLog, OtpLogSchema } from './schemas/otp-log.schema';
 import { Otp, OtpSchema } from './schemas/otp.schema';
 import {
   VerificationToken,
@@ -25,6 +26,7 @@ import {
     MongooseModule.forFeature([
       { name: VerificationToken.name, schema: VerificationTokenSchema },
       { name: Otp.name, schema: OtpSchema },
+      { name: OtpLog.name, schema: OtpLogSchema },
     ]),
     JwtModule.register({
       secret: config.jwtSecretKey,

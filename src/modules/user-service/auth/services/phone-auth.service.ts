@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
@@ -10,21 +10,42 @@ import {
 import { UserService } from 'src/modules/user-service/user/user.service';
 import { PhoneStartDto, PhoneVerifyDto } from '../dto/phone-auth.dto';
 import { AUTH_EVENTS, PhoneOtpRequestedEvent } from '../events/auth.events';
+import { OtpLog, OtpLogDocument } from '../schemas/otp-log.schema';
 import { Otp, OtpDocument } from '../schemas/otp.schema';
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class PhoneAuthService {
+  private readonly logger = new Logger(PhoneAuthService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly eventEmitter: EventEmitter2,
     private readonly authService: AuthService,
     @InjectModel(Otp.name)
     private readonly otpModel: Model<OtpDocument>,
+    @InjectModel(OtpLog.name)
+    private readonly otpLogModel: Model<OtpLogDocument>,
   ) {}
 
   async phoneStart(payload: PhoneStartDto) {
     const { phoneNumber } = payload;
+
+    // Daily Limit Check
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const count = await this.otpLogModel.countDocuments({
+      phoneNumber,
+      attemptedAt: { $gte: today },
+    });
+
+    if (count >= 5) {
+      this.logger.warn(`Daily SMS limit reached for ${phoneNumber}`);
+      throw new BadRequestException(
+        'Daily SMS limit reached. Try again tomorrow.',
+      );
+    }
 
     // Generate 6-digit numeric OTP
     const rawOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -48,6 +69,13 @@ export class PhoneAuthService {
       AUTH_EVENTS.PHONE_OTP_REQUESTED,
       new PhoneOtpRequestedEvent(phoneNumber, rawOtp),
     );
+
+    // Log Attempt
+    await this.otpLogModel.create({
+      phoneNumber,
+      attemptedAt: new Date(),
+      success: true,
+    });
 
     return {
       message: 'OTP sent successfully',

@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsPhoneNumber, IsString, Length } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Length,
+  Matches,
+  ValidateIf,
+} from 'class-validator';
 
 export class PhoneStartDto {
   @ApiProperty({
@@ -8,7 +16,14 @@ export class PhoneStartDto {
   })
   @IsPhoneNumber()
   @IsNotEmpty()
+  @Matches(/^\+?[1-9]\d{1,14}$/, { message: 'Invalid E.164 phone number' })
   phoneNumber: string;
+
+  // Honeypot field - should be empty
+  @IsOptional()
+  @ValidateIf((o) => o.bot_field)
+  @Matches(/^$/, { message: 'Bots not allowed' })
+  bot_field?: string;
 }
 
 export class PhoneVerifyDto {

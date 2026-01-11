@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -32,6 +33,8 @@ import {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
@@ -178,6 +181,7 @@ export class AuthService {
 
     // Brute Force Protection
     if (user.security.lockUntil && user.security.lockUntil > new Date()) {
+      this.logger.warn(`Login attempt on locked account: ${user.email}`);
       throw new UnauthorizedException(
         `Account is locked until ${user.security.lockUntil.toISOString()}`,
       );
@@ -196,6 +200,7 @@ export class AuthService {
         updates.failedLoginAttempts = 0;
       }
       await this.userService.updateSecurity(user._id.toString(), updates);
+      this.logger.warn(`Failed login attempt for user: ${user.email}`);
       throw new UnauthorizedException('Invalid credentials');
     }
 

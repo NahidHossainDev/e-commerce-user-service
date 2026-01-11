@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -11,6 +12,7 @@ export class LoginDto {
   @ApiProperty({ example: 'superadmin@gmail.com', required: false })
   @IsOptional()
   @IsEmail()
+  @Transform(({ value }) => value?.trim().toLowerCase())
   email?: string;
 
   @ApiProperty({ example: '+8801700000000', required: false })
