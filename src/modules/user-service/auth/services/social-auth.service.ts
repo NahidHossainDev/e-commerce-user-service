@@ -12,8 +12,8 @@ import {
   AuthProvider,
 } from 'src/modules/user-service/user/user.schema';
 import { UserService } from 'src/modules/user-service/user/user.service';
-import { AuthService } from '../auth.service';
 import { FacebookLoginDto, GoogleLoginDto } from '../dto/social-auth.dto';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class SocialAuthService {

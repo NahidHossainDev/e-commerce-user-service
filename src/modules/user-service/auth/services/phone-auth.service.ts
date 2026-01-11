@@ -8,10 +8,10 @@ import {
   AuthProvider,
 } from 'src/modules/user-service/user/user.schema';
 import { UserService } from 'src/modules/user-service/user/user.service';
-import { AuthService } from '../auth.service';
 import { PhoneStartDto, PhoneVerifyDto } from '../dto/phone-auth.dto';
 import { AUTH_EVENTS, PhoneOtpRequestedEvent } from '../events/auth.events';
 import { Otp, OtpDocument } from '../schemas/otp.schema';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class PhoneAuthService {

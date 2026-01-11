@@ -16,7 +16,6 @@ import {
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { UserDocument } from '../user/user.schema';
-import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import {
   PhoneResendDto,
@@ -25,6 +24,7 @@ import {
 } from './dto/phone-auth.dto';
 import { RegisterDto } from './dto/register.dto';
 import { FacebookLoginDto, GoogleLoginDto } from './dto/social-auth.dto';
+import { AuthService } from './services/auth.service';
 import { PhoneAuthService } from './services/phone-auth.service';
 import { SocialAuthService } from './services/social-auth.service';
 

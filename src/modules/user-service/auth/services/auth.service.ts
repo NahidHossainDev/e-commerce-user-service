@@ -8,28 +8,28 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { config } from 'src/config';
 import { UserService } from 'src/modules/user-service/user/user.service';
-import { AUTH_CONSTANTS } from './constants/auth.constants';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
+import { AUTH_CONSTANTS } from '../constants/auth.constants';
+import { LoginDto } from '../dto/login.dto';
+import { RegisterDto } from '../dto/register.dto';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
 import { Model } from 'mongoose';
 import { NotificationService } from 'src/modules/communication-service/notification/notification.service';
-import { CreateUserDto } from '../user/dto/create-user.dto';
-import { AccountStatus, UserDocument, UserRole } from '../user/user.schema';
-import { VerifyEmailDto } from './dto/verify-email.dto';
+import { CreateUserDto } from '../../user/dto/create-user.dto';
+import { AccountStatus, UserDocument, UserRole } from '../../user/user.schema';
+import { VerifyEmailDto } from '../dto/verify-email.dto';
 import {
   AUTH_EVENTS,
   UserRegisteredEvent,
   UserResendVerificationEvent,
-} from './events/auth.events';
+} from '../events/auth.events';
 import {
   VerificationToken,
   VerificationTokenDocument,
   VerificationTokenType,
-} from './schemas/verification-token.schema';
+} from '../schemas/verification-token.schema';
 
 @Injectable()
 export class AuthService {
