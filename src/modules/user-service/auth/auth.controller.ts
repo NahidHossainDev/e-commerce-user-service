@@ -25,12 +25,18 @@ import {
 } from './dto/phone-auth.dto';
 import { RegisterDto } from './dto/register.dto';
 import { FacebookLoginDto, GoogleLoginDto } from './dto/social-auth.dto';
+import { PhoneAuthService } from './services/phone-auth.service';
+import { SocialAuthService } from './services/social-auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly phoneAuthService: PhoneAuthService,
+    private readonly socialAuthService: SocialAuthService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
@@ -87,21 +93,21 @@ export class AuthController {
   @ApiOperation({ summary: 'Start phone registration/OTP request' })
   @ApiResponse({ status: 200, description: 'OTP sent' })
   async phoneStart(@Body() phoneStartDto: PhoneStartDto) {
-    return this.authService.phoneStart(phoneStartDto);
+    return this.phoneAuthService.phoneStart(phoneStartDto);
   }
 
   @Post('phone/verify')
   @ApiOperation({ summary: 'Verify phone OTP and login/register' })
   @ApiResponse({ status: 200, description: 'Phone verified and logged in' })
   async phoneVerify(@Body() phoneVerifyDto: PhoneVerifyDto) {
-    return this.authService.phoneVerify(phoneVerifyDto);
+    return this.phoneAuthService.phoneVerify(phoneVerifyDto);
   }
 
   @Post('phone/resend')
   @ApiOperation({ summary: 'Resend phone OTP' })
   @ApiResponse({ status: 200, description: 'OTP resent' })
   async phoneResend(@Body() phoneResendDto: PhoneResendDto) {
-    return this.authService.resendPhoneOtp(phoneResendDto.phoneNumber);
+    return this.phoneAuthService.resendPhoneOtp(phoneResendDto.phoneNumber);
   }
 
   // --- Social Auth ---
@@ -109,12 +115,12 @@ export class AuthController {
   @Post('google')
   @ApiOperation({ summary: 'Google OAuth login' })
   async googleLogin(@Body() googleLoginDto: GoogleLoginDto) {
-    return this.authService.googleLogin(googleLoginDto);
+    return this.socialAuthService.googleLogin(googleLoginDto);
   }
 
   @Post('facebook')
   @ApiOperation({ summary: 'Facebook OAuth login' })
   async facebookLogin(@Body() facebookLoginDto: FacebookLoginDto) {
-    return this.authService.facebookLogin(facebookLoginDto);
+    return this.socialAuthService.facebookLogin(facebookLoginDto);
   }
 }
