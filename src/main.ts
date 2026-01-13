@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { writeFileSync } from 'fs';
 import { AppModule } from './app.module';
 import { config } from './config';
 import {
@@ -32,6 +33,11 @@ function setupSwagger(app: INestApplication) {
     swaggerOptions: { persistAuthorization: true },
     useGlobalPrefix: true,
   });
+
+  if (config.exportSwagger === 'true') {
+    writeFileSync('openapi.json', JSON.stringify(document, null, 2));
+    console.log('Swagger exported to openapi.json');
+  }
 }
 
 async function bootstrap() {

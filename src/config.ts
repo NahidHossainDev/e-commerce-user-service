@@ -18,6 +18,7 @@ export interface Config {
   redisHost: string;
   redisPort: number;
   saltRound: number;
+  exportSwagger: string | undefined;
   r2: {
     accountId: string;
     accessKeyId: string;
@@ -76,6 +77,7 @@ const getConfig = (): Config => {
     GOOGLE_CLIENT_ID: googleClientId,
     FACEBOOK_APP_ID: facebookAppId,
     FACEBOOK_APP_SECRET: facebookAppSecret,
+    EXPORT_SWAGGER: exportSwagger,
   } = process.env;
 
   if (!dbURL) throw new Error('DataBase url is required');
@@ -102,6 +104,7 @@ const getConfig = (): Config => {
     env,
     natsURL,
     jwtSecretKey,
+    exportSwagger,
     jwtExpire: jwtExpire || '1h',
     redisHost,
     redisPort: Number(redisPort),
