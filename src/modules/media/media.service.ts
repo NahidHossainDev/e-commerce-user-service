@@ -161,19 +161,19 @@ export class MediaService {
 
   async cleanupOrphanFiles(): Promise<CleanupResponseDto> {
     try {
-      // 1. List all files from R2
+      // List all files from R2
       const allR2Keys = await this.r2Adapter.listObjects();
 
-      // 2. Get all file URLs from DB
+      // Get all file URLs from DB
       const allDbMedia = await this.mediaModel
         .find({}, { storageKey: 1 })
         .exec();
       const dbKeys = new Set(allDbMedia.map((m) => m.storageKey));
 
-      // 3. Find orphans (Keys in R2 but NOT in DB)
+      // Find orphans (Keys in R2 but NOT in DB)
       const orphanKeys = allR2Keys.filter((key) => !dbKeys.has(key));
 
-      // 4. Delete orphans
+      // Delete orphans
       if (orphanKeys.length > 0) {
         await Promise.all(
           orphanKeys.map((key) => this.r2Adapter.deleteFile(key)),
@@ -256,10 +256,6 @@ export class MediaService {
     }
   }
 
-  /**
-   * Processes a media attachment by moving the file from temporary to permanent storage
-   * and updating the media document with owner information.
-   */
   async attachImage(event: ImageAttachedEvent) {
     try {
       const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
@@ -270,12 +266,12 @@ export class MediaService {
 
       const newKey = oldKey.replace('tmp/', '');
 
-      // 1. Copy in R2
+      // Copy in R2
       await this.r2Adapter.copyFile(oldKey, newKey);
-      // 2. Delete old from R2
+      // Delete old from R2
       await this.r2Adapter.deleteFile(oldKey);
 
-      // 3. Update DB
+      // Update DB
       media.status = MediaStatus.ACTIVE;
       media.ownerId = event.ownerId;
       media.ownerType = event.ownerType;
@@ -293,10 +289,6 @@ export class MediaService {
     }
   }
 
-  /**
-   * Processes a media detachment by reverting its status to temporary
-   * and clearing owner information.
-   */
   async detachImage(event: ImageDetachedEvent) {
     try {
       const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();

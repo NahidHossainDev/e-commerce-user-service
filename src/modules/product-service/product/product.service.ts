@@ -26,7 +26,11 @@ import {
   PRODUCT_SEARCH_FIELDS,
   PRODUCT_SORT_OPTIONS,
 } from './product.constants';
-import { Product, ProductDocument } from './schemas/product.schema';
+import {
+  Product,
+  ProductDocument,
+  ProductStatus,
+} from './schemas/product.schema';
 
 @Injectable()
 export class ProductService {
@@ -35,7 +39,6 @@ export class ProductService {
     private productModel: Model<ProductDocument>,
     private readonly inventoryService: InventoryService,
     private readonly eventEmitter: EventEmitter2,
-
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
@@ -67,9 +70,8 @@ export class ProductService {
         isInStock: (createProductDto.initialStock || 0) > 0,
       });
 
-      const savedProduct = await product.save({ session: session || null });
+      const savedProduct = await product.save({ session });
 
-      // Create Inventory
       await this.inventoryService.create(
         {
           productId: (savedProduct._id as Types.ObjectId).toString(),
@@ -88,27 +90,7 @@ export class ProductService {
       );
       await session.commitTransaction();
 
-      // --- Emit Media Events ---
-      const productId = (savedProduct._id as Types.ObjectId).toString();
-      const thumbnailId = extractMediaIdFromUrl(savedProduct.thumbnail);
-      if (thumbnailId) {
-        this.eventEmitter.emit(
-          MediaEvent.IMAGE_ATTACHED,
-          new ImageAttachedEvent(thumbnailId, productId, 'product'),
-        );
-      }
-      // 2. Media Gallery (if any)
-      if (savedProduct.media && savedProduct.media.length > 0) {
-        savedProduct.media.forEach((m) => {
-          const mediaId = extractMediaIdFromUrl(m.url);
-          if (mediaId) {
-            this.eventEmitter.emit(
-              MediaEvent.IMAGE_ATTACHED,
-              new ImageAttachedEvent(mediaId, productId, 'product'),
-            );
-          }
-        });
-      }
+      this.emitMediaEvents(savedProduct, 'attach');
 
       return savedProduct;
     } catch (error) {
@@ -119,7 +101,56 @@ export class ProductService {
     }
   }
 
-  async findAll(queryDto: ProductQueryDto) {
+  async findAllPublic(queryDto: ProductQueryDto) {
+    const paginateQueries = pick(
+      queryDto,
+      paginateOptions as unknown as (keyof ProductQueryDto)[],
+    );
+    const filters = pick(queryDto, PRODUCT_FILTER_FIELDS);
+
+    const {
+      searchTerm,
+      categoryId,
+      brandId,
+      minPrice,
+      maxPrice,
+      ...remainingFilters
+    } = filters;
+
+    const filterQuery: FilterQuery<ProductDocument> = {
+      isDeleted: false,
+      status: ProductStatus.ACTIVE,
+      ...remainingFilters,
+    };
+
+    this.applySearchFilters(filterQuery, searchTerm);
+    this.applyIdFilters(filterQuery, categoryId, brandId);
+    this.applyPriceFilters(filterQuery, minPrice, maxPrice);
+
+    const pagination = paginationHelpers.calculatePagination(
+      paginateQueries as any, // Cast to avoid strict type error vs helper signature
+    );
+    this.applySorting(pagination);
+
+    const result = await getPaginatedData<ProductDocument>({
+      model: this.productModel,
+      paginationQuery: pagination,
+      filterQuery,
+    });
+
+    result.data = result.data.map((item) => {
+      const obj = item.toObject ? item.toObject() : item;
+      delete obj.vendorId;
+      delete obj.isDeleted;
+      delete obj.deletedAt;
+      delete obj.lastStockSyncAt;
+      return obj;
+    });
+
+    return result;
+  }
+
+  async findAllAdmin(queryDto: ProductQueryDto) {
     const paginateQueries = pick(
       queryDto,
       paginateOptions as unknown as (keyof ProductQueryDto)[],
@@ -137,41 +168,19 @@ export class ProductService {
     } = filters;
 
     const filterQuery: FilterQuery<ProductDocument> = {
-      isDeleted: false,
       ...remainingFilters,
     };
 
-    // 1. Search Logic
-    if (searchTerm) {
-      filterQuery['$or'] = PRODUCT_SEARCH_FIELDS.map((field) => ({
-        [field]: { $regex: searchTerm, $options: 'i' },
-      }));
-    }
-
-    // 2. ID Mapping
-    if (categoryId) filterQuery['category.id'] = new Types.ObjectId(categoryId);
-    if (brandId) filterQuery['brand.id'] = new Types.ObjectId(brandId);
     if (vendorId) filterQuery.vendorId = new Types.ObjectId(vendorId);
 
-    // 3. Price Range
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      filterQuery['price.basePrice'] = {
-        ...(minPrice !== undefined && { $gte: minPrice }),
-        ...(maxPrice !== undefined && { $lte: maxPrice }),
-      };
-    }
+    this.applySearchFilters(filterQuery, searchTerm);
+    this.applyIdFilters(filterQuery, categoryId, brandId);
+    this.applyPriceFilters(filterQuery, minPrice, maxPrice);
 
     const pagination = paginationHelpers.calculatePagination(
       paginateQueries as any,
     );
-
-    // 4. Sort Mapping (Presets)
-    if (pagination.sortBy && (PRODUCT_SORT_OPTIONS as any)[pagination.sortBy]) {
-      const sortOption = (PRODUCT_SORT_OPTIONS as any)[pagination.sortBy];
-      const field = Object.keys(sortOption)[0];
-      pagination.sortBy = field;
-      pagination.sortOrder = sortOption[field];
-    }
+    this.applySorting(pagination);
 
     return await getPaginatedData<ProductDocument>({
       model: this.productModel,
@@ -180,14 +189,28 @@ export class ProductService {
     });
   }
 
-  async findOne(idOrSlug: string): Promise<ProductDocument> {
+  async findOnePublic(idOrSlug: string): Promise<ProductDocument> {
     const query = Types.ObjectId.isValid(idOrSlug)
       ? { _id: new Types.ObjectId(idOrSlug) }
       : { slug: idOrSlug };
 
+    const product = await this.productModel
+      .findOne({
+        ...query,
+        isDeleted: false,
+        status: ProductStatus.ACTIVE,
+      })
+      .select('-vendorId -isDeleted -deletedAt -lastStockSyncAt -__v');
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
+  }
+
+  async findOneAdmin(id: string): Promise<ProductDocument> {
     const product = await this.productModel.findOne({
-      ...query,
-      isDeleted: false,
+      _id: new Types.ObjectId(id),
     });
     if (!product) {
       throw new NotFoundException('Product not found');
@@ -199,7 +222,7 @@ export class ProductService {
     id: string,
     updateProductDto: UpdateProductDto,
   ): Promise<ProductDocument> {
-    const oldProduct = await this.findOne(id);
+    const oldProduct = await this.findOneAdmin(id);
     const updateData: UpdateProductDto & { slug?: string } = {
       ...updateProductDto,
     };
@@ -209,7 +232,7 @@ export class ProductService {
     }
 
     const product = await this.productModel.findOneAndUpdate(
-      { _id: new Types.ObjectId(id), isDeleted: false },
+      { _id: new Types.ObjectId(id) },
       { $set: updateData as UpdateQuery<ProductDocument> },
       { new: true },
     );
@@ -218,62 +241,87 @@ export class ProductService {
       throw new NotFoundException('Product not found');
     }
 
-    // --- Media Events ---
     if (
       updateProductDto.thumbnail &&
       updateProductDto.thumbnail !== oldProduct.thumbnail
     ) {
-      const oldId = extractMediaIdFromUrl(oldProduct.thumbnail);
-      const newId = extractMediaIdFromUrl(updateProductDto.thumbnail);
-      const productId = (product._id as Types.ObjectId).toString();
-
-      if (oldId) {
-        this.eventEmitter.emit(
-          MediaEvent.IMAGE_DETACHED,
-          new ImageDetachedEvent(oldId),
-        );
-      }
-      if (newId) {
-        this.eventEmitter.emit(
-          MediaEvent.IMAGE_ATTACHED,
-          new ImageAttachedEvent(newId, productId, 'product'),
-        );
-      }
+      this.emitMediaEvents(oldProduct, 'detach', true);
+      this.emitMediaEvents(product, 'attach', true);
     }
 
     return product;
   }
 
   async remove(id: string): Promise<void> {
-    const product = await this.findOne(id);
+    const product = await this.findOneAdmin(id);
     const result = await this.productModel.updateOne(
       { _id: new Types.ObjectId(id) },
-      { $set: { isDeleted: true, deletedAt: new Date() } },
+      {
+        $set: {
+          isDeleted: true,
+          deletedAt: new Date(),
+          status: ProductStatus.ARCHIVED,
+        },
+      },
     );
 
     if (result.matchedCount === 0) {
       throw new NotFoundException('Product not found');
     }
 
-    // --- Media Events ---
-    const thumbnailId = extractMediaIdFromUrl(product.thumbnail);
-    if (thumbnailId) {
-      this.eventEmitter.emit(
-        MediaEvent.IMAGE_DETACHED,
-        new ImageDetachedEvent(thumbnailId),
-      );
+    this.emitMediaEvents(product, 'detach');
+  }
+
+  async hardDelete(id: string): Promise<void> {
+    const product = await this.findOneAdmin(id);
+    const result = await this.productModel.deleteOne({
+      _id: new Types.ObjectId(id),
+    });
+
+    if (result.deletedCount === 0) {
+      throw new NotFoundException('Product not found');
     }
-    if (product.media && product.media.length > 0) {
-      product.media.forEach((m) => {
-        const mediaId = extractMediaIdFromUrl(m.url);
-        if (mediaId) {
-          this.eventEmitter.emit(
-            MediaEvent.IMAGE_DETACHED,
-            new ImageDetachedEvent(mediaId),
-          );
-        }
-      });
+
+    this.emitMediaEvents(product, 'detach');
+  }
+
+  async updateStatus(
+    id: string,
+    status: ProductStatus,
+  ): Promise<ProductDocument> {
+    const product = await this.productModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(id) },
+      { $set: { status } },
+      { new: true },
+    );
+    if (!product) throw new NotFoundException('Product not found');
+    return product;
+  }
+
+  async restore(id: string): Promise<ProductDocument> {
+    const product = await this.productModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(id), isDeleted: true },
+      {
+        $set: {
+          isDeleted: false,
+          deletedAt: null,
+          status: ProductStatus.DRAFT,
+        },
+      },
+      { new: true },
+    );
+
+    if (!product) {
+      throw new NotFoundException('Product not found or not deleted');
     }
+    return product;
+  }
+
+  async bulkUpdateStatus(ids: string[], status: ProductStatus): Promise<any> {
+    return this.productModel.updateMany(
+      { _id: { $in: ids.map((id) => new Types.ObjectId(id)) } },
+      { $set: { status } },
+    );
   }
 
   async updateStock(productId: string, quantityChange: number): Promise<void> {
@@ -285,5 +333,82 @@ export class ProductService {
           : InventoryTransactionType.SALE,
       reason: 'Manual adjustment via Product Service',
     });
+  }
+
+  // --- Private Helpers ---
+
+  private applySearchFilters(filterQuery: any, searchTerm?: string) {
+    if (searchTerm) {
+      filterQuery['$or'] = PRODUCT_SEARCH_FIELDS.map((field) => ({
+        [field]: { $regex: searchTerm, $options: 'i' },
+      }));
+    }
+  }
+
+  private applyIdFilters(
+    filterQuery: any,
+    categoryId?: string,
+    brandId?: string,
+  ) {
+    if (categoryId) filterQuery['category.id'] = new Types.ObjectId(categoryId);
+    if (brandId) filterQuery['brand.id'] = new Types.ObjectId(brandId);
+  }
+
+  private applyPriceFilters(
+    filterQuery: any,
+    minPrice?: number,
+    maxPrice?: number,
+  ) {
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      filterQuery['price.basePrice'] = {
+        ...(minPrice !== undefined && { $gte: minPrice }),
+        ...(maxPrice !== undefined && { $lte: maxPrice }),
+      };
+    }
+  }
+
+  private applySorting(pagination: any) {
+    if (pagination.sortBy && (PRODUCT_SORT_OPTIONS as any)[pagination.sortBy]) {
+      const sortOption = (PRODUCT_SORT_OPTIONS as any)[pagination.sortBy];
+      const field = Object.keys(sortOption)[0];
+      pagination.sortBy = field;
+      pagination.sortOrder = sortOption[field];
+    }
+  }
+
+  private emitMediaEvents(
+    product: ProductDocument,
+    type: 'attach' | 'detach',
+    thumbnailOnly = false,
+  ) {
+    const productId = (product._id as Types.ObjectId).toString();
+    const thumbnailId = extractMediaIdFromUrl(product.thumbnail);
+
+    if (thumbnailId) {
+      this.eventEmitter.emit(
+        type === 'attach'
+          ? MediaEvent.IMAGE_ATTACHED
+          : MediaEvent.IMAGE_DETACHED,
+        type === 'attach'
+          ? new ImageAttachedEvent(thumbnailId, productId, 'product')
+          : new ImageDetachedEvent(thumbnailId),
+      );
+    }
+
+    if (!thumbnailOnly && product.media && product.media.length > 0) {
+      product.media.forEach((m) => {
+        const mediaId = extractMediaIdFromUrl(m.url);
+        if (mediaId) {
+          this.eventEmitter.emit(
+            type === 'attach'
+              ? MediaEvent.IMAGE_ATTACHED
+              : MediaEvent.IMAGE_DETACHED,
+            type === 'attach'
+              ? new ImageAttachedEvent(mediaId, productId, 'product')
+              : new ImageDetachedEvent(mediaId),
+          );
+        }
+      });
+    }
   }
 }

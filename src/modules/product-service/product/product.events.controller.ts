@@ -17,7 +17,7 @@ export class ProductEventsController {
   async handleCheckAvailability(
     payload: ProductCheckAvailabilityEvent,
   ): Promise<ProductAvailabilityResult> {
-    const product = await this.productService.findOne(payload.productId);
+    const product = await this.productService.findOneAdmin(payload.productId);
 
     if (!product || product.status !== ProductStatus.ACTIVE) {
       return new ProductAvailabilityResult({
