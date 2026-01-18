@@ -13,4 +13,6 @@ export interface StorageAdapter {
   listObjects(prefix?: string): Promise<string[]>;
 
   copyFile(sourceKey: string, destinationKey: string): Promise<void>;
+
+  getPublicUrl(key: string): string;
 }

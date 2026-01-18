@@ -108,4 +108,8 @@ export class R2StorageAdapter implements StorageAdapter {
       throw error;
     }
   }
+
+  getPublicUrl(key: string): string {
+    return `${config.r2.publicUrl}/${key}`;
+  }
 }

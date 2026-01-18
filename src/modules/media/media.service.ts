@@ -8,7 +8,6 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as path from 'path';
-import { Stream } from 'stream';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ImageAttachedEvent,
@@ -22,19 +21,6 @@ import { ImageOptimizerService } from './infrastructure/image-optimizer.service'
 import { Media } from './infrastructure/schemas/media.schema';
 import { StorageAdapter } from './storage/storage.adapter.interface';
 
-interface MulterFile {
-  fieldname: string;
-  originalname: string;
-  encoding: string;
-  mimetype: string;
-  size: number;
-  stream: Stream;
-  destination: string;
-  filename: string;
-  path: string;
-  buffer: Buffer;
-}
-
 @Injectable()
 export class MediaService {
   private readonly logger = new Logger(MediaService.name);
@@ -45,8 +31,8 @@ export class MediaService {
     private readonly imageOptimizer: ImageOptimizerService,
   ) {}
 
-  async uploadFile(file: any): Promise<MediaResponseDto> {
-    const multerFile = file as MulterFile;
+  async uploadFile(file: Express.Multer.File): Promise<MediaResponseDto> {
+    const multerFile = file;
 
     // 1. Validate
     if (multerFile.size > config.media.maxFileSize) {
@@ -277,7 +263,7 @@ export class MediaService {
       media.ownerId = event.ownerId;
       media.ownerType = event.ownerType;
       media.storageKey = newKey;
-      media.url = `${config.r2.publicUrl}/${newKey}`;
+      media.url = this.storageAdapter.getPublicUrl(newKey);
 
       await media.save();
       this.logger.log(

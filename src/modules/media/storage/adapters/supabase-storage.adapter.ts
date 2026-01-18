@@ -11,17 +11,55 @@ export class SupabaseStorageAdapter implements StorageAdapter {
   private readonly bucket: string;
 
   constructor() {
-    this.client = createClient(config.supabase.url, config.supabase.key);
+    if (!config.supabase.url || !config.supabase.key) {
+      this.logger.error(
+        'Supabase configuration is missing URL or Key. Check your environment variables.',
+      );
+    }
+
+    this.client = createClient(config.supabase.url, config.supabase.key, {
+      auth: {
+        persistSession: false,
+        detectSessionInUrl: false,
+        autoRefreshToken: false,
+      },
+    });
     this.bucket = config.supabase.bucket;
+
+    this.checkKeyRole(config.supabase.key);
+  }
+
+  private checkKeyRole(key: string) {
+    try {
+      if (!key || !key.includes('.')) return;
+      const parts = key.split('.');
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const role = payload.role as string;
+
+      this.logger.log(`Supabase initialized with key role: ${role}`);
+
+      if (role !== 'service_role') {
+        this.logger.warn(
+          'CRITICAL: The provided key is NOT a service_role key. ' +
+            'Supabase Storage will reject uploads unless you have public RLS policies. ' +
+            'Please use the SERVICE_ROLE_KEY to bypass RLS.',
+        );
+      }
+    } catch {
+      this.logger.warn('Could not verify Supabase key JWT payload.');
+    }
   }
 
   async uploadFile(
     file: Buffer,
     key: string,
     mimeType: string,
-    acl?: ObjectCannedACL,
+    _acl?: ObjectCannedACL,
   ): Promise<string> {
     try {
+      this.logger.debug(`Uploading to Supabase: ${key} (${mimeType})`);
+
       const { error } = await this.client.storage
         .from(this.bucket)
         .upload(key, file, {
@@ -29,7 +67,15 @@ export class SupabaseStorageAdapter implements StorageAdapter {
           upsert: true,
         });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message?.includes('row-level security')) {
+          this.logger.error(
+            `RLS Violation: The current key (${config.storageProvider} provider) does not have permission to upload to bucket "${this.bucket}". ` +
+              'Ensure you are using the SERVICE_ROLE_KEY or have configured RLS policies.',
+          );
+        }
+        throw error;
+      }
 
       const { data } = this.client.storage.from(this.bucket).getPublicUrl(key);
 
@@ -59,21 +105,20 @@ export class SupabaseStorageAdapter implements StorageAdapter {
 
   async listObjects(prefix: string = ''): Promise<string[]> {
     try {
-      // Supabase list expects a folder path. If prefix is typically "tmp/" or "images/", it works.
-      // If prefix is empty, list root.
-      // Note: Supabase list is not recursive by default like S3, so this might be limited.
-      // However, for strict interface compliance we do our best.
       const { data, error } = await this.client.storage
         .from(this.bucket)
         .list(prefix, {
           limit: 100,
           offset: 0,
+          sortBy: { column: 'name', order: 'asc' },
         });
 
       if (error) throw error;
 
-      // Note: 'list' returns file names relative to the folder, so we prepend prefix.
-      return data.map((item) => (prefix ? `${prefix}${item.name}` : item.name));
+      return (
+        data?.map((item) => (prefix ? `${prefix}${item.name}` : item.name)) ||
+        []
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
@@ -97,5 +142,10 @@ export class SupabaseStorageAdapter implements StorageAdapter {
       this.logger.error(`Failed to copy file in Supabase: ${errorMessage}`);
       throw error;
     }
+  }
+
+  getPublicUrl(key: string): string {
+    const { data } = this.client.storage.from(this.bucket).getPublicUrl(key);
+    return data.publicUrl;
   }
 }
