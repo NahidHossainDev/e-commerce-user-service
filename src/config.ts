@@ -26,6 +26,12 @@ export interface Config {
     bucketName: string;
     publicUrl: string;
   };
+  supabase: {
+    url: string;
+    key: string;
+    bucket: string;
+  };
+  storageProvider: 'r2' | 'supabase';
   media: {
     maxFileSize: number;
     allowedMimeTypes: string[];
@@ -68,6 +74,10 @@ const getConfig = (): Config => {
     R2_SECRET_ACCESS_KEY: r2SecretAccessKey,
     R2_BUCKET_NAME: r2BucketName,
     R2_PUBLIC_URL: r2PublicUrl,
+    SUPABASE_URL: supabaseUrl,
+    SUPABASE_SERVICE_ROLE_KEY: supabaseKey,
+    SUPABASE_BUCKET: supabaseBucket,
+    STORAGE_PROVIDER: storageProvider,
     SMTP_HOST: smtpHost,
     SMTP_PORT: smtpPort,
     SMTP_USER: smtpUser,
@@ -116,6 +126,12 @@ const getConfig = (): Config => {
       bucketName: r2BucketName,
       publicUrl: r2PublicUrl,
     },
+    supabase: {
+      url: supabaseUrl || '',
+      key: supabaseKey || '',
+      bucket: supabaseBucket || 'media-public',
+    },
+    storageProvider: (storageProvider as 'r2' | 'supabase') || 'r2',
     media: {
       maxFileSize: Number(process.env.MEDIA_MAX_FILE_SIZE) || 50 * 1024 * 1024, // 50MB
       tempFileExpirationHours:

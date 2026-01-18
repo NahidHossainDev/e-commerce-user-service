@@ -7,10 +7,11 @@ import {
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { Injectable, Logger } from '@nestjs/common';
-import { config } from '../../../config';
+import { config } from 'src/config';
+import { StorageAdapter } from '../storage.adapter.interface';
 
 @Injectable()
-export class R2StorageAdapter {
+export class R2StorageAdapter implements StorageAdapter {
   private readonly client: S3Client;
   private readonly logger = new Logger(R2StorageAdapter.name);
 

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -18,8 +19,8 @@ import { MediaStatus, MediaType } from './domain/media.types';
 import { CleanupResponseDto } from './dto/cleanup-response.dto';
 import { MediaResponseDto } from './dto/media-response.dto';
 import { ImageOptimizerService } from './infrastructure/image-optimizer.service';
-import { R2StorageAdapter } from './infrastructure/r2-storage.adapter';
 import { Media } from './infrastructure/schemas/media.schema';
+import { StorageAdapter } from './storage/storage.adapter.interface';
 
 interface MulterFile {
   fieldname: string;
@@ -40,7 +41,7 @@ export class MediaService {
 
   constructor(
     @InjectModel(Media.name) private readonly mediaModel: Model<Media>,
-    private readonly r2Adapter: R2StorageAdapter,
+    @Inject('STORAGE_ADAPTER') private readonly storageAdapter: StorageAdapter,
     private readonly imageOptimizer: ImageOptimizerService,
   ) {}
 
@@ -100,7 +101,7 @@ export class MediaService {
 
     try {
       // 2. Upload to R2
-      const url = await this.r2Adapter.uploadFile(
+      const url = await this.storageAdapter.uploadFile(
         finalBuffer,
         storageKey,
         finalMimeType,
@@ -127,7 +128,7 @@ export class MediaService {
         await media.save();
       } catch (dbError) {
         // 4. Cleanup R2 if DB save fails
-        await this.r2Adapter.deleteFile(storageKey);
+        await this.storageAdapter.deleteFile(storageKey);
         throw dbError;
       }
 
@@ -155,14 +156,14 @@ export class MediaService {
       throw new NotFoundException(`Media with ID ${id} not found`);
     }
 
-    await this.r2Adapter.deleteFile(media.storageKey);
+    await this.storageAdapter.deleteFile(media.storageKey);
     await this.mediaModel.deleteOne({ id }).exec();
   }
 
   async cleanupOrphanFiles(): Promise<CleanupResponseDto> {
     try {
       // List all files from R2
-      const allR2Keys = await this.r2Adapter.listObjects();
+      const allR2Keys = await this.storageAdapter.listObjects();
 
       // Get all file URLs from DB
       const allDbMedia = await this.mediaModel
@@ -176,7 +177,7 @@ export class MediaService {
       // Delete orphans
       if (orphanKeys.length > 0) {
         await Promise.all(
-          orphanKeys.map((key) => this.r2Adapter.deleteFile(key)),
+          orphanKeys.map((key) => this.storageAdapter.deleteFile(key)),
         );
       }
 
@@ -225,7 +226,7 @@ export class MediaService {
           // Delete from R2
           const m = media as Media;
           const storageKey = m.storageKey;
-          await this.r2Adapter.deleteFile(storageKey);
+          await this.storageAdapter.deleteFile(storageKey);
           deletedIds.push(m.id);
         } catch (err) {
           const errMsg = err instanceof Error ? err.message : 'Unknown error';
@@ -267,9 +268,9 @@ export class MediaService {
       const newKey = oldKey.replace('tmp/', '');
 
       // Copy in R2
-      await this.r2Adapter.copyFile(oldKey, newKey);
+      await this.storageAdapter.copyFile(oldKey, newKey);
       // Delete old from R2
-      await this.r2Adapter.deleteFile(oldKey);
+      await this.storageAdapter.deleteFile(oldKey);
 
       // Update DB
       media.status = MediaStatus.ACTIVE;
