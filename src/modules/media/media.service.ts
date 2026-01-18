@@ -86,7 +86,7 @@ export class MediaService {
     const storageKey = `tmp/${type}s/${id}.${finalFormat}`;
 
     try {
-      // 2. Upload to R2
+      // 2. Upload to storage
       const url = await this.storageAdapter.uploadFile(
         finalBuffer,
         storageKey,
@@ -113,7 +113,7 @@ export class MediaService {
       try {
         await media.save();
       } catch (dbError) {
-        // 4. Cleanup R2 if DB save fails
+        // 4. Cleanup storage if DB save fails
         await this.storageAdapter.deleteFile(storageKey);
         throw dbError;
       }
@@ -148,8 +148,8 @@ export class MediaService {
 
   async cleanupOrphanFiles(): Promise<CleanupResponseDto> {
     try {
-      // List all files from R2
-      const allR2Keys = await this.storageAdapter.listObjects();
+      // List all files from storage
+      const allStorageKeys = await this.storageAdapter.listObjects();
 
       // Get all file URLs from DB
       const allDbMedia = await this.mediaModel
@@ -157,8 +157,8 @@ export class MediaService {
         .exec();
       const dbKeys = new Set(allDbMedia.map((m) => m.storageKey));
 
-      // Find orphans (Keys in R2 but NOT in DB)
-      const orphanKeys = allR2Keys.filter((key) => !dbKeys.has(key));
+      // Find orphans (Keys in storage but NOT in DB)
+      const orphanKeys = allStorageKeys.filter((key) => !dbKeys.has(key));
 
       // Delete orphans
       if (orphanKeys.length > 0) {
@@ -209,7 +209,7 @@ export class MediaService {
 
       for (const media of tempMedia) {
         try {
-          // Delete from R2
+          // Delete from storage
           const m = media as Media;
           const storageKey = m.storageKey;
           await this.storageAdapter.deleteFile(storageKey);
@@ -217,7 +217,7 @@ export class MediaService {
         } catch (err) {
           const errMsg = err instanceof Error ? err.message : 'Unknown error';
           this.logger.error(
-            `Failed to delete R2 file for media ID ${media.id}: ${errMsg}`,
+            `Failed to delete storage file for media ID ${media.id}: ${errMsg}`,
           );
         }
       }
@@ -253,9 +253,9 @@ export class MediaService {
 
       const newKey = oldKey.replace('tmp/', '');
 
-      // Copy in R2
+      // Copy in storage
       await this.storageAdapter.copyFile(oldKey, newKey);
-      // Delete old from R2
+      // Delete old from storage
       await this.storageAdapter.deleteFile(oldKey);
 
       // Update DB
