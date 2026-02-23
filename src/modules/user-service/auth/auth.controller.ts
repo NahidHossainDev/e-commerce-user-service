@@ -5,6 +5,7 @@ import {
   Post,
   Query,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -14,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Response } from 'express';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { UserDocument } from '../user/user.schema';
 import { LoginDto } from './dto/login.dto';
@@ -55,8 +57,13 @@ export class AuthController {
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { refreshToken, ...rest } = await this.authService.login(loginDto);
+    this.setRefreshTokenCookie(res, refreshToken);
+    return rest;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -70,8 +77,18 @@ export class AuthController {
 
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh tokens' })
-  async refresh(@Body('refreshToken') refreshToken: string) {
-    return this.authService.refreshTokens(refreshToken);
+  async refresh(
+    @Body('refreshToken') refreshTokenFromReq: string,
+    @Request() req: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = (refreshTokenFromReq ||
+      req.cookies?.refreshToken) as string;
+    const tokens = await this.authService.refreshTokens(refreshToken);
+
+    this.setRefreshTokenCookie(res, tokens.refreshToken);
+
+    return { accessToken: tokens.accessToken };
   }
 
   @Get('verify-email')
@@ -101,8 +118,16 @@ export class AuthController {
   @Post('phone/verify')
   @ApiOperation({ summary: 'Verify phone OTP and login/register' })
   @ApiResponse({ status: 200, description: 'Phone verified and logged in' })
-  async phoneVerify(@Body() phoneVerifyDto: PhoneVerifyDto) {
-    return this.phoneAuthService.phoneVerify(phoneVerifyDto);
+  async phoneVerify(
+    @Body() phoneVerifyDto: PhoneVerifyDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { refreshToken, ...rest } =
+      await this.phoneAuthService.phoneVerify(phoneVerifyDto);
+
+    this.setRefreshTokenCookie(res, refreshToken);
+
+    return rest;
   }
 
   @Post('phone/resend')
@@ -116,13 +141,38 @@ export class AuthController {
 
   @Post('google')
   @ApiOperation({ summary: 'Google OAuth login' })
-  async googleLogin(@Body() googleLoginDto: GoogleLoginDto) {
-    return this.socialAuthService.googleLogin(googleLoginDto);
+  async googleLogin(
+    @Body() googleLoginDto: GoogleLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { refreshToken, ...rest } =
+      await this.socialAuthService.googleLogin(googleLoginDto);
+
+    this.setRefreshTokenCookie(res, refreshToken);
+
+    return rest;
   }
 
   @Post('facebook')
   @ApiOperation({ summary: 'Facebook OAuth login' })
-  async facebookLogin(@Body() facebookLoginDto: FacebookLoginDto) {
-    return this.socialAuthService.facebookLogin(facebookLoginDto);
+  async facebookLogin(
+    @Body() facebookLoginDto: FacebookLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { refreshToken, ...rest } =
+      await this.socialAuthService.facebookLogin(facebookLoginDto);
+
+    this.setRefreshTokenCookie(res, refreshToken);
+
+    return rest;
+  }
+
+  private setRefreshTokenCookie(res: Response, refreshToken: string) {
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
   }
 }

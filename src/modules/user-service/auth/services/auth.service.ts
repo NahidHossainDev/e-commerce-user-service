@@ -159,7 +159,11 @@ export class AuthService {
     return { message: 'Verification email resent' };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    user: ReturnType<AuthService['sanitizeUser']>;
+  }> {
     const { phoneNumber, password } = loginDto;
 
     const email = loginDto.email?.trim().toLowerCase();

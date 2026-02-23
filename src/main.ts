@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { writeFileSync } from 'fs';
 import { AppModule } from './app.module';
 import { config } from './config';
@@ -43,7 +44,17 @@ function setupSwagger(app: INestApplication) {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Startup');
-  app.enableCors();
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin:
+      config.env === 'production'
+        ? process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000']
+        : true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   // app.connectMicroservice<MicroserviceOptions>({
   //   transport:Transport.NATS,
@@ -72,6 +83,5 @@ async function bootstrap() {
   logger.log(`App Started on http://localhost:${config.port}/api/v1`);
   logger.log(`Swagger Docs on http://localhost:${config.port}/api/v1/docs`);
 }
-
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrap();
