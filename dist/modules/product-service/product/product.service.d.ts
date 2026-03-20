@@ -1,0 +1,30 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Connection, Model } from 'mongoose';
+import { InventoryService } from '../inventory/inventory.service';
+import { ProductQueryDto } from './dto/product-query-options.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
+import { ProductDocument, ProductStatus } from './schemas/product.schema';
+export declare class ProductService {
+    private productModel;
+    private readonly inventoryService;
+    private readonly eventEmitter;
+    private readonly connection;
+    constructor(productModel: Model<ProductDocument>, inventoryService: InventoryService, eventEmitter: EventEmitter2, connection: Connection);
+    create(createProductDto: CreateProductDto): Promise<ProductDocument>;
+    findAllPublic(queryDto: ProductQueryDto): Promise<import("../../../common/interface").IPaginatedResponse<ProductDocument>>;
+    findAllAdmin(queryDto: ProductQueryDto): Promise<import("../../../common/interface").IPaginatedResponse<ProductDocument>>;
+    findOnePublic(idOrSlug: string): Promise<ProductDocument>;
+    findOneAdmin(id: string): Promise<ProductDocument>;
+    update(id: string, updateProductDto: UpdateProductDto): Promise<ProductDocument>;
+    remove(id: string): Promise<void>;
+    hardDelete(id: string): Promise<void>;
+    updateStatus(id: string, status: ProductStatus): Promise<ProductDocument>;
+    restore(id: string): Promise<ProductDocument>;
+    bulkUpdateStatus(ids: string[], status: ProductStatus): Promise<any>;
+    updateStock(productId: string, quantityChange: number): Promise<void>;
+    private applySearchFilters;
+    private applyIdFilters;
+    private applyPriceFilters;
+    private applySorting;
+    private emitMediaEvents;
+}

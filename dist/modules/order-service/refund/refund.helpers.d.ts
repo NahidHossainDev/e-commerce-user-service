@@ -1,0 +1,20 @@
+import { Model, Types } from 'mongoose';
+import { OrderDocument } from '../order/schemas/order.schema';
+import { CreateRefundRequestDto } from './dto/refund.dto';
+import { RefundAmount, RefundDocument, RefundReason } from './schemas/refund.schema';
+export declare const generateRefundId: () => string;
+export declare const validateOrderOwnership: (orderModel: Model<OrderDocument>, orderId: string, userId: string) => Promise<OrderDocument>;
+export declare const validateRefundEligibility: (order: OrderDocument) => void;
+export declare const checkExistingRefund: (refundModel: Model<RefundDocument>, orderId: Types.ObjectId) => Promise<void>;
+export declare const validateRefundItems: (refundItems: {
+    productId: string;
+    quantity: number;
+}[], order: OrderDocument) => void;
+export declare const checkUserRefundLimits: (refundModel: Model<RefundDocument>, userId: string) => Promise<void>;
+export declare const checkEvidenceRequirements: (dto: CreateRefundRequestDto) => void;
+export declare const calculateRefundAmount: (order: OrderDocument, dto: CreateRefundRequestDto) => RefundAmount;
+export declare const calculateTotalRefundAmount: (refundAmount: RefundAmount) => number;
+export declare const generateUniqueRefundId: (refundModel: Model<RefundDocument>) => Promise<string>;
+export declare const shouldRestoreStock: (reason: RefundReason) => boolean;
+export declare const isStockSellable: (reason: RefundReason) => boolean;
+export declare const isStockDamaged: (reason: RefundReason) => boolean;

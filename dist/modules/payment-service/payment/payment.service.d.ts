@@ -1,0 +1,30 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ClientSession, Model } from 'mongoose';
+import { OrderPaymentRequestEvent, PaymentRequestResult } from 'src/common/events/order.events';
+import { IPaginatedResponse } from 'src/common/interface';
+import { WalletService } from '../wallet/wallet.service';
+import { InitiatePaymentDto } from './dto/initiate-payment.dto';
+import { PaymentQueryOptions } from './dto/payment.query-options.dto';
+import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
+import { PaymentCategoryConfig } from './payment-methods.config';
+import { PaymentDocument } from './schemas/payment.schema';
+export declare class PaymentService {
+    private paymentModel;
+    private readonly walletService;
+    private readonly eventEmitter;
+    constructor(paymentModel: Model<PaymentDocument>, walletService: WalletService, eventEmitter: EventEmitter2);
+    initiatePayment(dto: InitiatePaymentDto, session?: ClientSession): Promise<PaymentDocument>;
+    verifyPayment(transactionId: string): Promise<PaymentDocument>;
+    processPaymentSuccess(transactionId: string, gatewayResponse: Record<string, any>): Promise<PaymentDocument>;
+    processPaymentFailure(transactionId: string, reason: string): Promise<PaymentDocument>;
+    handleSSLCommerzCallback(payload: Record<string, any>): Promise<void>;
+    getMyPayments(userId: string, query: PaymentQueryOptions): Promise<IPaginatedResponse<PaymentDocument>>;
+    getPaymentByTransactionId(transactionId: string, userId: string): Promise<PaymentDocument>;
+    findAll(query: PaymentQueryOptions): Promise<IPaginatedResponse<PaymentDocument>>;
+    findOne(id: string): Promise<PaymentDocument>;
+    getPaymentStats(): Promise<any[]>;
+    manualUpdateStatus(id: string, dto: UpdatePaymentStatusDto): Promise<PaymentDocument>;
+    initiateRefund(paymentId: string, amount: number, reason: string): Promise<PaymentDocument>;
+    getAvailablePaymentMethods(): PaymentCategoryConfig[];
+    paymentRequest(event: OrderPaymentRequestEvent): Promise<PaymentRequestResult>;
+}
