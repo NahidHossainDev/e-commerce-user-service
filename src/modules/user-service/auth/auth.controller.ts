@@ -16,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Response } from 'express';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { UserDocument } from '../user/user.schema';
 import { LoginDto } from './dto/login.dto';
@@ -64,6 +65,19 @@ export class AuthController {
     const { refreshToken, ...rest } = await this.authService.login(loginDto);
     this.setRefreshTokenCookie(res, refreshToken);
     return rest;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getMe(@CurrentUser() user: UserDocument) {
+    return await this.authService.getMe(user._id.toString());
   }
 
   @UseGuards(JwtAuthGuard)

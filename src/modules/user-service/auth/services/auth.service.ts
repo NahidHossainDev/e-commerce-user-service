@@ -333,6 +333,11 @@ export class AuthService {
     };
   }
 
+  async getMe(userId: string) {
+    const user = await this.userService.findOne(userId);
+    return this.sanitizeUser(user);
+  }
+
   private async createVerificationToken(
     userId: any,
     type: VerificationTokenType,
