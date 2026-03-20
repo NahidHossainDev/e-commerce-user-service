@@ -55,6 +55,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "sharp": "^0.34.5",
+    "@swc/core": "^1.10.7",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
