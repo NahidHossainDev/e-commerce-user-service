@@ -8,8 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiWrappedResponse } from 'src/utils/response/swagger.helper';
 import { BrandService } from './brand.service';
+import {
+  BrandResponseDto,
+  PaginatedBrandsResponseDto,
+} from './dto/brand-response.dto';
 import { BrandQueryOptionsDto } from './dto/brand-query-options.dto';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -21,48 +26,70 @@ export class BrandController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new brand' })
-  @ApiResponse({
+  @ApiWrappedResponse({
     status: 201,
     description: 'The brand has been successfully created.',
+    type: BrandResponseDto,
   })
-  @ApiResponse({
-    status: 409,
-    description: 'Brand name or slug already exists.',
-  })
-  create(@Body() createBrandDto: CreateBrandDto) {
-    return this.brandService.create(createBrandDto);
+  async create(
+    @Body() createBrandDto: CreateBrandDto,
+  ): Promise<BrandResponseDto> {
+    return (await this.brandService.create(
+      createBrandDto,
+    )) as unknown as BrandResponseDto;
   }
 
   @Get()
   @ApiOperation({
     summary: 'Retrieve all brands with pagination and filtering',
   })
-  findAll(@Query() query: BrandQueryOptionsDto) {
-    return this.brandService.findAll(query);
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Paginated list of brands.',
+    type: PaginatedBrandsResponseDto,
+  })
+  async findAll(@Query() query: BrandQueryOptionsDto) {
+    return (await this.brandService.findAll(
+      query,
+    )) as unknown as PaginatedBrandsResponseDto;
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve a brand by ID' })
-  @ApiResponse({ status: 404, description: 'Brand not found.' })
-  findOne(@Param('id') id: string) {
-    return this.brandService.findOne(id);
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Brand found.',
+    type: BrandResponseDto,
+  })
+  async findOne(@Param('id') id: string): Promise<BrandResponseDto> {
+    return (await this.brandService.findOne(id)) as unknown as BrandResponseDto;
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a brand by ID' })
-  @ApiResponse({ status: 404, description: 'Brand not found.' })
-  @ApiResponse({
-    status: 409,
-    description: 'Brand name or slug already exists.',
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Brand updated successfully.',
+    type: BrandResponseDto,
   })
-  update(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
-    return this.brandService.update(id, updateBrandDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateBrandDto: UpdateBrandDto,
+  ): Promise<BrandResponseDto> {
+    return (await this.brandService.update(
+      id,
+      updateBrandDto,
+    )) as unknown as BrandResponseDto;
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a brand by ID' })
-  @ApiResponse({ status: 404, description: 'Brand not found.' })
-  remove(@Param('id') id: string) {
-    return this.brandService.remove(id);
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Brand deleted successfully.',
+    type: BrandResponseDto,
+  })
+  async remove(@Param('id') id: string): Promise<BrandResponseDto> {
+    return (await this.brandService.remove(id)) as unknown as BrandResponseDto;
   }
 }
