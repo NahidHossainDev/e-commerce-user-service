@@ -17,6 +17,7 @@ export declare class AuthController {
     }>;
     login(loginDto: LoginDto, res: Response): Promise<{
         accessToken: string;
+        refreshToken: string;
         user: ReturnType<AuthService["sanitizeUser"]>;
     }>;
     getMe(user: UserDocument): Promise<{
@@ -51,6 +52,7 @@ export declare class AuthController {
     }) | null>;
     refresh(refreshTokenFromReq: string, req: any, res: Response): Promise<{
         accessToken: string;
+        refreshToken: string;
     }>;
     verifyEmail(token: string): Promise<{
         message: string;
@@ -63,6 +65,7 @@ export declare class AuthController {
     }>;
     phoneVerify(phoneVerifyDto: PhoneVerifyDto, res: Response): Promise<{
         accessToken: string;
+        refreshToken: string;
         user: {
             _id: import("mongoose").Types.ObjectId;
             email: string | undefined;
@@ -88,6 +91,7 @@ export declare class AuthController {
     }>;
     googleLogin(googleLoginDto: GoogleLoginDto, res: Response): Promise<{
         accessToken: string;
+        refreshToken: string;
         user: {
             _id: import("mongoose").Types.ObjectId;
             email: string | undefined;
@@ -110,6 +114,7 @@ export declare class AuthController {
     }>;
     facebookLogin(facebookLoginDto: FacebookLoginDto, res: Response): Promise<{
         accessToken: string;
+        refreshToken: string;
         user: {
             _id: import("mongoose").Types.ObjectId;
             email: string | undefined;

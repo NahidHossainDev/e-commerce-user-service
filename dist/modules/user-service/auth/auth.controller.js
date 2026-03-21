@@ -38,9 +38,8 @@ let AuthController = class AuthController {
         return this.authService.register(registerDto);
     }
     async login(loginDto, res) {
-        const { refreshToken, ...rest } = await this.authService.login(loginDto);
-        this.setRefreshTokenCookie(res, refreshToken);
-        return rest;
+        const result = await this.authService.login(loginDto);
+        return result;
     }
     async getMe(user) {
         return await this.authService.getMe(user._id.toString());
@@ -52,8 +51,7 @@ let AuthController = class AuthController {
         const refreshToken = (refreshTokenFromReq ||
             req.cookies?.refreshToken);
         const tokens = await this.authService.refreshTokens(refreshToken);
-        this.setRefreshTokenCookie(res, tokens.refreshToken);
-        return { accessToken: tokens.accessToken };
+        return tokens;
     }
     async verifyEmail(token) {
         return this.authService.verifyEmail({ token });
@@ -65,22 +63,19 @@ let AuthController = class AuthController {
         return this.phoneAuthService.phoneStart(phoneStartDto);
     }
     async phoneVerify(phoneVerifyDto, res) {
-        const { refreshToken, ...rest } = await this.phoneAuthService.phoneVerify(phoneVerifyDto);
-        this.setRefreshTokenCookie(res, refreshToken);
-        return rest;
+        const result = await this.phoneAuthService.phoneVerify(phoneVerifyDto);
+        return result;
     }
     async phoneResend(phoneResendDto) {
         return this.phoneAuthService.resendPhoneOtp(phoneResendDto.phoneNumber);
     }
     async googleLogin(googleLoginDto, res) {
-        const { refreshToken, ...rest } = await this.socialAuthService.googleLogin(googleLoginDto);
-        this.setRefreshTokenCookie(res, refreshToken);
-        return rest;
+        const result = await this.socialAuthService.googleLogin(googleLoginDto);
+        return result;
     }
     async facebookLogin(facebookLoginDto, res) {
-        const { refreshToken, ...rest } = await this.socialAuthService.facebookLogin(facebookLoginDto);
-        this.setRefreshTokenCookie(res, refreshToken);
-        return rest;
+        const result = await this.socialAuthService.facebookLogin(facebookLoginDto);
+        return result;
     }
     setRefreshTokenCookie(res, refreshToken) {
         res.cookie('refreshToken', refreshToken, {
