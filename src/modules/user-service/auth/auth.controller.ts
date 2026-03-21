@@ -62,9 +62,9 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { refreshToken, ...rest } = await this.authService.login(loginDto);
-    this.setRefreshTokenCookie(res, refreshToken);
-    return rest;
+    const result = await this.authService.login(loginDto);
+    // this.setRefreshTokenCookie(res, result.refreshToken);
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -99,10 +99,8 @@ export class AuthController {
     const refreshToken = (refreshTokenFromReq ||
       req.cookies?.refreshToken) as string;
     const tokens = await this.authService.refreshTokens(refreshToken);
-
-    this.setRefreshTokenCookie(res, tokens.refreshToken);
-
-    return { accessToken: tokens.accessToken };
+    // this.setRefreshTokenCookie(res, tokens.refreshToken);
+    return tokens;
   }
 
   @Get('verify-email')
@@ -136,12 +134,9 @@ export class AuthController {
     @Body() phoneVerifyDto: PhoneVerifyDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { refreshToken, ...rest } =
-      await this.phoneAuthService.phoneVerify(phoneVerifyDto);
-
-    this.setRefreshTokenCookie(res, refreshToken);
-
-    return rest;
+    const result = await this.phoneAuthService.phoneVerify(phoneVerifyDto);
+    // this.setRefreshTokenCookie(res, result.refreshToken);
+    return result;
   }
 
   @Post('phone/resend')
@@ -159,12 +154,9 @@ export class AuthController {
     @Body() googleLoginDto: GoogleLoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { refreshToken, ...rest } =
-      await this.socialAuthService.googleLogin(googleLoginDto);
-
-    this.setRefreshTokenCookie(res, refreshToken);
-
-    return rest;
+    const result = await this.socialAuthService.googleLogin(googleLoginDto);
+    // this.setRefreshTokenCookie(res, result.refreshToken);
+    return result;
   }
 
   @Post('facebook')
@@ -173,12 +165,9 @@ export class AuthController {
     @Body() facebookLoginDto: FacebookLoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { refreshToken, ...rest } =
-      await this.socialAuthService.facebookLogin(facebookLoginDto);
-
-    this.setRefreshTokenCookie(res, refreshToken);
-
-    return rest;
+    const result = await this.socialAuthService.facebookLogin(facebookLoginDto);
+    // this.setRefreshTokenCookie(res, result.refreshToken);
+    return result;
   }
 
   private setRefreshTokenCookie(res: Response, refreshToken: string) {
