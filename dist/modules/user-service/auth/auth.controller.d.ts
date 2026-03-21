@@ -50,7 +50,11 @@ export declare class AuthController {
     }> & {
         __v: number;
     }) | null>;
-    refresh(refreshTokenFromReq: string, req: any, res: Response): Promise<{
+    refresh(refreshTokenFromReq: string, req: {
+        cookies?: {
+            refreshToken?: string;
+        };
+    }, _res: Response): Promise<{
         accessToken: string;
         refreshToken: string;
     }>;
@@ -63,7 +67,7 @@ export declare class AuthController {
     phoneStart(phoneStartDto: PhoneStartDto): Promise<{
         message: string;
     }>;
-    phoneVerify(phoneVerifyDto: PhoneVerifyDto, res: Response): Promise<{
+    phoneVerify(phoneVerifyDto: PhoneVerifyDto, _res: Response): Promise<{
         accessToken: string;
         refreshToken: string;
         user: {
@@ -89,7 +93,7 @@ export declare class AuthController {
     phoneResend(phoneResendDto: PhoneResendDto): Promise<{
         message: string;
     }>;
-    googleLogin(googleLoginDto: GoogleLoginDto, res: Response): Promise<{
+    googleLogin(googleLoginDto: GoogleLoginDto, _res: Response): Promise<{
         accessToken: string;
         refreshToken: string;
         user: {
@@ -112,7 +116,7 @@ export declare class AuthController {
             accountStatus: import("../user/user.schema").AccountStatus;
         };
     }>;
-    facebookLogin(facebookLoginDto: FacebookLoginDto, res: Response): Promise<{
+    facebookLogin(facebookLoginDto: FacebookLoginDto, _res: Response): Promise<{
         accessToken: string;
         refreshToken: string;
         user: {
