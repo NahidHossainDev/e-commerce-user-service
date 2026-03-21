@@ -22,6 +22,7 @@ export function ApiWrappedResponse<TModel extends Type<unknown>>(options: {
   status: number;
   description: string;
   type: TModel;
+  isArray?: boolean;
 }) {
   return applyDecorators(
     ApiExtraModels(options.type),
@@ -29,20 +30,21 @@ export function ApiWrappedResponse<TModel extends Type<unknown>>(options: {
       status: options.status,
       description: options.description,
       schema: {
-        allOf: [
-          {
-            properties: {
-              success: { type: 'boolean', example: true },
-              message: {
-                nullable: true,
-                example: null,
-                oneOf: [{ type: 'string' }, { type: 'null' }],
-              },
-              data: { $ref: getSchemaPath(options.type) },
-            },
-            required: ['success', 'data'],
+        properties: {
+          success: { type: 'boolean', example: true },
+          message: {
+            nullable: true,
+            example: null,
+            oneOf: [{ type: 'string' }, { type: 'null' }],
           },
-        ],
+          data: options.isArray
+            ? {
+                type: 'array',
+                items: { $ref: getSchemaPath(options.type) },
+              }
+            : { $ref: getSchemaPath(options.type) },
+        },
+        required: ['success', 'data'],
       },
     }),
   );
