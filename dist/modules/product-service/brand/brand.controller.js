@@ -15,7 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BrandController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const swagger_helper_1 = require("../../../utils/response/swagger.helper");
 const brand_service_1 = require("./brand.service");
+const brand_response_dto_1 = require("./dto/brand-response.dto");
 const brand_query_options_dto_1 = require("./dto/brand-query-options.dto");
 const create_brand_dto_1 = require("./dto/create-brand.dto");
 const update_brand_dto_1 = require("./dto/update-brand.dto");
@@ -24,80 +26,90 @@ let BrandController = class BrandController {
     constructor(brandService) {
         this.brandService = brandService;
     }
-    create(createBrandDto) {
-        return this.brandService.create(createBrandDto);
+    async create(createBrandDto) {
+        return (await this.brandService.create(createBrandDto));
     }
-    findAll(query) {
-        return this.brandService.findAll(query);
+    async findAll(query) {
+        return (await this.brandService.findAll(query));
     }
-    findOne(id) {
-        return this.brandService.findOne(id);
+    async findOne(id) {
+        return (await this.brandService.findOne(id));
     }
-    update(id, updateBrandDto) {
-        return this.brandService.update(id, updateBrandDto);
+    async update(id, updateBrandDto) {
+        return (await this.brandService.update(id, updateBrandDto));
     }
-    remove(id) {
-        return this.brandService.remove(id);
+    async remove(id) {
+        return (await this.brandService.remove(id));
     }
 };
 exports.BrandController = BrandController;
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new brand' }),
-    (0, swagger_1.ApiResponse)({
+    (0, swagger_helper_1.ApiWrappedResponse)({
         status: 201,
         description: 'The brand has been successfully created.',
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 409,
-        description: 'Brand name or slug already exists.',
+        type: brand_response_dto_1.BrandResponseDto,
     }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_brand_dto_1.CreateBrandDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BrandController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({
         summary: 'Retrieve all brands with pagination and filtering',
     }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Paginated list of brands.',
+        type: brand_response_dto_1.PaginatedBrandsResponseDto,
+    }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [brand_query_options_dto_1.BrandQueryOptionsDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BrandController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Retrieve a brand by ID' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Brand not found.' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Brand found.',
+        type: brand_response_dto_1.BrandResponseDto,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BrandController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Update a brand by ID' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Brand not found.' }),
-    (0, swagger_1.ApiResponse)({
-        status: 409,
-        description: 'Brand name or slug already exists.',
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Brand updated successfully.',
+        type: brand_response_dto_1.BrandResponseDto,
     }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_brand_dto_1.UpdateBrandDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BrandController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a brand by ID' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Brand not found.' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Brand deleted successfully.',
+        type: brand_response_dto_1.BrandResponseDto,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], BrandController.prototype, "remove", null);
 exports.BrandController = BrandController = __decorate([
     (0, swagger_1.ApiTags)('Brands'),

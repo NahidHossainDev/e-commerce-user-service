@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { UserDocument } from '../user/user.schema';
+import { AuthResponseDto, AuthTokensResponseDto, LogoutResponseDto, MessageResponseDto, SanitizedUserDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { PhoneResendDto, PhoneStartDto, PhoneVerifyDto } from './dto/phone-auth.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -12,132 +13,23 @@ export declare class AuthController {
     private readonly phoneAuthService;
     private readonly socialAuthService;
     constructor(authService: AuthService, phoneAuthService: PhoneAuthService, socialAuthService: SocialAuthService);
-    register(registerDto: RegisterDto): Promise<{
-        message: string;
-    }>;
-    login(loginDto: LoginDto, res: Response): Promise<{
-        accessToken: string;
-        refreshToken: string;
-        user: ReturnType<AuthService["sanitizeUser"]>;
-    }>;
-    getMe(user: UserDocument): Promise<{
-        _id: import("mongoose").Types.ObjectId;
-        email: string | undefined;
-        phoneNumber: string | undefined;
-        profile: {
-            fullName: string;
-            imageUrl?: string;
-            dateOfBirth?: Date;
-            gender?: import("../user/user.schema").Gender;
-        };
-        roles: {
-            type: import("../user/user.schema").UserRole;
-            status: import("../user/user.schema").RoleStatus;
-            assignedAt: Date;
-            metadata?: Record<string, unknown>;
-        }[];
-        primaryRole: import("../user/user.schema").UserRole;
-        accountStatus: import("../user/user.schema").AccountStatus;
-    }>;
+    register(registerDto: RegisterDto): Promise<MessageResponseDto>;
+    login(loginDto: LoginDto, res: Response): Promise<AuthResponseDto>;
+    getMe(user: UserDocument): Promise<SanitizedUserDto>;
     logout(req: {
         user: UserDocument;
-    }): Promise<(import("mongoose").Document<unknown, {}, import("mongoose").Document<unknown, {}, import("../user/user.schema").User, {}, {}> & import("../user/user.schema").User & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }> & {
-        __v: number;
-    }, {}, {}> & import("mongoose").Document<unknown, {}, import("../user/user.schema").User, {}, {}> & import("../user/user.schema").User & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }> & {
-        __v: number;
-    }) | null>;
+    }): Promise<LogoutResponseDto>;
     refresh(refreshTokenFromReq: string, req: {
         cookies?: {
             refreshToken?: string;
         };
-    }, _res: Response): Promise<{
-        accessToken: string;
-        refreshToken: string;
-    }>;
-    verifyEmail(token: string): Promise<{
-        message: string;
-    }>;
-    resendVerification(email: string): Promise<{
-        message: string;
-    }>;
-    phoneStart(phoneStartDto: PhoneStartDto): Promise<{
-        message: string;
-    }>;
-    phoneVerify(phoneVerifyDto: PhoneVerifyDto, _res: Response): Promise<{
-        accessToken: string;
-        refreshToken: string;
-        user: {
-            _id: import("mongoose").Types.ObjectId;
-            email: string | undefined;
-            phoneNumber: string | undefined;
-            profile: {
-                fullName: string;
-                imageUrl?: string;
-                dateOfBirth?: Date;
-                gender?: import("../user/user.schema").Gender;
-            };
-            roles: {
-                type: import("../user/user.schema").UserRole;
-                status: import("../user/user.schema").RoleStatus;
-                assignedAt: Date;
-                metadata?: Record<string, unknown>;
-            }[];
-            primaryRole: import("../user/user.schema").UserRole;
-            accountStatus: import("../user/user.schema").AccountStatus;
-        };
-    }>;
-    phoneResend(phoneResendDto: PhoneResendDto): Promise<{
-        message: string;
-    }>;
-    googleLogin(googleLoginDto: GoogleLoginDto, _res: Response): Promise<{
-        accessToken: string;
-        refreshToken: string;
-        user: {
-            _id: import("mongoose").Types.ObjectId;
-            email: string | undefined;
-            phoneNumber: string | undefined;
-            profile: {
-                fullName: string;
-                imageUrl?: string;
-                dateOfBirth?: Date;
-                gender?: import("../user/user.schema").Gender;
-            };
-            roles: {
-                type: import("../user/user.schema").UserRole;
-                status: import("../user/user.schema").RoleStatus;
-                assignedAt: Date;
-                metadata?: Record<string, unknown>;
-            }[];
-            primaryRole: import("../user/user.schema").UserRole;
-            accountStatus: import("../user/user.schema").AccountStatus;
-        };
-    }>;
-    facebookLogin(facebookLoginDto: FacebookLoginDto, _res: Response): Promise<{
-        accessToken: string;
-        refreshToken: string;
-        user: {
-            _id: import("mongoose").Types.ObjectId;
-            email: string | undefined;
-            phoneNumber: string | undefined;
-            profile: {
-                fullName: string;
-                imageUrl?: string;
-                dateOfBirth?: Date;
-                gender?: import("../user/user.schema").Gender;
-            };
-            roles: {
-                type: import("../user/user.schema").UserRole;
-                status: import("../user/user.schema").RoleStatus;
-                assignedAt: Date;
-                metadata?: Record<string, unknown>;
-            }[];
-            primaryRole: import("../user/user.schema").UserRole;
-            accountStatus: import("../user/user.schema").AccountStatus;
-        };
-    }>;
+    }, _res: Response): Promise<AuthTokensResponseDto>;
+    verifyEmail(token: string): Promise<MessageResponseDto>;
+    resendVerification(email: string): Promise<MessageResponseDto>;
+    phoneStart(phoneStartDto: PhoneStartDto): Promise<MessageResponseDto>;
+    phoneVerify(phoneVerifyDto: PhoneVerifyDto, _res: Response): Promise<AuthResponseDto>;
+    phoneResend(phoneResendDto: PhoneResendDto): Promise<MessageResponseDto>;
+    googleLogin(googleLoginDto: GoogleLoginDto, _res: Response): Promise<AuthResponseDto>;
+    facebookLogin(facebookLoginDto: FacebookLoginDto, _res: Response): Promise<AuthResponseDto>;
     private setRefreshTokenCookie;
 }

@@ -4,11 +4,11 @@ export declare class UserProfileDto {
     avatarUrl?: string;
 }
 export declare class SanitizedUserDto {
-    _id: string;
+    _id: any;
     email?: string;
     phoneNumber?: string;
     profile: UserProfileDto;
-    roles: string[];
+    roles: any[];
     primaryRole: UserRole;
     accountStatus: AccountStatus;
 }

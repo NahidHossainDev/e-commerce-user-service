@@ -17,7 +17,9 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../../../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../../../common/guards/roles.guard");
+const swagger_helper_1 = require("../../../utils/response/swagger.helper");
 const address_service_1 = require("./address.service");
+const address_response_dto_1 = require("./dto/address-response.dto");
 const create_address_dto_1 = require("./dto/create-address.dto");
 const update_address_dto_1 = require("./dto/update-address.dto");
 let AddressController = class AddressController {
@@ -25,58 +27,89 @@ let AddressController = class AddressController {
     constructor(addressService) {
         this.addressService = addressService;
     }
-    create(createAddressDto) {
-        return this.addressService.create(createAddressDto);
+    async create(createAddressDto) {
+        return (await this.addressService.create(createAddressDto));
     }
-    findAll(userId) {
-        return this.addressService.findAllByUser(userId);
+    async findAll(userId) {
+        return (await this.addressService.findAllByUser(userId));
     }
-    findOne(id) {
-        return this.addressService.findOne(id);
+    async findOne(id) {
+        return (await this.addressService.findOne(id));
     }
-    update(id, updateAddressDto) {
-        return this.addressService.update(id, updateAddressDto);
+    async update(id, updateAddressDto) {
+        return (await this.addressService.update(id, updateAddressDto));
     }
-    remove(id) {
-        return this.addressService.remove(id);
+    async remove(id) {
+        return (await this.addressService.remove(id));
     }
 };
 exports.AddressController = AddressController;
 __decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new address' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 201,
+        description: 'Address created successfully.',
+        type: address_response_dto_1.AddressResponseDto,
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_address_dto_1.CreateAddressDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AddressController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all addresses for a user' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'List of user addresses.',
+        type: address_response_dto_1.AddressResponseDto,
+        isArray: true,
+    }),
     __param(0, (0, common_1.Query)('userId')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AddressController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a single address by ID' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Address found.',
+        type: address_response_dto_1.AddressResponseDto,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AddressController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update an address by ID' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Address updated successfully.',
+        type: address_response_dto_1.AddressResponseDto,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_address_dto_1.UpdateAddressDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AddressController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete an address by ID' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Address deleted successfully.',
+        type: address_response_dto_1.AddressMessageResponseDto,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AddressController.prototype, "remove", null);
 exports.AddressController = AddressController = __decorate([
     (0, swagger_1.ApiTags)('Address'),

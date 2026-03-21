@@ -15,18 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const swagger_helper_1 = require("../../../utils/response/swagger.helper");
 const product_query_options_dto_1 = require("./dto/product-query-options.dto");
+const product_response_dto_1 = require("./dto/product-response.dto");
 const product_service_1 = require("./product.service");
 let ProductController = class ProductController {
     productService;
     constructor(productService) {
         this.productService = productService;
     }
-    findAll(queryDto) {
-        return this.productService.findAllPublic(queryDto);
+    async findAll(queryDto) {
+        return (await this.productService.findAllPublic(queryDto));
     }
-    findOne(idOrSlug) {
-        return this.productService.findOnePublic(idOrSlug);
+    async findOne(idOrSlug) {
+        return (await this.productService.findOnePublic(idOrSlug));
     }
 };
 exports.ProductController = ProductController;
@@ -35,18 +37,28 @@ __decorate([
     (0, swagger_1.ApiOperation)({
         summary: 'Get all products with filtering, search and pagination',
     }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Paginated list of products.',
+        type: product_response_dto_1.PaginatedProductsResponseDto,
+    }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [product_query_options_dto_1.ProductQueryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ProductController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':idOrSlug'),
     (0, swagger_1.ApiOperation)({ summary: 'Get a product by ID or slug' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Product found.',
+        type: product_response_dto_1.ProductResponseDto,
+    }),
     __param(0, (0, common_1.Param)('idOrSlug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ProductController.prototype, "findOne", null);
 exports.ProductController = ProductController = __decorate([
     (0, swagger_1.ApiTags)('Products'),

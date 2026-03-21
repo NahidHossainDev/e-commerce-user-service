@@ -15,41 +15,63 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PublicCategoryController = void 0;
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const swagger_helper_1 = require("../../../../utils/response/swagger.helper");
 const category_service_1 = require("../category.service");
+const category_response_dto_1 = require("../dto/category-response.dto");
 let PublicCategoryController = class PublicCategoryController {
     categoryService;
     constructor(categoryService) {
         this.categoryService = categoryService;
     }
-    findAll() {
-        return this.categoryService.findAllPublic();
+    async findAll() {
+        return (await this.categoryService.findAllPublic());
     }
-    getTree() {
-        return this.categoryService.getPublicCategoryTree();
+    async getTree() {
+        return (await this.categoryService.getPublicCategoryTree());
     }
-    getBySlug(slug) {
-        return this.categoryService.getBySlug(slug);
+    async getBySlug(slug) {
+        return (await this.categoryService.getBySlug(slug));
     }
 };
 exports.PublicCategoryController = PublicCategoryController;
 __decorate([
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all active categories' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'List of active categories.',
+        type: category_response_dto_1.CategoryResponseDto,
+        isArray: true,
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], PublicCategoryController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('tree'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get the full category tree' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Hierarchical tree of categories.',
+        type: category_response_dto_1.CategoryTreeResponseDto,
+        isArray: true,
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], PublicCategoryController.prototype, "getTree", null);
 __decorate([
     (0, common_1.Get)(':slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get a category by slug' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Category found.',
+        type: category_response_dto_1.CategoryResponseDto,
+    }),
     __param(0, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], PublicCategoryController.prototype, "getBySlug", null);
 exports.PublicCategoryController = PublicCategoryController = __decorate([
     (0, swagger_1.ApiTags)('Categories'),

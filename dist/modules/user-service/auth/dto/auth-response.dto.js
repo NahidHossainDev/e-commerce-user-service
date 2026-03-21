@@ -37,7 +37,7 @@ class SanitizedUserDto {
 exports.SanitizedUserDto = SanitizedUserDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '64b1f2c3d4e5f6a7b8c9d0e1' }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], SanitizedUserDto.prototype, "_id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'user@example.com', required: false }),

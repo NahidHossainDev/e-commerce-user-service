@@ -37,17 +37,17 @@ let AuthController = class AuthController {
         this.socialAuthService = socialAuthService;
     }
     async register(registerDto) {
-        return this.authService.register(registerDto);
+        return await this.authService.register(registerDto);
     }
     async login(loginDto, res) {
         const result = await this.authService.login(loginDto);
         return result;
     }
     async getMe(user) {
-        return this.authService.getMe(user._id.toString());
+        return await this.authService.getMe(user._id.toString());
     }
     async logout(req) {
-        return this.authService.logout(req.user._id.toString());
+        return (await this.authService.logout(req.user._id.toString()));
     }
     async refresh(refreshTokenFromReq, req, _res) {
         const refreshToken = (refreshTokenFromReq ||
@@ -56,20 +56,20 @@ let AuthController = class AuthController {
         return tokens;
     }
     async verifyEmail(token) {
-        return this.authService.verifyEmail({ token });
+        return await this.authService.verifyEmail({ token });
     }
     async resendVerification(email) {
-        return this.authService.resendVerification(email);
+        return await this.authService.resendVerification(email);
     }
     async phoneStart(phoneStartDto) {
-        return this.phoneAuthService.phoneStart(phoneStartDto);
+        return await this.phoneAuthService.phoneStart(phoneStartDto);
     }
     async phoneVerify(phoneVerifyDto, _res) {
         const result = await this.phoneAuthService.phoneVerify(phoneVerifyDto);
         return result;
     }
     async phoneResend(phoneResendDto) {
-        return this.phoneAuthService.resendPhoneOtp(phoneResendDto.phoneNumber);
+        return await this.phoneAuthService.resendPhoneOtp(phoneResendDto.phoneNumber);
     }
     async googleLogin(googleLoginDto, _res) {
         const result = await this.socialAuthService.googleLogin(googleLoginDto);

@@ -35,34 +35,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/MessageResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -101,34 +97,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/AuthResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AuthResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -157,34 +149,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/SanitizedUserDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/SanitizedUserDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -215,34 +203,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/LogoutResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LogoutResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -274,34 +258,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/AuthTokensResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AuthTokensResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -336,34 +316,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/MessageResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -389,34 +365,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/MessageResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -452,34 +424,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/MessageResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -515,34 +483,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/AuthResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AuthResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -578,34 +542,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/MessageResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -641,34 +601,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/AuthResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AuthResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -704,34 +660,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "properties": {
-                        "success": {
-                          "type": "boolean",
-                          "example": true
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
                         },
-                        "message": {
-                          "nullable": true,
-                          "example": null,
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "data": {
-                          "$ref": "#/components/schemas/AuthResponseDto"
+                        {
+                          "type": "null"
                         }
-                      },
-                      "required": [
-                        "success",
-                        "data"
                       ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AuthResponseDto"
                     }
+                  },
+                  "required": [
+                    "success",
+                    "data"
                   ]
                 }
               }
@@ -766,7 +718,38 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "User created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -774,6 +757,7 @@
             "bearer": []
           }
         ],
+        "summary": "Create a new user (admin only)",
         "tags": [
           "User"
         ]
@@ -858,7 +842,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Paginated list of users.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedUsersResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -866,6 +881,7 @@
             "bearer": []
           }
         ],
+        "summary": "List all users with pagination and filters (admin only)",
         "tags": [
           "User"
         ]
@@ -886,7 +902,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "User found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -894,6 +941,7 @@
             "bearer": []
           }
         ],
+        "summary": "Get a single user by ID",
         "tags": [
           "User"
         ]
@@ -922,7 +970,38 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "User updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -930,6 +1009,7 @@
             "bearer": []
           }
         ],
+        "summary": "Update a user by ID",
         "tags": [
           "User"
         ]
@@ -948,7 +1028,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "User deleted - returns the deleted document.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -956,6 +1067,7 @@
             "bearer": []
           }
         ],
+        "summary": "Delete a user by ID (admin only)",
         "tags": [
           "User"
         ]
@@ -977,7 +1089,38 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Address created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AddressResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -985,6 +1128,7 @@
             "bearer": []
           }
         ],
+        "summary": "Create a new address",
         "tags": [
           "Address"
         ]
@@ -1003,7 +1147,41 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "List of user addresses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AddressResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1011,6 +1189,7 @@
             "bearer": []
           }
         ],
+        "summary": "Get all addresses for a user",
         "tags": [
           "Address"
         ]
@@ -1031,7 +1210,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Address found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AddressResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1039,6 +1249,7 @@
             "bearer": []
           }
         ],
+        "summary": "Get a single address by ID",
         "tags": [
           "Address"
         ]
@@ -1067,7 +1278,38 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Address updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AddressResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1075,6 +1317,7 @@
             "bearer": []
           }
         ],
+        "summary": "Update an address by ID",
         "tags": [
           "Address"
         ]
@@ -1093,7 +1336,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Address deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AddressMessageResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1101,6 +1375,7 @@
             "bearer": []
           }
         ],
+        "summary": "Delete an address by ID",
         "tags": [
           "Address"
         ]
@@ -1255,7 +1530,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Paginated list of products.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedProductsResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Get all products with filtering, search and pagination",
@@ -1279,7 +1585,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Product found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Get a product by ID or slug",
@@ -1304,7 +1641,38 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Product created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1465,7 +1833,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Paginated list of products.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedProductsResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1494,7 +1893,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Product found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1531,7 +1961,38 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Product updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1558,7 +2019,40 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Product soft-deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1587,7 +2081,40 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Product hard-deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1626,7 +2153,38 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Product status updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1655,7 +2213,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Product restored successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1685,7 +2274,40 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Bulk update initiated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1715,7 +2337,38 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Inventory created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductInventoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Create inventory for a product",
@@ -1739,7 +2392,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Inventory found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductInventoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Get inventory by product ID",
@@ -1771,7 +2455,38 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Inventory updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductInventoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Update inventory settings by product ID",
@@ -1805,7 +2520,38 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Stock adjusted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ProductInventoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Adjust stock quantity",
@@ -1829,7 +2575,41 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Inventory history found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductInventoryHistoryResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Get inventory history for a product",
@@ -1854,7 +2634,38 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Category created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CategoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1862,6 +2673,7 @@
             "bearer": []
           }
         ],
+        "summary": "Create a new category",
         "tags": [
           "Categories"
         ]
@@ -1944,7 +2756,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Paginated list of categories.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedCategoriesResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1952,6 +2795,7 @@
             "bearer": []
           }
         ],
+        "summary": "Get all categories with pagination and filtering",
         "tags": [
           "Categories"
         ]
@@ -1972,7 +2816,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Category found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CategoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1980,6 +2855,7 @@
             "bearer": []
           }
         ],
+        "summary": "Get a category by ID",
         "tags": [
           "Categories"
         ]
@@ -2008,7 +2884,38 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Category updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CategoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2016,6 +2923,7 @@
             "bearer": []
           }
         ],
+        "summary": "Update a category",
         "tags": [
           "Categories"
         ]
@@ -2034,7 +2942,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Category deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CategoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2042,6 +2981,7 @@
             "bearer": []
           }
         ],
+        "summary": "Delete a category",
         "tags": [
           "Categories"
         ]
@@ -2053,9 +2993,44 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "List of active categories.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CategoryResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
+        "summary": "Get all active categories",
         "tags": [
           "Categories"
         ]
@@ -2067,9 +3042,44 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Hierarchical tree of categories.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CategoryTreeResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
+        "summary": "Get the full category tree",
         "tags": [
           "Categories"
         ]
@@ -2090,9 +3100,41 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Category found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CategoryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
+        "summary": "Get a category by slug",
         "tags": [
           "Categories"
         ]
@@ -2114,10 +3156,38 @@
         },
         "responses": {
           "201": {
-            "description": "The brand has been successfully created."
-          },
-          "409": {
-            "description": "Brand name or slug already exists."
+            "description": "The brand has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BrandResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Create a new brand",
@@ -2185,7 +3255,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Paginated list of brands.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedBrandsResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Retrieve all brands with pagination and filtering",
@@ -2208,8 +3309,39 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Brand not found."
+          "200": {
+            "description": "Brand found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BrandResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Retrieve a brand by ID",
@@ -2240,11 +3372,39 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Brand not found."
-          },
-          "409": {
-            "description": "Brand name or slug already exists."
+          "200": {
+            "description": "Brand updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BrandResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Update a brand by ID",
@@ -2265,8 +3425,39 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Brand not found."
+          "200": {
+            "description": "Brand deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BrandResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Delete a brand by ID",
@@ -2291,7 +3482,38 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "Review created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReviewResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2299,6 +3521,7 @@
             "bearer": []
           }
         ],
+        "summary": "Create a new review",
         "tags": [
           "Review"
         ]
@@ -2404,9 +3627,41 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Paginated list of reviews.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedReviewsResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
+        "summary": "Retrieve all reviews with pagination and filters",
         "tags": [
           "Review"
         ]
@@ -2427,9 +3682,41 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Rating summary retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/RatingSummaryResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
+        "summary": "Get rating summary for a product",
         "tags": [
           "Review"
         ]
@@ -2450,9 +3737,41 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Review found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReviewResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
+        "summary": "Get a single review by ID",
         "tags": [
           "Review"
         ]
@@ -2481,7 +3800,38 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "Review updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReviewResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2489,6 +3839,7 @@
             "bearer": []
           }
         ],
+        "summary": "Update a review (Admin only)",
         "tags": [
           "Review"
         ]
@@ -2507,7 +3858,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Review deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReviewResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2515,6 +3897,7 @@
             "bearer": []
           }
         ],
+        "summary": "Delete a review (Admin only)",
         "tags": [
           "Review"
         ]
@@ -2535,7 +3918,38 @@
         ],
         "responses": {
           "201": {
-            "description": ""
+            "description": "Vote recorded successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ReviewResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2543,6 +3957,7 @@
             "bearer": []
           }
         ],
+        "summary": "Vote on a review",
         "tags": [
           "Review"
         ]
@@ -2564,10 +3979,38 @@
         },
         "responses": {
           "201": {
-            "description": "The unit has been successfully created."
-          },
-          "409": {
-            "description": "Unit name or symbol already exists."
+            "description": "The unit has been successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UnitResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Create a new measurement unit",
@@ -2645,7 +4088,38 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Paginated list of units.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedUnitsResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Retrieve all measurement units",
@@ -2668,8 +4142,39 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Unit not found."
+          "200": {
+            "description": "The unit has been successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UnitResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Retrieve a unit by ID",
@@ -2700,11 +4205,39 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Unit not found."
-          },
-          "409": {
-            "description": "Unit name or symbol already exists."
+          "200": {
+            "description": "The unit has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UnitResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Update a unit by ID",
@@ -2725,8 +4258,39 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Unit not found."
+          "200": {
+            "description": "The unit has been successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UnitResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
           }
         },
         "summary": "Delete a unit by ID",
@@ -4620,7 +6184,7 @@
         "type": "object",
         "properties": {
           "_id": {
-            "type": "string",
+            "type": "object",
             "example": "64b1f2c3d4e5f6a7b8c9d0e1"
           },
           "email": {
@@ -4817,6 +6381,182 @@
           "facebookAccessToken"
         ]
       },
+      "UserProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "imageUrl": {
+            "type": "string",
+            "example": "https://ibb.co/5WHkfvR4"
+          },
+          "dateOfBirth": {
+            "format": "date-time",
+            "type": "string",
+            "example": "1998-07-21"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ],
+            "example": "MALE"
+          }
+        },
+        "required": [
+          "fullName"
+        ]
+      },
+      "UserRoleResponseDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "SELLER",
+              "ADMIN",
+              "SUPER_ADMIN"
+            ],
+            "example": "CUSTOMER"
+          },
+          "status": {
+            "type": "string",
+            "example": "ACTIVE"
+          },
+          "assignedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "assignedAt"
+        ]
+      },
+      "UserVerificationResponseDto": {
+        "type": "object",
+        "properties": {
+          "emailVerified": {
+            "type": "boolean",
+            "example": false
+          },
+          "phoneVerified": {
+            "type": "boolean",
+            "example": false
+          },
+          "emailVerifiedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "phoneVerifiedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "emailVerified",
+          "phoneVerified"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+8801700000000"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "local",
+              "google",
+              "facebook"
+            ],
+            "example": "local"
+          },
+          "googleId": {
+            "type": "string",
+            "example": "google_sub_id"
+          },
+          "facebookId": {
+            "type": "string",
+            "example": "facebook_user_id"
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "SUSPENDED",
+              "BLOCKED",
+              "DELETED",
+              "PENDING",
+              "PENDING_VERIFICATION"
+            ],
+            "example": "ACTIVE"
+          },
+          "primaryRole": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "SELLER",
+              "ADMIN",
+              "SUPER_ADMIN"
+            ],
+            "example": "CUSTOMER"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/UserProfileResponseDto"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleResponseDto"
+            }
+          },
+          "verification": {
+            "$ref": "#/components/schemas/UserVerificationResponseDto"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "_id",
+          "provider",
+          "accountStatus",
+          "primaryRole",
+          "profile",
+          "roles",
+          "verification",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "CreateRoleDto": {
         "type": "object",
         "properties": {
@@ -4936,6 +6676,57 @@
           "profile"
         ]
       },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "totalCount": {
+            "type": "number",
+            "example": 100
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 10
+          },
+          "limit": {
+            "type": "number",
+            "example": 10
+          },
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "nextPage": {
+            "type": "object",
+            "example": 2,
+            "nullable": true
+          }
+        },
+        "required": [
+          "totalCount",
+          "totalPages",
+          "limit",
+          "page",
+          "nextPage"
+        ]
+      },
+      "PaginatedUsersResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "UpdateUserDto": {
         "type": "object",
         "properties": {
@@ -5014,6 +6805,86 @@
         },
         "required": [
           "isDeleted"
+        ]
+      },
+      "AddressResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "userId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d012"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+8801700000000"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "HOME",
+              "WORK",
+              "OFFICE",
+              "SUPER_ADMIN"
+            ],
+            "example": "HOME"
+          },
+          "street": {
+            "type": "string",
+            "example": "123 Street"
+          },
+          "city": {
+            "type": "string",
+            "example": "Dhaka"
+          },
+          "state": {
+            "type": "string",
+            "example": "Dhaka"
+          },
+          "postalCode": {
+            "type": "string",
+            "example": "1212"
+          },
+          "country": {
+            "type": "string",
+            "example": "Bangladesh"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "example": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "_id",
+          "userId",
+          "fullName",
+          "phoneNumber",
+          "type",
+          "street",
+          "city",
+          "state",
+          "postalCode",
+          "country",
+          "isDefault",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "CreateAddressDto": {
@@ -5149,16 +7020,59 @@
           }
         }
       },
+      "AddressMessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Address deleted successfully"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ProductMediaDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "http://example.com/image.jpg"
+          },
+          "altText": {
+            "type": "string",
+            "example": "Product Image"
+          },
+          "format": {
+            "type": "string",
+            "example": "image/jpeg"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "IMAGE",
+              "VIDEO"
+            ],
+            "example": "IMAGE"
+          }
+        },
+        "required": [
+          "url",
+          "altText",
+          "format",
+          "type"
+        ]
+      },
       "CategoryRefDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "description": "Category ID"
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d012"
           },
           "name": {
             "type": "string",
-            "description": "Category name"
+            "example": "Fruits"
           }
         },
         "required": [
@@ -5170,17 +7084,398 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "description": "Brand ID"
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d034"
           },
           "name": {
             "type": "string",
-            "description": "Brand name"
+            "example": "Organic Farm"
           }
         },
         "required": [
           "id",
           "name"
+        ]
+      },
+      "ProductPriceDto": {
+        "type": "object",
+        "properties": {
+          "basePrice": {
+            "type": "number",
+            "example": 100
+          },
+          "discountPrice": {
+            "type": "number",
+            "example": 90
+          },
+          "discountRate": {
+            "type": "number",
+            "example": 10
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          }
+        },
+        "required": [
+          "basePrice",
+          "discountPrice",
+          "discountRate",
+          "currency"
+        ]
+      },
+      "ProductUnitDto": {
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "value": {
+            "type": "number",
+            "example": 1
+          },
+          "symbol": {
+            "type": "string",
+            "example": "kg"
+          }
+        },
+        "required": [
+          "unitId",
+          "value",
+          "symbol"
+        ]
+      },
+      "ProductVariantDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Medium-Red"
+          },
+          "attributes": {
+            "type": "object",
+            "example": {
+              "color": "Red",
+              "size": "Medium"
+            }
+          },
+          "sku": {
+            "type": "string",
+            "example": "SKU-MED-RED"
+          },
+          "additionalPrice": {
+            "type": "number",
+            "example": 10
+          },
+          "barcode": {
+            "type": "string",
+            "example": "123456789"
+          },
+          "stock": {
+            "type": "number",
+            "example": 50
+          },
+          "isAvailable": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "name",
+          "attributes",
+          "sku",
+          "additionalPrice",
+          "barcode",
+          "stock",
+          "isAvailable"
+        ]
+      },
+      "ProductAttributeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Color"
+          },
+          "value": {
+            "type": "object",
+            "example": "Red"
+          },
+          "label": {
+            "type": "string",
+            "example": "Primary Color"
+          },
+          "unit": {
+            "type": "string",
+            "example": "piece"
+          },
+          "isFilterable": {
+            "type": "boolean",
+            "example": true
+          },
+          "isVisibleOnList": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "label",
+          "unit",
+          "isFilterable",
+          "isVisibleOnList"
+        ]
+      },
+      "PerishableInfoDto": {
+        "type": "object",
+        "properties": {
+          "expiryDate": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-01-01T00:00:00.000Z"
+          },
+          "manufactureDate": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "batchNumber": {
+            "type": "string",
+            "example": "BATCH-001"
+          },
+          "requiresRefrigeration": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "expiryDate",
+          "manufactureDate",
+          "batchNumber",
+          "requiresRefrigeration"
+        ]
+      },
+      "ProductResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "title": {
+            "type": "string",
+            "example": "Fresh Apple"
+          },
+          "slug": {
+            "type": "string",
+            "example": "fresh-apple"
+          },
+          "description": {
+            "type": "string",
+            "example": "Delicious red apples"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "INACTIVE",
+              "OUT_OF_STOCK",
+              "COMING_SOON",
+              "DISCONTINUED",
+              "ARCHIVED",
+              "BLOCKED"
+            ],
+            "example": "ACTIVE"
+          },
+          "thumbnail": {
+            "type": "string",
+            "example": "http://example.com/thumb.jpg"
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductMediaDto"
+            }
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryRefDto"
+          },
+          "subCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryRefDto"
+            }
+          },
+          "brand": {
+            "$ref": "#/components/schemas/BrandRefDto"
+          },
+          "vendorId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d099"
+          },
+          "price": {
+            "$ref": "#/components/schemas/ProductPriceDto"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/ProductUnitDto"
+          },
+          "sku": {
+            "type": "string",
+            "example": "SKU-001"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "123456789"
+          },
+          "stock": {
+            "type": "number",
+            "example": 100
+          },
+          "isInStock": {
+            "type": "boolean",
+            "example": true
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVariantDto"
+            }
+          },
+          "hasVariants": {
+            "type": "boolean",
+            "example": false
+          },
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttributeDto"
+            }
+          },
+          "perishableInfo": {
+            "$ref": "#/components/schemas/PerishableInfoDto"
+          },
+          "isPerishable": {
+            "type": "boolean",
+            "example": false
+          },
+          "tags": {
+            "example": [
+              "fresh",
+              "fruit"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "keywords": {
+            "example": [
+              "apple",
+              "red"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isBestSeller": {
+            "type": "boolean",
+            "example": true
+          },
+          "isFeatured": {
+            "type": "boolean",
+            "example": true
+          },
+          "isOnOffer": {
+            "type": "boolean",
+            "example": false
+          },
+          "isNew": {
+            "type": "boolean",
+            "example": true
+          },
+          "salesCount": {
+            "type": "number",
+            "example": 500
+          },
+          "viewCount": {
+            "type": "number",
+            "example": 1000
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.5
+          },
+          "reviewCount": {
+            "type": "number",
+            "example": 100
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "_id",
+          "title",
+          "slug",
+          "description",
+          "status",
+          "thumbnail",
+          "media",
+          "category",
+          "subCategories",
+          "brand",
+          "vendorId",
+          "price",
+          "unit",
+          "sku",
+          "barcode",
+          "stock",
+          "isInStock",
+          "variants",
+          "hasVariants",
+          "attributes",
+          "isPerishable",
+          "tags",
+          "keywords",
+          "isBestSeller",
+          "isFeatured",
+          "isOnOffer",
+          "isNew",
+          "salesCount",
+          "viewCount",
+          "averageRating",
+          "reviewCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginatedProductsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
         ]
       },
       "PriceDto": {
@@ -5212,129 +7507,6 @@
         "required": [
           "basePrice",
           "currency"
-        ]
-      },
-      "ProductUnitDto": {
-        "type": "object",
-        "properties": {
-          "unitId": {
-            "type": "string",
-            "description": "Unit ID"
-          },
-          "value": {
-            "type": "number",
-            "description": "Value of the unit"
-          },
-          "symbol": {
-            "type": "string",
-            "description": "Symbol of the unit"
-          }
-        },
-        "required": [
-          "unitId",
-          "value",
-          "symbol"
-        ]
-      },
-      "ProductVariantDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Variant name"
-          },
-          "attributes": {
-            "type": "object",
-            "description": "Variant attributes"
-          },
-          "sku": {
-            "type": "string",
-            "description": "Variant SKU"
-          },
-          "additionalPrice": {
-            "type": "number",
-            "description": "Additional price"
-          },
-          "barcode": {
-            "type": "string",
-            "description": "Barcode"
-          },
-          "isAvailable": {
-            "type": "boolean",
-            "description": "Is available",
-            "default": true
-          }
-        },
-        "required": [
-          "name",
-          "attributes",
-          "isAvailable"
-        ]
-      },
-      "ProductAttributeDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Attribute name"
-          },
-          "value": {
-            "type": "object",
-            "description": "Attribute value"
-          },
-          "label": {
-            "type": "string",
-            "description": "Label"
-          },
-          "unit": {
-            "type": "string",
-            "description": "Unit"
-          },
-          "isFilterable": {
-            "type": "boolean",
-            "description": "Is filterable",
-            "default": false
-          },
-          "isVisibleOnList": {
-            "type": "boolean",
-            "description": "Is visible on list",
-            "default": false
-          }
-        },
-        "required": [
-          "name",
-          "value",
-          "isFilterable",
-          "isVisibleOnList"
-        ]
-      },
-      "PerishableInfoDto": {
-        "type": "object",
-        "properties": {
-          "expiryDate": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Expiry date"
-          },
-          "manufactureDate": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Manufacture date"
-          },
-          "batchNumber": {
-            "type": "string",
-            "description": "Batch number"
-          },
-          "requiresRefrigeration": {
-            "type": "boolean",
-            "description": "Requires refrigeration",
-            "default": false
-          }
-        },
-        "required": [
-          "expiryDate",
-          "manufactureDate",
-          "requiresRefrigeration"
         ]
       },
       "CreateProductDto": {
@@ -5651,22 +7823,19 @@
         "properties": {
           "variantSku": {
             "type": "string",
-            "description": "SKU of the variant"
+            "example": "SKU-001-RED"
           },
           "stockQuantity": {
             "type": "number",
-            "description": "Stock quantity of the variant",
-            "default": 0
+            "example": 100
           },
           "reservedQuantity": {
             "type": "number",
-            "description": "Reserved quantity of the variant",
-            "default": 0
+            "example": 0
           },
           "lowStockThreshold": {
             "type": "number",
-            "description": "Low stock threshold for the variant",
-            "default": 5
+            "example": 5
           }
         },
         "required": [
@@ -5674,6 +7843,77 @@
           "stockQuantity",
           "reservedQuantity",
           "lowStockThreshold"
+        ]
+      },
+      "ProductInventoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "sku": {
+            "type": "string",
+            "example": "sku-001"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "123456789"
+          },
+          "stockQuantity": {
+            "type": "number",
+            "example": 500
+          },
+          "reservedQuantity": {
+            "type": "number",
+            "example": 10
+          },
+          "lowStockThreshold": {
+            "type": "number",
+            "example": 5
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "warehouseLocation": {
+            "type": "string",
+            "example": "Warehouse A, Shelf 1"
+          },
+          "totalSold": {
+            "type": "number",
+            "example": 1000
+          },
+          "lastRestockedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "lastSoldAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "variantStock": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VariantStockDto"
+            }
+          }
+        },
+        "required": [
+          "productId",
+          "sku",
+          "barcode",
+          "stockQuantity",
+          "reservedQuantity",
+          "lowStockThreshold",
+          "isActive",
+          "warehouseLocation",
+          "totalSold",
+          "lastRestockedAt",
+          "lastSoldAt",
+          "variantStock"
         ]
       },
       "CreateInventoryDto": {
@@ -5816,16 +8056,192 @@
           "type"
         ]
       },
+      "ProductInventoryHistoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "inventoryId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e2"
+          },
+          "sku": {
+            "type": "string",
+            "example": "sku-001"
+          },
+          "variantSku": {
+            "type": "string",
+            "example": "sku-001-red"
+          },
+          "date": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 10
+          },
+          "quantityBefore": {
+            "type": "number",
+            "example": 100
+          },
+          "quantityAfter": {
+            "type": "number",
+            "example": 110
+          },
+          "unitCost": {
+            "type": "number",
+            "example": 50
+          },
+          "totalCost": {
+            "type": "number",
+            "example": 500
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "RESTOCK",
+              "SALE",
+              "RETURN",
+              "ADJUSTMENT",
+              "INITIAL"
+            ],
+            "example": "RESTOCK"
+          },
+          "referenceId": {
+            "type": "string",
+            "example": "RESTOCK-123"
+          },
+          "performedBy": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e3"
+          },
+          "note": {
+            "type": "string",
+            "example": "Monthly restock"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Restock from supplier"
+          }
+        },
+        "required": [
+          "productId",
+          "inventoryId",
+          "sku",
+          "variantSku",
+          "date",
+          "quantity",
+          "quantityBefore",
+          "quantityAfter",
+          "unitCost",
+          "totalCost",
+          "type",
+          "referenceId",
+          "performedBy",
+          "note",
+          "reason"
+        ]
+      },
       "CategoryMetaDto": {
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "example": "Electronics Category"
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "example": "Browse the latest electronics and gadgets."
           }
-        }
+        },
+        "required": [
+          "title",
+          "description"
+        ]
+      },
+      "CategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Electronics"
+          },
+          "slug": {
+            "type": "string",
+            "example": "electronics"
+          },
+          "description": {
+            "type": "string",
+            "example": "Electronic gadgets and devices"
+          },
+          "image": {
+            "type": "string",
+            "example": "http://example.com/category-image.jpg"
+          },
+          "parentCategory": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e2",
+            "nullable": true
+          },
+          "level": {
+            "type": "number",
+            "example": 0,
+            "minimum": 0,
+            "maximum": 3
+          },
+          "path": {
+            "type": "string",
+            "example": ",64b1f2c3d4e5f6a7b8c9d0e2,"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "productCount": {
+            "type": "number",
+            "example": 150
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CategoryMetaDto"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "slug",
+          "description",
+          "image",
+          "parentCategory",
+          "level",
+          "path",
+          "isActive",
+          "productCount",
+          "sortOrder",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "CreateCategoryDto": {
         "type": "object",
@@ -5862,6 +8278,24 @@
           "name"
         ]
       },
+      "PaginatedCategoriesResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "UpdateCategoryDto": {
         "type": "object",
         "properties": {
@@ -5894,6 +8328,92 @@
           }
         }
       },
+      "CategoryTreeResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Electronics"
+          },
+          "slug": {
+            "type": "string",
+            "example": "electronics"
+          },
+          "description": {
+            "type": "string",
+            "example": "Electronic gadgets and devices"
+          },
+          "image": {
+            "type": "string",
+            "example": "http://example.com/category-image.jpg"
+          },
+          "parentCategory": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e2",
+            "nullable": true
+          },
+          "level": {
+            "type": "number",
+            "example": 0,
+            "minimum": 0,
+            "maximum": 3
+          },
+          "path": {
+            "type": "string",
+            "example": ",64b1f2c3d4e5f6a7b8c9d0e2,"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "productCount": {
+            "type": "number",
+            "example": 150
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CategoryMetaDto"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTreeResponseDto"
+            }
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "slug",
+          "description",
+          "image",
+          "parentCategory",
+          "level",
+          "path",
+          "isActive",
+          "productCount",
+          "sortOrder",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "SocialMediaDto": {
         "type": "object",
         "properties": {
@@ -5920,16 +8440,16 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "Brand Name - Best Products"
+            "example": "Brand Title"
           },
           "description": {
             "type": "string",
-            "example": "Description for SEO"
+            "example": "Brand Description"
           },
           "keywords": {
             "example": [
-              "brand",
-              "products"
+              "keyword1",
+              "keyword2"
             ],
             "type": "array",
             "items": {
@@ -5941,6 +8461,87 @@
           "title",
           "description",
           "keywords"
+        ]
+      },
+      "BrandResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Apple"
+          },
+          "slug": {
+            "type": "string",
+            "example": "apple"
+          },
+          "description": {
+            "type": "string",
+            "example": "Think Different"
+          },
+          "logo": {
+            "type": "string",
+            "example": "https://example.com/logo.png"
+          },
+          "website": {
+            "type": "string",
+            "example": "https://apple.com"
+          },
+          "establishedYear": {
+            "type": "number",
+            "example": 1976
+          },
+          "country": {
+            "type": "string",
+            "example": "USA"
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "socialMedia": {
+            "$ref": "#/components/schemas/SocialMediaDto"
+          },
+          "productCount": {
+            "type": "number",
+            "example": 1200
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.8
+          },
+          "meta": {
+            "$ref": "#/components/schemas/BrandMetaDto"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "slug",
+          "description",
+          "logo",
+          "website",
+          "establishedYear",
+          "country",
+          "isActive",
+          "socialMedia",
+          "productCount",
+          "averageRating",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "CreateBrandDto": {
@@ -5990,6 +8591,24 @@
           "description"
         ]
       },
+      "PaginatedBrandsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrandResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
       "UpdateBrandDto": {
         "type": "object",
         "properties": {
@@ -6033,6 +8652,103 @@
           }
         }
       },
+      "AdminResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Thank you for your review!"
+          },
+          "respondedBy": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "respondedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "message",
+          "respondedBy",
+          "respondedAt"
+        ]
+      },
+      "ReviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "productId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d012"
+          },
+          "user": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d034"
+          },
+          "comment": {
+            "type": "string",
+            "example": "Great product, highly recommend!"
+          },
+          "rating": {
+            "type": "number",
+            "example": 5,
+            "minimum": 1,
+            "maximum": 5
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ],
+            "example": "APPROVED"
+          },
+          "isVerifiedPurchase": {
+            "type": "boolean",
+            "example": true
+          },
+          "helpfulVotes": {
+            "type": "number",
+            "example": 10
+          },
+          "unhelpfulVotes": {
+            "type": "number",
+            "example": 2
+          },
+          "adminResponse": {
+            "$ref": "#/components/schemas/AdminResponseDto"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "_id",
+          "productId",
+          "user",
+          "comment",
+          "rating",
+          "status",
+          "isVerifiedPurchase",
+          "helpfulVotes",
+          "unhelpfulVotes",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "CreateReviewDto": {
         "type": "object",
         "properties": {
@@ -6064,6 +8780,87 @@
           "rating"
         ]
       },
+      "PaginatedReviewsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "RatingDistributionDto": {
+        "type": "object",
+        "properties": {
+          "five": {
+            "type": "number",
+            "example": 50
+          },
+          "four": {
+            "type": "number",
+            "example": 30
+          },
+          "three": {
+            "type": "number",
+            "example": 10
+          },
+          "two": {
+            "type": "number",
+            "example": 5
+          },
+          "one": {
+            "type": "number",
+            "example": 5
+          }
+        },
+        "required": [
+          "five",
+          "four",
+          "three",
+          "two",
+          "one"
+        ]
+      },
+      "RatingSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d012"
+          },
+          "totalReviews": {
+            "type": "number",
+            "example": 100
+          },
+          "totalRatings": {
+            "type": "number",
+            "example": 450
+          },
+          "averageRating": {
+            "type": "number",
+            "example": 4.5
+          },
+          "ratingDistribution": {
+            "$ref": "#/components/schemas/RatingDistributionDto"
+          }
+        },
+        "required": [
+          "productId",
+          "totalReviews",
+          "totalRatings",
+          "averageRating",
+          "ratingDistribution"
+        ]
+      },
       "UpdateReviewDto": {
         "type": "object",
         "properties": {
@@ -6082,9 +8879,69 @@
           }
         }
       },
+      "UnitResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Kilogram"
+          },
+          "symbol": {
+            "type": "string",
+            "example": "kg"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "COUNT",
+              "WEIGHT",
+              "VOLUME",
+              "LENGTH",
+              "AREA",
+              "TIME",
+              "DIGITAL",
+              "CUSTOM"
+            ],
+            "example": "WEIGHT"
+          },
+          "allowsDecimal": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "symbol",
+          "category",
+          "allowsDecimal"
+        ]
+      },
       "CreateUnitDto": {
         "type": "object",
         "properties": {}
+      },
+      "PaginatedUnitsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitResponseDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       },
       "UpdateUnitDto": {
         "type": "object",
