@@ -62,8 +62,10 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Bad Request – validation error' })
   @ApiResponse({ status: 409, description: 'Conflict – email already in use' })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterDto,
+  ): Promise<MessageResponseDto> {
+    return await this.authService.register(registerDto);
   }
 
   // ---------------------------------------------------------------------------
@@ -89,7 +91,7 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const result = await this.authService.login(loginDto);
     // this.setRefreshTokenCookie(res, result.refreshToken);
     return result;
@@ -112,8 +114,8 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized – missing or invalid JWT',
   })
-  async getMe(@CurrentUser() user: UserDocument) {
-    return this.authService.getMe(user._id.toString());
+  async getMe(@CurrentUser() user: UserDocument): Promise<SanitizedUserDto> {
+    return await this.authService.getMe(user._id.toString());
   }
 
   // ---------------------------------------------------------------------------
@@ -133,8 +135,12 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized – missing or invalid JWT',
   })
-  async logout(@Request() req: { user: UserDocument }) {
-    return this.authService.logout(req.user._id.toString());
+  async logout(
+    @Request() req: { user: UserDocument },
+  ): Promise<LogoutResponseDto> {
+    return (await this.authService.logout(
+      req.user._id.toString(),
+    )) as unknown as LogoutResponseDto;
   }
 
   // ---------------------------------------------------------------------------
@@ -160,7 +166,7 @@ export class AuthController {
     @Body('refreshToken') refreshTokenFromReq: string,
     @Request() req: { cookies?: { refreshToken?: string } },
     @Res({ passthrough: true }) _res: Response,
-  ) {
+  ): Promise<AuthTokensResponseDto> {
     const refreshToken = (refreshTokenFromReq ||
       req.cookies?.refreshToken) as string;
     const tokens = await this.authService.refreshTokens(refreshToken);
@@ -183,8 +189,10 @@ export class AuthController {
     status: 400,
     description: 'Bad Request – token invalid or expired',
   })
-  async verifyEmail(@Query('token') token: string) {
-    return this.authService.verifyEmail({ token });
+  async verifyEmail(
+    @Query('token') token: string,
+  ): Promise<MessageResponseDto> {
+    return await this.authService.verifyEmail({ token });
   }
 
   @Post('resend-verification')
@@ -198,8 +206,10 @@ export class AuthController {
     status: 400,
     description: 'Bad Request – user not found, already verified, or throttled',
   })
-  async resendVerification(@Body('email') email: string) {
-    return this.authService.resendVerification(email);
+  async resendVerification(
+    @Body('email') email: string,
+  ): Promise<MessageResponseDto> {
+    return await this.authService.resendVerification(email);
   }
 
   // ---------------------------------------------------------------------------
@@ -218,8 +228,10 @@ export class AuthController {
     status: 400,
     description: 'Bad Request – daily SMS limit reached',
   })
-  async phoneStart(@Body() phoneStartDto: PhoneStartDto) {
-    return this.phoneAuthService.phoneStart(phoneStartDto);
+  async phoneStart(
+    @Body() phoneStartDto: PhoneStartDto,
+  ): Promise<MessageResponseDto> {
+    return await this.phoneAuthService.phoneStart(phoneStartDto);
   }
 
   @Post('phone/verify')
@@ -238,9 +250,9 @@ export class AuthController {
   async phoneVerify(
     @Body() phoneVerifyDto: PhoneVerifyDto,
     @Res({ passthrough: true }) _res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const result = await this.phoneAuthService.phoneVerify(phoneVerifyDto);
-    // this.setRefreshTokenCookie(res, result.refreshToken);
+    // this.setRefreshTokenCookie(_res, result.refreshToken);
     return result;
   }
 
@@ -255,8 +267,12 @@ export class AuthController {
     status: 400,
     description: 'Bad Request – daily SMS limit reached',
   })
-  async phoneResend(@Body() phoneResendDto: PhoneResendDto) {
-    return this.phoneAuthService.resendPhoneOtp(phoneResendDto.phoneNumber);
+  async phoneResend(
+    @Body() phoneResendDto: PhoneResendDto,
+  ): Promise<MessageResponseDto> {
+    return await this.phoneAuthService.resendPhoneOtp(
+      phoneResendDto.phoneNumber,
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -278,7 +294,7 @@ export class AuthController {
   async googleLogin(
     @Body() googleLoginDto: GoogleLoginDto,
     @Res({ passthrough: true }) _res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const result = await this.socialAuthService.googleLogin(googleLoginDto);
     // this.setRefreshTokenCookie(_res, result.refreshToken);
     return result;
@@ -304,7 +320,7 @@ export class AuthController {
   async facebookLogin(
     @Body() facebookLoginDto: FacebookLoginDto,
     @Res({ passthrough: true }) _res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const result = await this.socialAuthService.facebookLogin(facebookLoginDto);
     // this.setRefreshTokenCookie(_res, result.refreshToken);
     return result;

@@ -15,7 +15,7 @@ export class UserProfileDto {
 
 export class SanitizedUserDto {
   @ApiProperty({ example: '64b1f2c3d4e5f6a7b8c9d0e1' })
-  _id: string;
+  _id: any;
 
   @ApiProperty({ example: 'user@example.com', required: false })
   email?: string;
@@ -27,7 +27,7 @@ export class SanitizedUserDto {
   profile: UserProfileDto;
 
   @ApiProperty({ isArray: true })
-  roles: string[];
+  roles: any[];
 
   @ApiProperty({ enum: UserRole, example: UserRole.CUSTOMER })
   primaryRole: UserRole;
