@@ -21,11 +21,10 @@ import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 export function ApiWrappedResponse<TModel extends Type<unknown>>(options: {
   status: number;
   description: string;
-  type: TModel;
+  type?: TModel;
   isArray?: boolean;
 }) {
-  return applyDecorators(
-    ApiExtraModels(options.type),
+  const decorators = [
     ApiResponse({
       status: options.status,
       description: options.description,
@@ -37,15 +36,23 @@ export function ApiWrappedResponse<TModel extends Type<unknown>>(options: {
             example: null,
             oneOf: [{ type: 'string' }, { type: 'null' }],
           },
-          data: options.isArray
-            ? {
-                type: 'array',
-                items: { $ref: getSchemaPath(options.type) },
-              }
-            : { $ref: getSchemaPath(options.type) },
+          data: options.type
+            ? options.isArray
+              ? {
+                  type: 'array',
+                  items: { $ref: getSchemaPath(options.type) },
+                }
+              : { $ref: getSchemaPath(options.type) }
+            : { type: 'object', nullable: true, example: null },
         },
         required: ['success', 'data'],
       },
     }),
-  );
+  ];
+
+  if (options.type) {
+    decorators.push(ApiExtraModels(options.type));
+  }
+
+  return applyDecorators(...decorators);
 }
