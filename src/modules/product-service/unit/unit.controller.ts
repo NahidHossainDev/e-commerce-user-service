@@ -8,8 +8,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiWrappedResponse } from 'src/utils/response/swagger.helper';
 import { CreateUnitDto } from './dto/create-unit.dto';
+import {
+  PaginatedUnitsResponseDto,
+  UnitResponseDto,
+} from './dto/unit-response.dto';
 import { UnitQueryOptions } from './dto/unit-query-options.dto';
 import { UpdateUnitDto } from './dto/update-unit.dto';
 import { UnitService } from './unit.service';
@@ -21,46 +26,68 @@ export class UnitController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new measurement unit' })
-  @ApiResponse({
+  @ApiWrappedResponse({
     status: 201,
     description: 'The unit has been successfully created.',
+    type: UnitResponseDto,
   })
-  @ApiResponse({
-    status: 409,
-    description: 'Unit name or symbol already exists.',
-  })
-  create(@Body() createUnitDto: CreateUnitDto) {
-    return this.unitService.create(createUnitDto);
+  async create(@Body() createUnitDto: CreateUnitDto): Promise<UnitResponseDto> {
+    return (await this.unitService.create(
+      createUnitDto,
+    )) as unknown as UnitResponseDto;
   }
 
   @Get()
   @ApiOperation({ summary: 'Retrieve all measurement units' })
-  findAll(@Query() query: UnitQueryOptions) {
-    return this.unitService.findAll(query);
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Paginated list of units.',
+    type: PaginatedUnitsResponseDto,
+  })
+  async findAll(
+    @Query() query: UnitQueryOptions,
+  ): Promise<PaginatedUnitsResponseDto> {
+    return (await this.unitService.findAll(
+      query,
+    )) as unknown as PaginatedUnitsResponseDto;
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve a unit by ID' })
-  @ApiResponse({ status: 404, description: 'Unit not found.' })
-  findOne(@Param('id') id: string) {
-    return this.unitService.findOne(id);
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'The unit has been successfully retrieved.',
+    type: UnitResponseDto,
+  })
+  async findOne(@Param('id') id: string): Promise<UnitResponseDto> {
+    return (await this.unitService.findOne(id)) as unknown as UnitResponseDto;
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a unit by ID' })
-  @ApiResponse({ status: 404, description: 'Unit not found.' })
-  @ApiResponse({
-    status: 409,
-    description: 'Unit name or symbol already exists.',
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'The unit has been successfully updated.',
+    type: UnitResponseDto,
   })
-  update(@Param('id') id: string, @Body() updateUnitDto: UpdateUnitDto) {
-    return this.unitService.update(id, updateUnitDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateUnitDto: UpdateUnitDto,
+  ): Promise<UnitResponseDto> {
+    return (await this.unitService.update(
+      id,
+      updateUnitDto,
+    )) as unknown as UnitResponseDto;
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a unit by ID' })
-  @ApiResponse({ status: 404, description: 'Unit not found.' })
-  remove(@Param('id') id: string) {
-    return this.unitService.remove(id);
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'The unit has been successfully deleted.',
+    type: UnitResponseDto,
+  })
+  async remove(@Param('id') id: string): Promise<UnitResponseDto> {
+    return (await this.unitService.remove(id)) as unknown as UnitResponseDto;
   }
 }
