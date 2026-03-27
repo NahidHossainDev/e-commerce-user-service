@@ -286,6 +286,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken: newRefreshToken,
+      user: this.sanitizeUser(user),
     };
   }
 

@@ -8,12 +8,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Response } from 'express';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
@@ -60,8 +55,6 @@ export class AuthController {
     description: 'User successfully registered. Verification email sent.',
     type: MessageResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Bad Request – validation error' })
-  @ApiResponse({ status: 409, description: 'Conflict – email already in use' })
   async register(
     @Body() registerDto: RegisterDto,
   ): Promise<MessageResponseDto> {
@@ -73,33 +66,20 @@ export class AuthController {
   // ---------------------------------------------------------------------------
 
   @Post('login')
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  // @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Login with email/phone and password' })
   @ApiWrappedResponse({
     status: 200,
     description: 'Login successful – returns JWT tokens and sanitized user.',
     type: AuthResponseDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request – email or phone required',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized – invalid credentials / account locked',
-  })
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponseDto> {
     const result = await this.authService.login(loginDto);
-    // this.setRefreshTokenCookie(res, result.refreshToken);
     return result;
   }
-
-  // ---------------------------------------------------------------------------
-  // Me
-  // ---------------------------------------------------------------------------
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -109,10 +89,6 @@ export class AuthController {
     status: 200,
     description: 'Authenticated user profile.',
     type: SanitizedUserDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized – missing or invalid JWT',
   })
   async getMe(@CurrentUser() user: UserDocument): Promise<SanitizedUserDto> {
     return await this.authService.getMe(user._id.toString());
@@ -130,10 +106,6 @@ export class AuthController {
     status: 200,
     description: 'Logout successful – refresh token cleared.',
     type: LogoutResponseDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized – missing or invalid JWT',
   })
   async logout(
     @Request() req: { user: UserDocument },
@@ -158,10 +130,6 @@ export class AuthController {
     description: 'New access token and rotated refresh token.',
     type: AuthTokensResponseDto,
   })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized – refresh token invalid or revoked',
-  })
   async refresh(
     @Body('refreshToken') refreshTokenFromReq: string,
     @Request() req: { cookies?: { refreshToken?: string } },
@@ -169,9 +137,7 @@ export class AuthController {
   ): Promise<AuthTokensResponseDto> {
     const refreshToken = (refreshTokenFromReq ||
       req.cookies?.refreshToken) as string;
-    const tokens = await this.authService.refreshTokens(refreshToken);
-    // this.setRefreshTokenCookie(_res, tokens.refreshToken);
-    return tokens;
+    return await this.authService.refreshTokens(refreshToken);
   }
 
   // ---------------------------------------------------------------------------
@@ -185,10 +151,6 @@ export class AuthController {
     description: 'Email verified successfully.',
     type: MessageResponseDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request – token invalid or expired',
-  })
   async verifyEmail(
     @Query('token') token: string,
   ): Promise<MessageResponseDto> {
@@ -201,10 +163,6 @@ export class AuthController {
     status: 200,
     description: 'Verification email resent.',
     type: MessageResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request – user not found, already verified, or throttled',
   })
   async resendVerification(
     @Body('email') email: string,
@@ -224,10 +182,6 @@ export class AuthController {
     description: 'OTP sent successfully.',
     type: MessageResponseDto,
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request – daily SMS limit reached',
-  })
   async phoneStart(
     @Body() phoneStartDto: PhoneStartDto,
   ): Promise<MessageResponseDto> {
@@ -238,21 +192,11 @@ export class AuthController {
   @ApiOperation({
     summary: 'Verify OTP and authenticate (login or register) via phone',
   })
-  @ApiWrappedResponse({
-    status: 200,
-    description: 'Phone verified – returns JWT tokens and sanitized user.',
-    type: AuthResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request – invalid or expired OTP',
-  })
   async phoneVerify(
     @Body() phoneVerifyDto: PhoneVerifyDto,
     @Res({ passthrough: true }) _res: Response,
   ): Promise<AuthResponseDto> {
     const result = await this.phoneAuthService.phoneVerify(phoneVerifyDto);
-    // this.setRefreshTokenCookie(_res, result.refreshToken);
     return result;
   }
 
@@ -262,10 +206,6 @@ export class AuthController {
     status: 200,
     description: 'OTP resent successfully.',
     type: MessageResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request – daily SMS limit reached',
   })
   async phoneResend(
     @Body() phoneResendDto: PhoneResendDto,
@@ -287,10 +227,6 @@ export class AuthController {
       'Google login successful – returns JWT tokens and sanitized user.',
     type: AuthResponseDto,
   })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized – invalid Google ID token',
-  })
   async googleLogin(
     @Body() googleLoginDto: GoogleLoginDto,
     @Res({ passthrough: true }) _res: Response,
@@ -308,14 +244,6 @@ export class AuthController {
     description:
       'Facebook login successful – returns JWT tokens and sanitized user.',
     type: AuthResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request – email not provided by Facebook',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized – invalid Facebook access token',
   })
   async facebookLogin(
     @Body() facebookLoginDto: FacebookLoginDto,
