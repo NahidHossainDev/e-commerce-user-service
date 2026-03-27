@@ -40,6 +40,25 @@ export declare class AuthService {
     refreshTokens(refreshToken: string): Promise<{
         accessToken: string;
         refreshToken: string;
+        user: {
+            _id: import("mongoose").Types.ObjectId;
+            email: string | undefined;
+            phoneNumber: string | undefined;
+            profile: {
+                fullName: string;
+                imageUrl?: string;
+                dateOfBirth?: Date;
+                gender?: import("../../user/user.schema").Gender;
+            };
+            roles: {
+                type: UserRole;
+                status: import("../../user/user.schema").RoleStatus;
+                assignedAt: Date;
+                metadata?: Record<string, unknown>;
+            }[];
+            primaryRole: UserRole;
+            accountStatus: AccountStatus;
+        };
     }>;
     issueTokens(user: UserDocument): Promise<{
         accessToken: string;

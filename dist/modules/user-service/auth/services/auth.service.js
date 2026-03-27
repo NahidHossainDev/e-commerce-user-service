@@ -194,6 +194,7 @@ let AuthService = AuthService_1 = class AuthService {
         return {
             accessToken,
             refreshToken: newRefreshToken,
+            user: this.sanitizeUser(user),
         };
     }
     async issueTokens(user) {

@@ -52,8 +52,7 @@ let AuthController = class AuthController {
     async refresh(refreshTokenFromReq, req, _res) {
         const refreshToken = (refreshTokenFromReq ||
             req.cookies?.refreshToken);
-        const tokens = await this.authService.refreshTokens(refreshToken);
-        return tokens;
+        return await this.authService.refreshTokens(refreshToken);
     }
     async verifyEmail(token) {
         return await this.authService.verifyEmail({ token });
@@ -97,8 +96,6 @@ __decorate([
         description: 'User successfully registered. Verification email sent.',
         type: auth_response_dto_1.MessageResponseDto,
     }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad Request – validation error' }),
-    (0, swagger_1.ApiResponse)({ status: 409, description: 'Conflict – email already in use' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [register_dto_1.RegisterDto]),
@@ -106,20 +103,11 @@ __decorate([
 ], AuthController.prototype, "register", null);
 __decorate([
     (0, common_1.Post)('login'),
-    (0, throttler_1.Throttle)({ default: { limit: 5, ttl: 60000 } }),
     (0, swagger_1.ApiOperation)({ summary: 'Login with email/phone and password' }),
     (0, swagger_helper_1.ApiWrappedResponse)({
         status: 200,
         description: 'Login successful – returns JWT tokens and sanitized user.',
         type: auth_response_dto_1.AuthResponseDto,
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Bad Request – email or phone required',
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 401,
-        description: 'Unauthorized – invalid credentials / account locked',
     }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
@@ -137,10 +125,6 @@ __decorate([
         description: 'Authenticated user profile.',
         type: auth_response_dto_1.SanitizedUserDto,
     }),
-    (0, swagger_1.ApiResponse)({
-        status: 401,
-        description: 'Unauthorized – missing or invalid JWT',
-    }),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -155,10 +139,6 @@ __decorate([
         status: 200,
         description: 'Logout successful – refresh token cleared.',
         type: auth_response_dto_1.LogoutResponseDto,
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 401,
-        description: 'Unauthorized – missing or invalid JWT',
     }),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -176,10 +156,6 @@ __decorate([
         description: 'New access token and rotated refresh token.',
         type: auth_response_dto_1.AuthTokensResponseDto,
     }),
-    (0, swagger_1.ApiResponse)({
-        status: 401,
-        description: 'Unauthorized – refresh token invalid or revoked',
-    }),
     __param(0, (0, common_1.Body)('refreshToken')),
     __param(1, (0, common_1.Request)()),
     __param(2, (0, common_1.Res)({ passthrough: true })),
@@ -195,10 +171,6 @@ __decorate([
         description: 'Email verified successfully.',
         type: auth_response_dto_1.MessageResponseDto,
     }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Bad Request – token invalid or expired',
-    }),
     __param(0, (0, common_1.Query)('token')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -211,10 +183,6 @@ __decorate([
         status: 200,
         description: 'Verification email resent.',
         type: auth_response_dto_1.MessageResponseDto,
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Bad Request – user not found, already verified, or throttled',
     }),
     __param(0, (0, common_1.Body)('email')),
     __metadata("design:type", Function),
@@ -230,10 +198,6 @@ __decorate([
         description: 'OTP sent successfully.',
         type: auth_response_dto_1.MessageResponseDto,
     }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Bad Request – daily SMS limit reached',
-    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [phone_auth_dto_1.PhoneStartDto]),
@@ -243,15 +207,6 @@ __decorate([
     (0, common_1.Post)('phone/verify'),
     (0, swagger_1.ApiOperation)({
         summary: 'Verify OTP and authenticate (login or register) via phone',
-    }),
-    (0, swagger_helper_1.ApiWrappedResponse)({
-        status: 200,
-        description: 'Phone verified – returns JWT tokens and sanitized user.',
-        type: auth_response_dto_1.AuthResponseDto,
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Bad Request – invalid or expired OTP',
     }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
@@ -267,10 +222,6 @@ __decorate([
         description: 'OTP resent successfully.',
         type: auth_response_dto_1.MessageResponseDto,
     }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Bad Request – daily SMS limit reached',
-    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [phone_auth_dto_1.PhoneResendDto]),
@@ -283,10 +234,6 @@ __decorate([
         status: 200,
         description: 'Google login successful – returns JWT tokens and sanitized user.',
         type: auth_response_dto_1.AuthResponseDto,
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 401,
-        description: 'Unauthorized – invalid Google ID token',
     }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
@@ -301,14 +248,6 @@ __decorate([
         status: 200,
         description: 'Facebook login successful – returns JWT tokens and sanitized user.',
         type: auth_response_dto_1.AuthResponseDto,
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Bad Request – email not provided by Facebook',
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 401,
-        description: 'Unauthorized – invalid Facebook access token',
     }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)({ passthrough: true })),
