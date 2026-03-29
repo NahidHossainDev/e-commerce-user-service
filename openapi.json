@@ -63,12 +63,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request – validation error"
-          },
-          "409": {
-            "description": "Conflict – email already in use"
           }
         },
         "summary": "Register a new user",
@@ -125,12 +119,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request – email or phone required"
-          },
-          "401": {
-            "description": "Unauthorized – invalid credentials / account locked"
           }
         },
         "summary": "Login with email/phone and password",
@@ -177,9 +165,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized – missing or invalid JWT"
           }
         },
         "security": [
@@ -231,9 +216,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized – missing or invalid JWT"
           }
         },
         "security": [
@@ -286,9 +268,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized – refresh token invalid or revoked"
           }
         },
         "summary": "Rotate JWT tokens using a valid refresh token",
@@ -344,9 +323,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request – token invalid or expired"
           }
         },
         "summary": "Verify email address using the one-time token",
@@ -393,9 +369,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request – user not found, already verified, or throttled"
           }
         },
         "summary": "Resend email verification link",
@@ -452,9 +425,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request – daily SMS limit reached"
           }
         },
         "summary": "Request an OTP to the given phone number",
@@ -478,42 +448,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Phone verified – returns JWT tokens and sanitized user.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "nullable": true,
-                      "example": null,
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "null"
-                        }
-                      ]
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/AuthResponseDto"
-                    }
-                  },
-                  "required": [
-                    "success",
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request – invalid or expired OTP"
+          "201": {
+            "description": ""
           }
         },
         "summary": "Verify OTP and authenticate (login or register) via phone",
@@ -570,9 +506,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request – daily SMS limit reached"
           }
         },
         "summary": "Resend OTP to the given phone number",
@@ -629,9 +562,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized – invalid Google ID token"
           }
         },
         "summary": "Authenticate using a Google ID token",
@@ -688,12 +618,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request – email not provided by Facebook"
-          },
-          "401": {
-            "description": "Unauthorized – invalid Facebook access token"
           }
         },
         "summary": "Authenticate using a Facebook access token",

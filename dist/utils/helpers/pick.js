@@ -4,7 +4,7 @@ exports.pick = void 0;
 const pick = (obj, keys) => {
     const finalObj = {};
     for (const key of keys) {
-        if (obj && Object.hasOwnProperty.call(obj, key)) {
+        if (obj && obj[key] !== undefined) {
             finalObj[key] = obj[key];
         }
     }
