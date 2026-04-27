@@ -16,6 +16,7 @@ exports.MediaController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const swagger_1 = require("@nestjs/swagger");
+const media_types_1 = require("./domain/media.types");
 const cleanup_response_dto_1 = require("./dto/cleanup-response.dto");
 const media_response_dto_1 = require("./dto/media-response.dto");
 const media_service_1 = require("./media.service");
@@ -59,7 +60,7 @@ __decorate([
         validators: [
             new common_1.MaxFileSizeValidator({ maxSize: 1024 * 1024 * 50 }),
             new common_1.FileTypeValidator({
-                fileType: /(jpg|jpeg|png|webp|mp4|pdf|doc|docx|xls|xlsx|csv)$/,
+                fileType: media_types_1.ALLOWED_MIME_TYPES_REGEX,
             }),
         ],
     }))),

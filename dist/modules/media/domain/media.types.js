@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MediaStatus = exports.FileFormat = exports.MediaType = void 0;
+exports.ALLOWED_MIME_TYPES_REGEX = exports.ALLOWED_MIME_TYPES = exports.MediaStatus = exports.FileFormat = exports.MediaType = void 0;
 var MediaType;
 (function (MediaType) {
     MediaType["IMAGE"] = "image";
@@ -28,4 +28,18 @@ var MediaStatus;
     MediaStatus["TEMP"] = "temp";
     MediaStatus["ACTIVE"] = "active";
 })(MediaStatus || (exports.MediaStatus = MediaStatus = {}));
+exports.ALLOWED_MIME_TYPES = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    webp: 'image/webp',
+    mp4: 'video/mp4',
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    csv: 'text/csv',
+};
+exports.ALLOWED_MIME_TYPES_REGEX = new RegExp(`^(${Object.values(exports.ALLOWED_MIME_TYPES).join('|')})$`);
 //# sourceMappingURL=media.types.js.map

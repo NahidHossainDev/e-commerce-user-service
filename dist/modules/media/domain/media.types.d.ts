@@ -22,6 +22,8 @@ export declare enum MediaStatus {
     TEMP = "temp",
     ACTIVE = "active"
 }
+export declare const ALLOWED_MIME_TYPES: Record<string, string>;
+export declare const ALLOWED_MIME_TYPES_REGEX: RegExp;
 export interface FileMetadata {
     id: string;
     url: string;

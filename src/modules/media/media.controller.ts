@@ -13,6 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 import {
   ApiBody,
   ApiConsumes,
@@ -20,6 +21,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { ALLOWED_MIME_TYPES_REGEX } from './domain/media.types';
 import { CleanupResponseDto } from './dto/cleanup-response.dto';
 import { MediaResponseDto } from './dto/media-response.dto';
 import { MediaService } from './media.service';
@@ -51,7 +53,7 @@ export class MediaController {
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 50 }), // 50MB
           new FileTypeValidator({
-            fileType: /(jpg|jpeg|png|webp|mp4|pdf|doc|docx|xls|xlsx|csv)$/,
+            fileType: ALLOWED_MIME_TYPES_REGEX,
           }),
         ],
       }),

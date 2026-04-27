@@ -25,6 +25,37 @@ export enum MediaStatus {
   ACTIVE = 'active',
 }
 
+/**
+ * Allowed MIME types for file uploads.
+ * Maps file formats to their corresponding MIME types for proper validation.
+ */
+export const ALLOWED_MIME_TYPES: Record<string, string> = {
+  // Image formats
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+
+  // Video formats
+  mp4: 'video/mp4',
+
+  // Document formats
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  csv: 'text/csv',
+};
+
+/**
+ * Regex pattern for validating file MIME types.
+ * Generated from ALLOWED_MIME_TYPES for use in FileTypeValidator.
+ */
+export const ALLOWED_MIME_TYPES_REGEX = new RegExp(
+  `^(${Object.values(ALLOWED_MIME_TYPES).join('|')})$`,
+);
+
 export interface FileMetadata {
   id: string;
   url: string;
