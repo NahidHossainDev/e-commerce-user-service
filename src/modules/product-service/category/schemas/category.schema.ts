@@ -20,7 +20,7 @@ export class Category {
   image: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Category', default: null })
-  parentCategory: Types.ObjectId;
+  parentCategoryId: Types.ObjectId;
 
   @Prop({ default: 0, min: 0, max: 3 })
   level: number;
@@ -49,5 +49,5 @@ export class Category {
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
 // Indexes
-CategorySchema.index({ parentCategory: 1 });
+CategorySchema.index({ parentCategoryId: 1 });
 CategorySchema.index({ slug: 1 });

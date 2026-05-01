@@ -51,9 +51,9 @@ export class CategoryService {
     let level = 0;
     let path = ',';
 
-    if (createCategoryDto.parentCategory) {
+    if (createCategoryDto.parentCategoryId) {
       const parent = await this.categoryModel.findById(
-        createCategoryDto.parentCategory,
+        createCategoryDto.parentCategoryId,
       );
       if (!parent) {
         throw new NotFoundException('Parent category not found');
@@ -148,17 +148,17 @@ export class CategoryService {
       updateData.sortOrder = updateCategoryDto.sortOrder;
     }
 
-    if (updateCategoryDto.parentCategory !== undefined) {
+    if (updateCategoryDto.parentCategoryId !== undefined) {
       let newLevel = 0;
       let newPath = ',';
 
-      if (updateCategoryDto.parentCategory) {
-        if (updateCategoryDto.parentCategory === id) {
+      if (updateCategoryDto.parentCategoryId) {
+        if (updateCategoryDto.parentCategoryId === id) {
           throw new ConflictException('Category cannot be its own parent');
         }
 
         const parent = await this.categoryModel.findById(
-          updateCategoryDto.parentCategory,
+          updateCategoryDto.parentCategoryId,
         );
         if (!parent) {
           throw new NotFoundException('Parent category not found');
@@ -180,7 +180,7 @@ export class CategoryService {
 
       // If category parent or hierarchy changed, update children too
       if (
-        category.parentCategory?.toString() !== updateCategoryDto.parentCategory
+        category.parentCategoryId?.toString() !== updateCategoryDto.parentCategoryId
       ) {
         const oldPath = `${category.path}${category._id.toString()},`;
         const nextPath = `${newPath}${category._id.toString()},`;
@@ -250,7 +250,7 @@ export class CategoryService {
 
     // Check if category has children
     const childCount = await this.categoryModel.countDocuments({
-      parentCategory: id,
+      parentCategoryId: id,
     });
     if (childCount > 0) {
       throw new ConflictException('Cannot delete category with sub-categories');

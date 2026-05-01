@@ -25,7 +25,7 @@ export class CategoryResponseDto {
   image: string;
 
   @ApiProperty({ example: '64b1f2c3d4e5f6a7b8c9d0e2', nullable: true })
-  parentCategory: any;
+  parentCategoryId: any;
 
   @ApiProperty({ example: 0, minimum: 0, maximum: 3 })
   level: number;

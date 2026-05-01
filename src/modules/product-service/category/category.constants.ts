@@ -5,6 +5,6 @@ export const categorySearchableFields = ['name', 'slug', 'description'];
 export const categoryFilterableFields: (keyof CategoryQueryOptionsDto)[] = [
   'searchTerm',
   'isActive',
-  'parentCategory',
+  'parentCategoryId',
   'level',
 ];

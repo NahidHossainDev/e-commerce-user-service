@@ -18,7 +18,7 @@ export class CategoryQueryOptionsDto extends QueryOptions {
   @ApiPropertyOptional({ description: 'Filter by parent category' })
   @IsOptional()
   @IsMongoId()
-  parentCategory?: string;
+  parentCategoryId?: string;
 
   @ApiPropertyOptional({ description: 'Filter by active status' })
   @IsOptional()

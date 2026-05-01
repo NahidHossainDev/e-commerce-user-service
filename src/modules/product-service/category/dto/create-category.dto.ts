@@ -24,7 +24,7 @@ class CategoryMetaDto {
 export class CreateCategoryDto {
   @ApiProperty({ description: 'Category name' })
   @IsString()
-  name: string;
+  name!: string;
 
   @ApiPropertyOptional({ description: 'Category description' })
   @IsOptional()
@@ -39,7 +39,7 @@ export class CreateCategoryDto {
   @ApiPropertyOptional({ description: 'Parent category ID' })
   @IsOptional()
   @IsMongoId()
-  parentCategory?: string;
+  parentCategoryId?: string;
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()
