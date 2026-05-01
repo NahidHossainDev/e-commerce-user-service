@@ -16,7 +16,7 @@ const class_validator_1 = require("class-validator");
 const queryOptions_dto_1 = require("../../../../common/dto/queryOptions.dto");
 class CategoryQueryOptionsDto extends queryOptions_dto_1.QueryOptions {
     searchTerm;
-    parentCategory;
+    parentCategoryId;
     isActive;
     level;
 }
@@ -32,7 +32,7 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
-], CategoryQueryOptionsDto.prototype, "parentCategory", void 0);
+], CategoryQueryOptionsDto.prototype, "parentCategoryId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by active status' }),
     (0, class_validator_1.IsOptional)(),

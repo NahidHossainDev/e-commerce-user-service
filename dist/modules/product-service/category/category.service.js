@@ -42,8 +42,8 @@ let CategoryService = class CategoryService {
         }
         let level = 0;
         let path = ',';
-        if (createCategoryDto.parentCategory) {
-            const parent = await this.categoryModel.findById(createCategoryDto.parentCategory);
+        if (createCategoryDto.parentCategoryId) {
+            const parent = await this.categoryModel.findById(createCategoryDto.parentCategoryId);
             if (!parent) {
                 throw new common_1.NotFoundException('Parent category not found');
             }
@@ -110,14 +110,14 @@ let CategoryService = class CategoryService {
         if (updateCategoryDto.sortOrder !== undefined) {
             updateData.sortOrder = updateCategoryDto.sortOrder;
         }
-        if (updateCategoryDto.parentCategory !== undefined) {
+        if (updateCategoryDto.parentCategoryId !== undefined) {
             let newLevel = 0;
             let newPath = ',';
-            if (updateCategoryDto.parentCategory) {
-                if (updateCategoryDto.parentCategory === id) {
+            if (updateCategoryDto.parentCategoryId) {
+                if (updateCategoryDto.parentCategoryId === id) {
                     throw new common_1.ConflictException('Category cannot be its own parent');
                 }
-                const parent = await this.categoryModel.findById(updateCategoryDto.parentCategory);
+                const parent = await this.categoryModel.findById(updateCategoryDto.parentCategoryId);
                 if (!parent) {
                     throw new common_1.NotFoundException('Parent category not found');
                 }
@@ -130,7 +130,7 @@ let CategoryService = class CategoryService {
                     throw new common_1.ConflictException('Category depth cannot exceed 3 levels');
                 }
             }
-            if (category.parentCategory?.toString() !== updateCategoryDto.parentCategory) {
+            if (category.parentCategoryId?.toString() !== updateCategoryDto.parentCategoryId) {
                 const oldPath = `${category.path}${category._id.toString()},`;
                 const nextPath = `${newPath}${category._id.toString()},`;
                 await this.categoryModel.updateMany({ path: { $regex: `^${oldPath}` } }, [
@@ -178,7 +178,7 @@ let CategoryService = class CategoryService {
             throw new common_1.NotFoundException(`Category with ID ${id} not found`);
         }
         const childCount = await this.categoryModel.countDocuments({
-            parentCategory: id,
+            parentCategoryId: id,
         });
         if (childCount > 0) {
             throw new common_1.ConflictException('Cannot delete category with sub-categories');

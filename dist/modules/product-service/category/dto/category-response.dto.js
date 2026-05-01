@@ -30,7 +30,7 @@ class CategoryResponseDto {
     slug;
     description;
     image;
-    parentCategory;
+    parentCategoryId;
     level;
     path;
     isActive;
@@ -64,7 +64,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({ example: '64b1f2c3d4e5f6a7b8c9d0e2', nullable: true }),
     __metadata("design:type", Object)
-], CategoryResponseDto.prototype, "parentCategory", void 0);
+], CategoryResponseDto.prototype, "parentCategoryId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 0, minimum: 0, maximum: 3 }),
     __metadata("design:type", Number)

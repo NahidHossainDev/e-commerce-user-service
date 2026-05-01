@@ -18,7 +18,7 @@ let Category = class Category {
     slug;
     description;
     image;
-    parentCategory;
+    parentCategoryId;
     level;
     path;
     isActive;
@@ -47,7 +47,7 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Category', default: null }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
-], Category.prototype, "parentCategory", void 0);
+], Category.prototype, "parentCategoryId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: 0, min: 0, max: 3 }),
     __metadata("design:type", Number)
@@ -76,6 +76,6 @@ exports.Category = Category = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Category);
 exports.CategorySchema = mongoose_1.SchemaFactory.createForClass(Category);
-exports.CategorySchema.index({ parentCategory: 1 });
+exports.CategorySchema.index({ parentCategoryId: 1 });
 exports.CategorySchema.index({ slug: 1 });
 //# sourceMappingURL=category.schema.js.map

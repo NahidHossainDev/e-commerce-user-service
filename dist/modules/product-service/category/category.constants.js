@@ -5,7 +5,7 @@ exports.categorySearchableFields = ['name', 'slug', 'description'];
 exports.categoryFilterableFields = [
     'searchTerm',
     'isActive',
-    'parentCategory',
+    'parentCategoryId',
     'level',
 ];
 //# sourceMappingURL=category.constants.js.map

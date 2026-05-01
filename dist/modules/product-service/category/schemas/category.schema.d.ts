@@ -6,7 +6,7 @@ export declare class Category {
     slug: string;
     description: string;
     image: string;
-    parentCategory: Types.ObjectId;
+    parentCategoryId: Types.ObjectId;
     level: number;
     path: string;
     isActive: boolean;

@@ -8,7 +8,7 @@ export declare class CategoryResponseDto {
     slug: string;
     description: string;
     image: string;
-    parentCategory: any;
+    parentCategoryId: any;
     level: number;
     path: string;
     isActive: boolean;

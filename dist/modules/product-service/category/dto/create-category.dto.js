@@ -33,7 +33,7 @@ class CreateCategoryDto {
     name;
     description;
     image;
-    parentCategory;
+    parentCategoryId;
     isActive = true;
     sortOrder = 0;
     meta;
@@ -61,7 +61,7 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
-], CreateCategoryDto.prototype, "parentCategory", void 0);
+], CreateCategoryDto.prototype, "parentCategoryId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ default: true }),
     (0, class_validator_1.IsOptional)(),

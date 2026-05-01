@@ -2651,7 +2651,7 @@
             }
           },
           {
-            "name": "parentCategory",
+            "name": "parentCategoryId",
             "required": false,
             "in": "query",
             "description": "Filter by parent category",
@@ -8110,7 +8110,7 @@
             "type": "string",
             "example": "http://example.com/category-image.jpg"
           },
-          "parentCategory": {
+          "parentCategoryId": {
             "type": "object",
             "example": "64b1f2c3d4e5f6a7b8c9d0e2",
             "nullable": true
@@ -8157,7 +8157,7 @@
           "slug",
           "description",
           "image",
-          "parentCategory",
+          "parentCategoryId",
           "level",
           "path",
           "isActive",
@@ -8182,7 +8182,7 @@
             "type": "string",
             "description": "Category image URL"
           },
-          "parentCategory": {
+          "parentCategoryId": {
             "type": "string",
             "description": "Parent category ID"
           },
@@ -8235,7 +8235,7 @@
             "type": "string",
             "description": "Category image URL"
           },
-          "parentCategory": {
+          "parentCategoryId": {
             "type": "string",
             "description": "Parent category ID"
           },
@@ -8275,7 +8275,7 @@
             "type": "string",
             "example": "http://example.com/category-image.jpg"
           },
-          "parentCategory": {
+          "parentCategoryId": {
             "type": "object",
             "example": "64b1f2c3d4e5f6a7b8c9d0e2",
             "nullable": true
@@ -8328,7 +8328,7 @@
           "slug",
           "description",
           "image",
-          "parentCategory",
+          "parentCategoryId",
           "level",
           "path",
           "isActive",

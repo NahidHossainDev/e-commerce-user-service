@@ -12,7 +12,7 @@ const buildCategoryTree = (categories) => {
     });
     categories.forEach((category) => {
         const categoryWithChildren = map.get(category._id.toString());
-        const parentId = category.parentCategory?.toString();
+        const parentId = category.parentCategoryId?.toString();
         if (parentId && map.has(parentId)) {
             map.get(parentId).children.push(categoryWithChildren);
         }
