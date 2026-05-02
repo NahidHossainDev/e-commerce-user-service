@@ -71,7 +71,7 @@ __decorate([
     __metadata("design:type", String)
 ], ProductUnitDto.prototype, "symbol", void 0);
 class CategoryRefDto {
-    id;
+    _id;
     name;
 }
 exports.CategoryRefDto = CategoryRefDto;
@@ -79,14 +79,14 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Category ID' }),
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
-], CategoryRefDto.prototype, "id", void 0);
+], CategoryRefDto.prototype, "_id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Category name' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CategoryRefDto.prototype, "name", void 0);
 class BrandRefDto {
-    id;
+    _id;
     name;
 }
 exports.BrandRefDto = BrandRefDto;
@@ -94,7 +94,7 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Brand ID' }),
     (0, class_validator_1.IsMongoId)(),
     __metadata("design:type", String)
-], BrandRefDto.prototype, "id", void 0);
+], BrandRefDto.prototype, "_id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Brand name' }),
     (0, class_validator_1.IsString)(),

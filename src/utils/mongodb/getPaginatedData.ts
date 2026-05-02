@@ -10,6 +10,7 @@ interface IPropsType<T> {
   project?: Record<string, unknown>;
   stageArr?: PipelineStage[];
   useAggregate?: boolean; // allow manual override
+  populate?: string | string[];
 }
 
 export async function getPaginatedData<T extends Document>({
@@ -19,6 +20,7 @@ export async function getPaginatedData<T extends Document>({
   filterQuery = {},
   stageArr = [],
   useAggregate = false,
+  populate,
 }: IPropsType<T>): Promise<IPaginatedResponse<T>> {
   const { skip, limit, sortBy, sortOrder, page } = paginationQuery;
   const shouldUseAggregate = useAggregate || stageArr.length > 0;
@@ -41,13 +43,17 @@ export async function getPaginatedData<T extends Document>({
   const [data, totalCount] = await Promise.all([
     shouldUseAggregate
       ? model.aggregate(pipeline).exec()
-      : model
-          .find(filterQuery, project)
-          .sort({ [sortBy]: sortOrder })
-          .skip(skip)
-          .limit(limit)
-          .lean()
-          .exec(),
+      : (() => {
+          let query = model
+            .find(filterQuery, project)
+            .sort({ [sortBy]: sortOrder })
+            .skip(skip)
+            .limit(limit);
+          if (populate) {
+            query = query.populate(populate) as any;
+          }
+          return query.lean().exec();
+        })(),
 
     model.countDocuments(filterQuery).exec(),
   ]);

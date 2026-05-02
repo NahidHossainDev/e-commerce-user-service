@@ -18,6 +18,8 @@ import { getPaginatedData } from '../../../utils/mongodb/getPaginatedData';
 import { generateSKU, generateSlug } from '../../../utils/product-helper';
 import { InventoryService } from '../inventory/inventory.service';
 import { InventoryTransactionType } from '../inventory/schemas/inventory-history.schema';
+import { BrandService } from '../brand/brand.service';
+import { CategoryService } from '../category/category.service';
 
 import { ProductQueryDto } from './dto/product-query-options.dto';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
@@ -38,6 +40,8 @@ export class ProductService {
     @InjectModel(Product.name)
     private productModel: Model<ProductDocument>,
     private readonly inventoryService: InventoryService,
+    private readonly categoryService: CategoryService,
+    private readonly brandService: BrandService,
     private readonly eventEmitter: EventEmitter2,
     @InjectConnection() private readonly connection: Connection,
   ) {}
@@ -55,12 +59,17 @@ export class ProductService {
         throw new ConflictException('Product with this title already exists');
       }
 
+      // Fetch category and brand names for SKU generation
+      const category = await this.categoryService.findOne(
+        createProductDto.categoryId,
+      );
+      const brand = createProductDto.brandId
+        ? await this.brandService.findOne(createProductDto.brandId)
+        : null;
+
       const sku =
         createProductDto.sku ||
-        generateSKU(
-          createProductDto.brand?.name || 'GEN',
-          createProductDto.category.name,
-        );
+        generateSKU(brand?.name || 'GEN', category.name);
 
       const product = new this.productModel({
         ...createProductDto,
@@ -136,6 +145,7 @@ export class ProductService {
       model: this.productModel,
       paginationQuery: pagination,
       filterQuery,
+      populate: ['categoryId', 'brandId', 'subCategoryIds'],
     });
 
     result.data = result.data.map((item) => {
@@ -186,6 +196,7 @@ export class ProductService {
       model: this.productModel,
       paginationQuery: pagination,
       filterQuery,
+      populate: ['categoryId', 'brandId', 'subCategoryIds'],
     });
   }
 
@@ -200,7 +211,8 @@ export class ProductService {
         isDeleted: false,
         status: ProductStatus.ACTIVE,
       })
-      .select('-vendorId -isDeleted -deletedAt -lastStockSyncAt -__v');
+      .select('-vendorId -isDeleted -deletedAt -lastStockSyncAt -__v')
+      .populate(['categoryId', 'brandId', 'subCategoryIds']);
 
     if (!product) {
       throw new NotFoundException('Product not found');
@@ -209,9 +221,11 @@ export class ProductService {
   }
 
   async findOneAdmin(id: string): Promise<ProductDocument> {
-    const product = await this.productModel.findOne({
-      _id: new Types.ObjectId(id),
-    });
+    const product = await this.productModel
+      .findOne({
+        _id: new Types.ObjectId(id),
+      })
+      .populate(['categoryId', 'brandId', 'subCategoryIds']);
     if (!product) {
       throw new NotFoundException('Product not found');
     }
@@ -350,8 +364,8 @@ export class ProductService {
     categoryId?: string,
     brandId?: string,
   ) {
-    if (categoryId) filterQuery['category.id'] = new Types.ObjectId(categoryId);
-    if (brandId) filterQuery['brand.id'] = new Types.ObjectId(brandId);
+    if (categoryId) filterQuery.categoryId = new Types.ObjectId(categoryId);
+    if (brandId) filterQuery.brandId = new Types.ObjectId(brandId);
   }
 
   private applyPriceFilters(

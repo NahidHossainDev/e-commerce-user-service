@@ -51,14 +51,14 @@ exports.ProductUnit = ProductUnit = __decorate([
     (0, mongoose_1.Schema)({ _id: false })
 ], ProductUnit);
 let CategoryRef = class CategoryRef {
-    id;
+    _id;
     name;
 };
 exports.CategoryRef = CategoryRef;
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Category', required: true, index: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
-], CategoryRef.prototype, "id", void 0);
+], CategoryRef.prototype, "_id", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -67,14 +67,14 @@ exports.CategoryRef = CategoryRef = __decorate([
     (0, mongoose_1.Schema)({ _id: false })
 ], CategoryRef);
 let BrandRef = class BrandRef {
-    id;
+    _id;
     name;
 };
 exports.BrandRef = BrandRef;
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Brand', required: true, index: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
-], BrandRef.prototype, "id", void 0);
+], BrandRef.prototype, "_id", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)

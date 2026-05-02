@@ -35,24 +35,6 @@ export class ProductUnit {
 }
 
 @Schema({ _id: false })
-export class CategoryRef {
-  @Prop({ type: Types.ObjectId, ref: 'Category', required: true, index: true })
-  id: Types.ObjectId;
-
-  @Prop({ required: true })
-  name: string;
-}
-
-@Schema({ _id: false })
-export class BrandRef {
-  @Prop({ type: Types.ObjectId, ref: 'Brand', required: true, index: true })
-  id: Types.ObjectId;
-
-  @Prop({ required: true })
-  name: string;
-}
-
-@Schema({ _id: false })
 export class ProductAttribute {
   @Prop({ required: true })
   name: string;
@@ -154,14 +136,14 @@ export class Product {
   @Prop({ type: [ProductMedia], default: [] })
   media: ProductMedia[];
 
-  @Prop({ type: CategoryRef, required: true })
-  category: CategoryRef;
+  @Prop({ type: Types.ObjectId, ref: 'Category', required: true, index: true })
+  categoryId: Types.ObjectId;
 
-  @Prop({ type: [CategoryRef], default: [] })
-  subCategories: CategoryRef[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Category' }], default: [] })
+  subCategoryIds: Types.ObjectId[];
 
-  @Prop({ type: BrandRef })
-  brand: BrandRef;
+  @Prop({ type: Types.ObjectId, ref: 'Brand', index: true })
+  brandId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Vendor', index: true })
   vendorId: Types.ObjectId;
@@ -263,8 +245,8 @@ export class Product {
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
 // ========== INDEXES ==========
-ProductSchema.index({ 'category.id': 1, status: 1 });
-ProductSchema.index({ 'brand.id': 1, status: 1 });
+ProductSchema.index({ categoryId: 1, status: 1 });
+ProductSchema.index({ brandId: 1, status: 1 });
 ProductSchema.index({ 'price.basePrice': 1, status: 1 });
 ProductSchema.index({ isFeatured: 1, status: 1, createdAt: -1 });
 ProductSchema.index({ isOnOffer: 1, status: 1 });

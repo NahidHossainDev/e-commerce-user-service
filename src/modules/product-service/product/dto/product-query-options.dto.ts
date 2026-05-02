@@ -18,12 +18,12 @@ export class ProductQueryDto extends QueryOptions {
   searchTerm?: string;
 
   @ApiProperty({ required: false })
-  @IsString()
+  @IsMongoId()
   @IsOptional()
   categoryId?: string;
 
   @ApiProperty({ required: false })
-  @IsString()
+  @IsMongoId()
   @IsOptional()
   brandId?: string;
 

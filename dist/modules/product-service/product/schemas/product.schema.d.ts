@@ -21,11 +21,11 @@ export declare class ProductUnit {
     symbol: string;
 }
 export declare class CategoryRef {
-    id: Types.ObjectId;
+    _id: Types.ObjectId;
     name: string;
 }
 export declare class BrandRef {
-    id: Types.ObjectId;
+    _id: Types.ObjectId;
     name: string;
 }
 export declare class ProductAttribute {

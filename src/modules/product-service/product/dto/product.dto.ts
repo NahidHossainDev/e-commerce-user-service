@@ -55,25 +55,6 @@ export class ProductUnitDto {
   symbol: string;
 }
 
-export class CategoryRefDto {
-  @ApiProperty({ description: 'Category ID' })
-  @IsMongoId()
-  id: string;
-
-  @ApiProperty({ description: 'Category name' })
-  @IsString()
-  name: string;
-}
-
-export class BrandRefDto {
-  @ApiProperty({ description: 'Brand ID' })
-  @IsMongoId()
-  id: string;
-
-  @ApiProperty({ description: 'Brand name' })
-  @IsString()
-  name: string;
-}
 
 export class ProductAttributeDto {
   @ApiProperty({ description: 'Attribute name' })
@@ -180,23 +161,20 @@ export class CreateProductDto {
   @IsNotEmpty()
   thumbnail: string;
 
-  @ApiProperty({ type: CategoryRefDto })
-  @ValidateNested()
-  @Type(() => CategoryRefDto)
-  category: CategoryRefDto;
+  @ApiProperty({ description: 'Category ID' })
+  @IsMongoId()
+  categoryId: string;
 
-  @ApiProperty({ type: [CategoryRefDto], required: false })
+  @ApiProperty({ type: [String], description: 'Sub category IDs', required: false })
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CategoryRefDto)
+  @IsMongoId({ each: true })
   @IsOptional()
-  subCategories?: CategoryRefDto[];
+  subCategoryIds?: string[];
 
-  @ApiProperty({ type: BrandRefDto, required: false })
-  @ValidateNested()
-  @Type(() => BrandRefDto)
+  @ApiProperty({ description: 'Brand ID', required: false })
+  @IsMongoId()
   @IsOptional()
-  brand?: BrandRefDto;
+  brandId?: string;
 
   @ApiProperty({ description: 'Vendor ID', required: false })
   @IsMongoId()

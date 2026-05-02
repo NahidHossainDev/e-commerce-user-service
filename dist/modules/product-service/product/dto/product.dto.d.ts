@@ -12,11 +12,11 @@ export declare class ProductUnitDto {
     symbol: string;
 }
 export declare class CategoryRefDto {
-    id: string;
+    _id: string;
     name: string;
 }
 export declare class BrandRefDto {
-    id: string;
+    _id: string;
     name: string;
 }
 export declare class ProductAttributeDto {
