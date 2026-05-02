@@ -83,7 +83,7 @@ export class MediaService {
       type = MediaType.DOCUMENT;
     }
 
-    const storageKey = `tmp/${type}s/${id}.${finalFormat}`;
+    const storageKey = `${type}s/${id}.${finalFormat}`;
 
     try {
       // 2. Upload to storage
@@ -197,7 +197,6 @@ export class MediaService {
         .find({
           status: MediaStatus.TEMP,
           createdAt: { $lt: expirationDate },
-          storageKey: { $regex: /^tmp\// },
         })
         .exec();
 
@@ -248,22 +247,10 @@ export class MediaService {
       const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
       if (!media || media.status === MediaStatus.ACTIVE) return;
 
-      const oldKey = media.storageKey;
-      if (!oldKey.startsWith('tmp/')) return;
-
-      const newKey = oldKey.replace('tmp/', '');
-
-      // Copy in storage
-      await this.storageAdapter.copyFile(oldKey, newKey);
-      // Delete old from storage
-      await this.storageAdapter.deleteFile(oldKey);
-
       // Update DB
       media.status = MediaStatus.ACTIVE;
       media.ownerId = event.ownerId;
       media.ownerType = event.ownerType;
-      media.storageKey = newKey;
-      media.url = this.storageAdapter.getPublicUrl(newKey);
 
       await media.save();
       this.logger.log(
@@ -278,15 +265,9 @@ export class MediaService {
 
   async detachImage(event: ImageDetachedEvent) {
     try {
-      const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
-      if (!media || media.status === MediaStatus.TEMP) return;
-
-      media.status = MediaStatus.TEMP;
-      media.ownerId = undefined;
-      media.ownerType = undefined;
-
-      await media.save();
-      this.logger.log(`Media ${media.id} detached`);
+      // Immediate deletion from DB and Storage
+      await this.deleteFile(event.mediaId);
+      this.logger.log(`Media ${event.mediaId} immediately deleted on detach`);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
