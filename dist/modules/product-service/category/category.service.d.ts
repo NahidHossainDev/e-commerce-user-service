@@ -9,6 +9,8 @@ export declare class CategoryService {
     private readonly eventEmitter;
     constructor(categoryModel: Model<CategoryDocument>, eventEmitter: EventEmitter2);
     create(createCategoryDto: CreateCategoryDto): Promise<CategoryDocument>;
+    private generateNextSortOrder;
+    private validateSortOrderUniqueness;
     findAll(query: CategoryQueryOptionsDto): Promise<import("../../../common/interface").IPaginatedResponse<import("mongoose").Document<unknown, {}, Category, {}, {}> & Category & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
@@ -20,4 +22,8 @@ export declare class CategoryService {
     findAllPublic(): Promise<CategoryDocument[]>;
     getPublicCategoryTree(): Promise<Category[]>;
     getBySlug(slug: string): Promise<CategoryDocument>;
+    getParentCategories(): Promise<Category[]>;
+    getSubCategories(parentId: string): Promise<Category[]>;
+    getParentCategoriesAdmin(): Promise<Category[]>;
+    getSubCategoriesAdmin(parentId: string): Promise<Category[]>;
 }

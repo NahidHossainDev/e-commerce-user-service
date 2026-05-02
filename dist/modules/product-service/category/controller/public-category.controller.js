@@ -29,6 +29,14 @@ let PublicCategoryController = class PublicCategoryController {
     async getTree() {
         return (await this.categoryService.getPublicCategoryTree());
     }
+    async getParentCategories() {
+        const categories = await this.categoryService.getParentCategories();
+        return categories;
+    }
+    async getSubCategories(parentId) {
+        const categories = await this.categoryService.getSubCategories(parentId);
+        return categories;
+    }
     async getBySlug(slug) {
         return (await this.categoryService.getBySlug(slug));
     }
@@ -60,6 +68,33 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], PublicCategoryController.prototype, "getTree", null);
+__decorate([
+    (0, common_1.Get)('parent-category'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all parent categories (level 0)' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'List of parent categories.',
+        type: category_response_dto_1.MinimalCategoryTreeDto,
+        isArray: true,
+    }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PublicCategoryController.prototype, "getParentCategories", null);
+__decorate([
+    (0, common_1.Get)(':parentId/sub-category'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get sub-categories for a parent category' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Nested sub-categories for the parent.',
+        type: category_response_dto_1.MinimalCategoryTreeDto,
+        isArray: true,
+    }),
+    __param(0, (0, common_1.Param)('parentId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PublicCategoryController.prototype, "getSubCategories", null);
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, swagger_1.ApiOperation)({ summary: 'Get a category by slug' }),

@@ -2911,6 +2911,123 @@
         ]
       }
     },
+    "/admin/categories/parent-category": {
+      "get": {
+        "operationId": "AdminCategoryController_getParentCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of parent categories with full details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CategoryResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all parent categories (level 0) for admin",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/admin/categories/{parentId}/sub-category": {
+      "get": {
+        "operationId": "AdminCategoryController_getSubCategories",
+        "parameters": [
+          {
+            "name": "parentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nested sub-categories for the parent with full details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CategoryTreeResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get sub-categories for a parent category with full details",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
     "/categories": {
       "get": {
         "operationId": "PublicCategoryController_findAll",
@@ -3004,6 +3121,113 @@
           }
         },
         "summary": "Get the full category tree",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/categories/parent-category": {
+      "get": {
+        "operationId": "PublicCategoryController_getParentCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of parent categories.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MinimalCategoryTreeDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all parent categories (level 0)",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/categories/{parentId}/sub-category": {
+      "get": {
+        "operationId": "PublicCategoryController_getSubCategories",
+        "parameters": [
+          {
+            "name": "parentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nested sub-categories for the parent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MinimalCategoryTreeDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get sub-categories for a parent category",
         "tags": [
           "Categories"
         ]
@@ -8336,6 +8560,51 @@
           "sortOrder",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "MinimalCategoryTreeDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Electronics"
+          },
+          "slug": {
+            "type": "string",
+            "example": "electronics"
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 0
+          },
+          "level": {
+            "type": "number",
+            "example": 0,
+            "minimum": 0,
+            "maximum": 3
+          },
+          "productCount": {
+            "type": "number",
+            "example": 150
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MinimalCategoryTreeDto"
+            }
+          }
+        },
+        "required": [
+          "_id",
+          "name",
+          "slug",
+          "sortOrder",
+          "level",
+          "productCount"
         ]
       },
       "SocialMediaDto": {

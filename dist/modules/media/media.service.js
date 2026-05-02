@@ -72,7 +72,7 @@ let MediaService = MediaService_1 = class MediaService {
         else if (this.imageOptimizer.isDocument(mimeType)) {
             type = media_types_1.MediaType.DOCUMENT;
         }
-        const storageKey = `tmp/${type}s/${id}.${finalFormat}`;
+        const storageKey = `${type}s/${id}.${finalFormat}`;
         try {
             const url = await this.storageAdapter.uploadFile(finalBuffer, storageKey, finalMimeType);
             const media = new this.mediaModel({
@@ -154,7 +154,6 @@ let MediaService = MediaService_1 = class MediaService {
                 .find({
                 status: media_types_1.MediaStatus.TEMP,
                 createdAt: { $lt: expirationDate },
-                storageKey: { $regex: /^tmp\// },
             })
                 .exec();
             if (tempMedia.length === 0) {
@@ -193,17 +192,9 @@ let MediaService = MediaService_1 = class MediaService {
             const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
             if (!media || media.status === media_types_1.MediaStatus.ACTIVE)
                 return;
-            const oldKey = media.storageKey;
-            if (!oldKey.startsWith('tmp/'))
-                return;
-            const newKey = oldKey.replace('tmp/', '');
-            await this.storageAdapter.copyFile(oldKey, newKey);
-            await this.storageAdapter.deleteFile(oldKey);
             media.status = media_types_1.MediaStatus.ACTIVE;
             media.ownerId = event.ownerId;
             media.ownerType = event.ownerType;
-            media.storageKey = newKey;
-            media.url = this.storageAdapter.getPublicUrl(newKey);
             await media.save();
             this.logger.log(`Media ${media.id} attached to ${event.ownerType}:${event.ownerId}`);
         }
@@ -214,14 +205,8 @@ let MediaService = MediaService_1 = class MediaService {
     }
     async detachImage(event) {
         try {
-            const media = await this.mediaModel.findOne({ id: event.mediaId }).exec();
-            if (!media || media.status === media_types_1.MediaStatus.TEMP)
-                return;
-            media.status = media_types_1.MediaStatus.TEMP;
-            media.ownerId = undefined;
-            media.ownerType = undefined;
-            await media.save();
-            this.logger.log(`Media ${media.id} detached`);
+            await this.deleteFile(event.mediaId);
+            this.logger.log(`Media ${event.mediaId} immediately deleted on detach`);
         }
         catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';

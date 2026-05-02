@@ -45,6 +45,13 @@ let AdminCategoryController = class AdminCategoryController {
     async remove(id) {
         return (await this.categoryService.remove(id));
     }
+    async getParentCategories() {
+        return (await this.categoryService.getParentCategoriesAdmin());
+    }
+    async getSubCategories(parentId) {
+        const categories = await this.categoryService.getSubCategoriesAdmin(parentId);
+        return categories;
+    }
 };
 exports.AdminCategoryController = AdminCategoryController;
 __decorate([
@@ -113,6 +120,35 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AdminCategoryController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('parent-category'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all parent categories (level 0) for admin' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'List of parent categories with full details.',
+        type: category_response_dto_1.CategoryResponseDto,
+        isArray: true,
+    }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminCategoryController.prototype, "getParentCategories", null);
+__decorate([
+    (0, common_1.Get)(':parentId/sub-category'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Get sub-categories for a parent category with full details',
+    }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Nested sub-categories for the parent with full details.',
+        type: category_response_dto_1.CategoryTreeResponseDto,
+        isArray: true,
+    }),
+    __param(0, (0, common_1.Param)('parentId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AdminCategoryController.prototype, "getSubCategories", null);
 exports.AdminCategoryController = AdminCategoryController = __decorate([
     (0, swagger_1.ApiTags)('Categories'),
     (0, common_1.Controller)('admin/categories'),

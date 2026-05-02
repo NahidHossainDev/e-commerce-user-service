@@ -5,6 +5,7 @@ import { CategoryService } from '../category.service';
 import {
   CategoryResponseDto,
   CategoryTreeResponseDto,
+  MinimalCategoryTreeDto,
 } from '../dto/category-response.dto';
 
 @ApiTags('Categories')
@@ -34,6 +35,34 @@ export class PublicCategoryController {
   })
   async getTree(): Promise<CategoryTreeResponseDto[]> {
     return (await this.categoryService.getPublicCategoryTree()) as unknown as CategoryTreeResponseDto[];
+  }
+
+  @Get('parent-category')
+  @ApiOperation({ summary: 'Get all parent categories (level 0)' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'List of parent categories.',
+    type: MinimalCategoryTreeDto,
+    isArray: true,
+  })
+  async getParentCategories(): Promise<MinimalCategoryTreeDto[]> {
+    const categories = await this.categoryService.getParentCategories();
+    return categories as unknown as MinimalCategoryTreeDto[];
+  }
+
+  @Get(':parentId/sub-category')
+  @ApiOperation({ summary: 'Get sub-categories for a parent category' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Nested sub-categories for the parent.',
+    type: MinimalCategoryTreeDto,
+    isArray: true,
+  })
+  async getSubCategories(
+    @Param('parentId') parentId: string,
+  ): Promise<MinimalCategoryTreeDto[]> {
+    const categories = await this.categoryService.getSubCategories(parentId);
+    return categories as unknown as MinimalCategoryTreeDto[];
   }
 
   @Get(':slug')

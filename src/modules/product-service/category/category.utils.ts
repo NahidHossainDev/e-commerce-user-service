@@ -10,8 +10,14 @@ export const buildCategoryTree = (categories: Category[]): Category[] => {
 
   // First pass: Create a map of all categories and initialize children arrays
   categories.forEach((category) => {
+    // Convert Mongoose document to plain object if needed
+    const plainCategory =
+      category && typeof (category as any).toObject === 'function'
+        ? (category as any).toObject()
+        : category;
+
     map.set(category._id.toString(), {
-      ...(category instanceof Object ? category : (category as any).toObject()),
+      ...plainCategory,
       children: [],
     });
   });

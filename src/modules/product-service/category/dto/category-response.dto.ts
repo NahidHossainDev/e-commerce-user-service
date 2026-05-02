@@ -81,3 +81,26 @@ export class CategoryTreeResponseDto extends CategoryResponseDto {
   @ApiProperty({ type: [CategoryTreeResponseDto], required: false })
   children?: CategoryTreeResponseDto[];
 }
+
+export class MinimalCategoryTreeDto {
+  @ApiProperty({ example: '64b1f2c3d4e5f6a7b8c9d0e1' })
+  _id: any;
+
+  @ApiProperty({ example: 'Electronics' })
+  name: string;
+
+  @ApiProperty({ example: 'electronics' })
+  slug: string;
+
+  @ApiProperty({ example: 0 })
+  sortOrder: number;
+
+  @ApiProperty({ example: 0, minimum: 0, maximum: 3 })
+  level: number;
+
+  @ApiProperty({ example: 150 })
+  productCount: number;
+
+  @ApiProperty({ type: [MinimalCategoryTreeDto], required: false })
+  children?: MinimalCategoryTreeDto[];
+}

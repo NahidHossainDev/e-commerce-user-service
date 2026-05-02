@@ -53,11 +53,19 @@ let CategoryService = class CategoryService {
                 throw new common_1.ConflictException('Category depth cannot exceed 3 levels');
             }
         }
+        let sortOrder = createCategoryDto.sortOrder;
+        if (sortOrder === undefined || sortOrder === null) {
+            sortOrder = await this.generateNextSortOrder(createCategoryDto.parentCategoryId);
+        }
+        else {
+            await this.validateSortOrderUniqueness(createCategoryDto.parentCategoryId, sortOrder);
+        }
         const savedCategory = await this.categoryModel.create({
             ...createCategoryDto,
             slug,
             level,
             path,
+            sortOrder,
         });
         if (savedCategory.image) {
             const mediaId = (0, media_helper_1.extractMediaIdFromUrl)(savedCategory.image);
@@ -66,6 +74,25 @@ let CategoryService = class CategoryService {
             }
         }
         return savedCategory;
+    }
+    async generateNextSortOrder(parentCategoryId) {
+        const maxSortOrder = await this.categoryModel
+            .find({ parentCategoryId: parentCategoryId || null })
+            .sort({ sortOrder: -1 })
+            .limit(1)
+            .select('sortOrder')
+            .exec();
+        return maxSortOrder.length > 0 ? maxSortOrder[0].sortOrder + 1 : 0;
+    }
+    async validateSortOrderUniqueness(parentCategoryId, sortOrder, excludeId) {
+        const existingCategory = await this.categoryModel.findOne({
+            parentCategoryId: parentCategoryId || null,
+            sortOrder,
+            ...(excludeId && { _id: { $ne: excludeId } }),
+        });
+        if (existingCategory) {
+            throw new common_1.ConflictException(`Sort order ${sortOrder} is already taken for categories at this level`);
+        }
     }
     async findAll(query) {
         const paginateQueries = (0, helpers_1.pick)(query, constants_1.paginateOptions);
@@ -110,6 +137,17 @@ let CategoryService = class CategoryService {
         if (updateCategoryDto.sortOrder !== undefined) {
             updateData.sortOrder = updateCategoryDto.sortOrder;
         }
+        const targetParentId = updateCategoryDto.parentCategoryId !== undefined
+            ? updateCategoryDto.parentCategoryId
+            : category.parentCategoryId?.toString();
+        if (updateCategoryDto.sortOrder !== undefined) {
+            await this.validateSortOrderUniqueness(targetParentId, updateCategoryDto.sortOrder, id);
+        }
+        else if (updateCategoryDto.parentCategoryId !== undefined &&
+            updateCategoryDto.parentCategoryId !==
+                category.parentCategoryId?.toString()) {
+            updateData.sortOrder = await this.generateNextSortOrder(updateCategoryDto.parentCategoryId);
+        }
         if (updateCategoryDto.parentCategoryId !== undefined) {
             let newLevel = 0;
             let newPath = ',';
@@ -130,7 +168,8 @@ let CategoryService = class CategoryService {
                     throw new common_1.ConflictException('Category depth cannot exceed 3 levels');
                 }
             }
-            if (category.parentCategoryId?.toString() !== updateCategoryDto.parentCategoryId) {
+            if (category.parentCategoryId?.toString() !==
+                updateCategoryDto.parentCategoryId) {
                 const oldPath = `${category.path}${category._id.toString()},`;
                 const nextPath = `${newPath}${category._id.toString()},`;
                 await this.categoryModel.updateMany({ path: { $regex: `^${oldPath}` } }, [
@@ -207,6 +246,7 @@ let CategoryService = class CategoryService {
         const categories = await this.categoryModel
             .find({ isActive: true })
             .sort({ sortOrder: 1 })
+            .lean()
             .exec();
         return (0, category_utils_1.buildCategoryTree)(categories);
     }
@@ -216,6 +256,55 @@ let CategoryService = class CategoryService {
             throw new common_1.NotFoundException(`Category with slug ${slug} not found`);
         }
         return category;
+    }
+    async getParentCategories() {
+        const allCategories = await this.categoryModel
+            .find({ isActive: true })
+            .sort({ sortOrder: 1 })
+            .lean()
+            .exec();
+        const fullTree = (0, category_utils_1.buildCategoryTree)(allCategories);
+        return fullTree.filter((cat) => cat.level === 0);
+    }
+    async getSubCategories(parentId) {
+        const parentCategory = await this.categoryModel.findById(parentId).exec();
+        if (!parentCategory) {
+            throw new common_1.NotFoundException(`Parent category with id ${parentId} not found`);
+        }
+        const subCategories = await this.categoryModel
+            .find({
+            isActive: true,
+            path: { $regex: `,${parentId},` },
+        })
+            .sort({ sortOrder: 1 })
+            .lean()
+            .exec();
+        const fullTree = (0, category_utils_1.buildCategoryTree)(subCategories);
+        return fullTree.filter((cat) => cat.parentCategoryId?.toString() === parentId);
+    }
+    async getParentCategoriesAdmin() {
+        const allCategories = await this.categoryModel
+            .find({})
+            .sort({ sortOrder: 1 })
+            .lean()
+            .exec();
+        const fullTree = (0, category_utils_1.buildCategoryTree)(allCategories);
+        return fullTree.filter((cat) => cat.level === 0);
+    }
+    async getSubCategoriesAdmin(parentId) {
+        const parentCategory = await this.categoryModel.findById(parentId).exec();
+        if (!parentCategory) {
+            throw new common_1.NotFoundException(`Parent category with id ${parentId} not found`);
+        }
+        const subCategories = await this.categoryModel
+            .find({
+            path: { $regex: `,${parentId},` },
+        })
+            .sort({ sortOrder: 1 })
+            .lean()
+            .exec();
+        const fullTree = (0, category_utils_1.buildCategoryTree)(subCategories);
+        return fullTree.filter((cat) => cat.parentCategoryId?.toString() === parentId);
     }
 };
 exports.CategoryService = CategoryService;

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CategoryTreeResponseDto = exports.PaginatedCategoriesResponseDto = exports.PaginationMetaDto = exports.CategoryResponseDto = exports.CategoryMetaDto = void 0;
+exports.MinimalCategoryTreeDto = exports.CategoryTreeResponseDto = exports.PaginatedCategoriesResponseDto = exports.PaginationMetaDto = exports.CategoryResponseDto = exports.CategoryMetaDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 class CategoryMetaDto {
     title;
@@ -146,4 +146,42 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: [CategoryTreeResponseDto], required: false }),
     __metadata("design:type", Array)
 ], CategoryTreeResponseDto.prototype, "children", void 0);
+class MinimalCategoryTreeDto {
+    _id;
+    name;
+    slug;
+    sortOrder;
+    level;
+    productCount;
+    children;
+}
+exports.MinimalCategoryTreeDto = MinimalCategoryTreeDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: '64b1f2c3d4e5f6a7b8c9d0e1' }),
+    __metadata("design:type", Object)
+], MinimalCategoryTreeDto.prototype, "_id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Electronics' }),
+    __metadata("design:type", String)
+], MinimalCategoryTreeDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'electronics' }),
+    __metadata("design:type", String)
+], MinimalCategoryTreeDto.prototype, "slug", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 0 }),
+    __metadata("design:type", Number)
+], MinimalCategoryTreeDto.prototype, "sortOrder", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 0, minimum: 0, maximum: 3 }),
+    __metadata("design:type", Number)
+], MinimalCategoryTreeDto.prototype, "level", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 150 }),
+    __metadata("design:type", Number)
+], MinimalCategoryTreeDto.prototype, "productCount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [MinimalCategoryTreeDto], required: false }),
+    __metadata("design:type", Array)
+], MinimalCategoryTreeDto.prototype, "children", void 0);
 //# sourceMappingURL=category-response.dto.js.map

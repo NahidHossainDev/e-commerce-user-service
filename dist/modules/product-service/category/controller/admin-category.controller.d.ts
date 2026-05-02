@@ -1,6 +1,6 @@
 import { CategoryService } from '../category.service';
 import { CategoryQueryOptionsDto } from '../dto/category-query-options.dto';
-import { CategoryResponseDto, PaginatedCategoriesResponseDto } from '../dto/category-response.dto';
+import { CategoryResponseDto, CategoryTreeResponseDto, PaginatedCategoriesResponseDto } from '../dto/category-response.dto';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 export declare class AdminCategoryController {
@@ -11,4 +11,6 @@ export declare class AdminCategoryController {
     findOne(id: string): Promise<CategoryResponseDto>;
     update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<CategoryResponseDto>;
     remove(id: string): Promise<CategoryResponseDto>;
+    getParentCategories(): Promise<CategoryResponseDto[]>;
+    getSubCategories(parentId: string): Promise<CategoryTreeResponseDto[]>;
 }

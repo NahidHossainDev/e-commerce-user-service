@@ -32,3 +32,12 @@ export declare class PaginatedCategoriesResponseDto {
 export declare class CategoryTreeResponseDto extends CategoryResponseDto {
     children?: CategoryTreeResponseDto[];
 }
+export declare class MinimalCategoryTreeDto {
+    _id: any;
+    name: string;
+    slug: string;
+    sortOrder: number;
+    level: number;
+    productCount: number;
+    children?: MinimalCategoryTreeDto[];
+}

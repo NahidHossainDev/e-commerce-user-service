@@ -19,6 +19,7 @@ import { CategoryService } from '../category.service';
 import { CategoryQueryOptionsDto } from '../dto/category-query-options.dto';
 import {
   CategoryResponseDto,
+  CategoryTreeResponseDto,
   PaginatedCategoriesResponseDto,
 } from '../dto/category-response.dto';
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -103,5 +104,35 @@ export class AdminCategoryController {
     return (await this.categoryService.remove(
       id,
     )) as unknown as CategoryResponseDto;
+  }
+
+  @Get('parent-category')
+  @ApiOperation({ summary: 'Get all parent categories (level 0) for admin' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'List of parent categories with full details.',
+    type: CategoryResponseDto,
+    isArray: true,
+  })
+  async getParentCategories(): Promise<CategoryResponseDto[]> {
+    return (await this.categoryService.getParentCategoriesAdmin()) as unknown as CategoryResponseDto[];
+  }
+
+  @Get(':parentId/sub-category')
+  @ApiOperation({
+    summary: 'Get sub-categories for a parent category with full details',
+  })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Nested sub-categories for the parent with full details.',
+    type: CategoryTreeResponseDto,
+    isArray: true,
+  })
+  async getSubCategories(
+    @Param('parentId') parentId: string,
+  ): Promise<CategoryTreeResponseDto[]> {
+    const categories =
+      await this.categoryService.getSubCategoriesAdmin(parentId);
+    return categories as unknown as CategoryTreeResponseDto[];
   }
 }

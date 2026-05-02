@@ -5,8 +5,11 @@ const buildCategoryTree = (categories) => {
     const map = new Map();
     const roots = [];
     categories.forEach((category) => {
+        const plainCategory = category && typeof category.toObject === 'function'
+            ? category.toObject()
+            : category;
         map.set(category._id.toString(), {
-            ...(category instanceof Object ? category : category.toObject()),
+            ...plainCategory,
             children: [],
         });
     });

@@ -66,11 +66,26 @@ export class CategoryService {
       }
     }
 
+    // Auto-generate sortOrder if not provided
+    let sortOrder = createCategoryDto.sortOrder;
+    if (sortOrder === undefined || sortOrder === null) {
+      sortOrder = await this.generateNextSortOrder(
+        createCategoryDto.parentCategoryId,
+      );
+    } else {
+      // Validate sortOrder uniqueness
+      await this.validateSortOrderUniqueness(
+        createCategoryDto.parentCategoryId,
+        sortOrder,
+      );
+    }
+
     const savedCategory = await this.categoryModel.create({
       ...createCategoryDto,
       slug,
       level,
       path,
+      sortOrder,
     });
 
     if (savedCategory.image) {
@@ -88,6 +103,37 @@ export class CategoryService {
     }
 
     return savedCategory;
+  }
+
+  private async generateNextSortOrder(
+    parentCategoryId?: string,
+  ): Promise<number> {
+    const maxSortOrder = await this.categoryModel
+      .find({ parentCategoryId: parentCategoryId || null })
+      .sort({ sortOrder: -1 })
+      .limit(1)
+      .select('sortOrder')
+      .exec();
+
+    return maxSortOrder.length > 0 ? maxSortOrder[0].sortOrder + 1 : 0;
+  }
+
+  private async validateSortOrderUniqueness(
+    parentCategoryId: string | undefined,
+    sortOrder: number,
+    excludeId?: string,
+  ): Promise<void> {
+    const existingCategory = await this.categoryModel.findOne({
+      parentCategoryId: parentCategoryId || null,
+      sortOrder,
+      ...(excludeId && { _id: { $ne: excludeId } }),
+    });
+
+    if (existingCategory) {
+      throw new ConflictException(
+        `Sort order ${sortOrder} is already taken for categories at this level`,
+      );
+    }
   }
 
   async findAll(query: CategoryQueryOptionsDto) {
@@ -148,6 +194,30 @@ export class CategoryService {
       updateData.sortOrder = updateCategoryDto.sortOrder;
     }
 
+    // Handle sortOrder validation and auto-generation
+    const targetParentId =
+      updateCategoryDto.parentCategoryId !== undefined
+        ? updateCategoryDto.parentCategoryId
+        : category.parentCategoryId?.toString();
+
+    if (updateCategoryDto.sortOrder !== undefined) {
+      // Validate sortOrder uniqueness
+      await this.validateSortOrderUniqueness(
+        targetParentId,
+        updateCategoryDto.sortOrder,
+        id,
+      );
+    } else if (
+      updateCategoryDto.parentCategoryId !== undefined &&
+      updateCategoryDto.parentCategoryId !==
+        category.parentCategoryId?.toString()
+    ) {
+      // Parent changed, auto-generate new sortOrder for the new level
+      updateData.sortOrder = await this.generateNextSortOrder(
+        updateCategoryDto.parentCategoryId,
+      );
+    }
+
     if (updateCategoryDto.parentCategoryId !== undefined) {
       let newLevel = 0;
       let newPath = ',';
@@ -180,7 +250,8 @@ export class CategoryService {
 
       // If category parent or hierarchy changed, update children too
       if (
-        category.parentCategoryId?.toString() !== updateCategoryDto.parentCategoryId
+        category.parentCategoryId?.toString() !==
+        updateCategoryDto.parentCategoryId
       ) {
         const oldPath = `${category.path}${category._id.toString()},`;
         const nextPath = `${newPath}${category._id.toString()},`;
@@ -288,9 +359,10 @@ export class CategoryService {
     const categories = await this.categoryModel
       .find({ isActive: true })
       .sort({ sortOrder: 1 })
+      .lean()
       .exec();
 
-    return buildCategoryTree(categories);
+    return buildCategoryTree(categories as any);
   }
 
   async getBySlug(slug: string): Promise<CategoryDocument> {
@@ -299,5 +371,76 @@ export class CategoryService {
       throw new NotFoundException(`Category with slug ${slug} not found`);
     }
     return category;
+  }
+
+  async getParentCategories(): Promise<Category[]> {
+    const allCategories = await this.categoryModel
+      .find({ isActive: true })
+      .sort({ sortOrder: 1 })
+      .lean()
+      .exec();
+
+    const fullTree = buildCategoryTree(allCategories as any);
+    return fullTree.filter((cat) => cat.level === 0);
+  }
+
+  async getSubCategories(parentId: string): Promise<Category[]> {
+    const parentCategory = await this.categoryModel.findById(parentId).exec();
+    if (!parentCategory) {
+      throw new NotFoundException(
+        `Parent category with id ${parentId} not found`,
+      );
+    }
+
+    // Get all categories that have this parent in their path (including the parent)
+    const subCategories = await this.categoryModel
+      .find({
+        isActive: true,
+        path: { $regex: `,${parentId},` },
+      })
+      .sort({ sortOrder: 1 })
+      .lean()
+      .exec();
+
+    const fullTree = buildCategoryTree(subCategories as any);
+    // Return the direct children of the parent (not the parent itself)
+    return fullTree.filter(
+      (cat) => cat.parentCategoryId?.toString() === parentId,
+    );
+  }
+
+  async getParentCategoriesAdmin(): Promise<Category[]> {
+    const allCategories = await this.categoryModel
+      .find({})
+      .sort({ sortOrder: 1 })
+      .lean()
+      .exec();
+
+    const fullTree = buildCategoryTree(allCategories as any);
+    return fullTree.filter((cat) => cat.level === 0);
+  }
+
+  async getSubCategoriesAdmin(parentId: string): Promise<Category[]> {
+    const parentCategory = await this.categoryModel.findById(parentId).exec();
+    if (!parentCategory) {
+      throw new NotFoundException(
+        `Parent category with id ${parentId} not found`,
+      );
+    }
+
+    // Get all categories that have this parent in their path (including the parent)
+    const subCategories = await this.categoryModel
+      .find({
+        path: { $regex: `,${parentId},` },
+      })
+      .sort({ sortOrder: 1 })
+      .lean()
+      .exec();
+
+    const fullTree = buildCategoryTree(subCategories as any);
+    // Return the direct children of the parent (not the parent itself)
+    return fullTree.filter(
+      (cat) => cat.parentCategoryId?.toString() === parentId,
+    );
   }
 }
