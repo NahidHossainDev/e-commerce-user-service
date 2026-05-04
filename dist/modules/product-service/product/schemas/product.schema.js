@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductSchema = exports.Product = exports.ProductMedia = exports.PerishableInfo = exports.ProductVariant = exports.ProductAttribute = exports.BrandRef = exports.CategoryRef = exports.ProductUnit = exports.ProductMediaType = exports.ProductStatus = void 0;
+exports.ProductSchema = exports.Product = exports.ProductMedia = exports.PerishableInfo = exports.ProductVariant = exports.ProductAttribute = exports.ProductUnit = exports.ProductMediaType = exports.ProductStatus = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const schemas_1 = require("../../../../common/schemas");
@@ -50,38 +50,6 @@ __decorate([
 exports.ProductUnit = ProductUnit = __decorate([
     (0, mongoose_1.Schema)({ _id: false })
 ], ProductUnit);
-let CategoryRef = class CategoryRef {
-    _id;
-    name;
-};
-exports.CategoryRef = CategoryRef;
-__decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Category', required: true, index: true }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], CategoryRef.prototype, "_id", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], CategoryRef.prototype, "name", void 0);
-exports.CategoryRef = CategoryRef = __decorate([
-    (0, mongoose_1.Schema)({ _id: false })
-], CategoryRef);
-let BrandRef = class BrandRef {
-    _id;
-    name;
-};
-exports.BrandRef = BrandRef;
-__decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Brand', required: true, index: true }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], BrandRef.prototype, "_id", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], BrandRef.prototype, "name", void 0);
-exports.BrandRef = BrandRef = __decorate([
-    (0, mongoose_1.Schema)({ _id: false })
-], BrandRef);
 let ProductAttribute = class ProductAttribute {
     name;
     value;
@@ -218,9 +186,9 @@ let Product = class Product {
     status;
     thumbnail;
     media;
-    category;
-    subCategories;
-    brand;
+    categoryId;
+    subCategoryIds;
+    brandId;
     vendorId;
     price;
     unit;
@@ -277,17 +245,17 @@ __decorate([
     __metadata("design:type", Array)
 ], Product.prototype, "media", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: CategoryRef, required: true }),
-    __metadata("design:type", CategoryRef)
-], Product.prototype, "category", void 0);
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Category', required: true, index: true }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Product.prototype, "categoryId", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [CategoryRef], default: [] }),
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Category' }], default: [] }),
     __metadata("design:type", Array)
-], Product.prototype, "subCategories", void 0);
+], Product.prototype, "subCategoryIds", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: BrandRef }),
-    __metadata("design:type", BrandRef)
-], Product.prototype, "brand", void 0);
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Brand', index: true }),
+    __metadata("design:type", mongoose_2.Types.ObjectId)
+], Product.prototype, "brandId", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Vendor', index: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
@@ -411,8 +379,8 @@ exports.Product = Product = __decorate([
     })
 ], Product);
 exports.ProductSchema = mongoose_1.SchemaFactory.createForClass(Product);
-exports.ProductSchema.index({ 'category.id': 1, status: 1 });
-exports.ProductSchema.index({ 'brand.id': 1, status: 1 });
+exports.ProductSchema.index({ categoryId: 1, status: 1 });
+exports.ProductSchema.index({ brandId: 1, status: 1 });
 exports.ProductSchema.index({ 'price.basePrice': 1, status: 1 });
 exports.ProductSchema.index({ isFeatured: 1, status: 1, createdAt: -1 });
 exports.ProductSchema.index({ isOnOffer: 1, status: 1 });

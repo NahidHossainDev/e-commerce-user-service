@@ -55,7 +55,6 @@ export class ProductUnitDto {
   symbol: string;
 }
 
-
 export class ProductAttributeDto {
   @ApiProperty({ description: 'Attribute name' })
   @IsString()
@@ -165,7 +164,11 @@ export class CreateProductDto {
   @IsMongoId()
   categoryId: string;
 
-  @ApiProperty({ type: [String], description: 'Sub category IDs', required: false })
+  @ApiProperty({
+    type: [String],
+    description: 'Sub category IDs',
+    required: false,
+  })
   @IsArray()
   @IsMongoId({ each: true })
   @IsOptional()
@@ -285,7 +288,7 @@ export class CreateProductDto {
   @IsNumber()
   @Min(0)
   @IsOptional()
-  initialStock?: number;
+  stock?: number;
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}

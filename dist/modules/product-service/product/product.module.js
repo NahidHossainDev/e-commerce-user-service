@@ -9,6 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
+const brand_module_1 = require("../brand/brand.module");
+const category_module_1 = require("../category/category.module");
 const inventory_module_1 = require("../inventory/inventory.module");
 const admin_product_controller_1 = require("./controller/admin-product.controller");
 const product_controller_1 = require("./product.controller");
@@ -23,6 +25,8 @@ exports.ProductModule = ProductModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: product_schema_1.Product.name, schema: product_schema_1.ProductSchema }]),
             inventory_module_1.InventoryModule,
+            category_module_1.CategoryModule,
+            brand_module_1.BrandModule,
         ],
         controllers: [
             product_controller_1.ProductController,

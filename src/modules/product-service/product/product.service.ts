@@ -16,10 +16,10 @@ import { paginationHelpers, pick } from '../../../utils/helpers';
 import { extractMediaIdFromUrl } from '../../../utils/helpers/media-helper';
 import { getPaginatedData } from '../../../utils/mongodb/getPaginatedData';
 import { generateSKU, generateSlug } from '../../../utils/product-helper';
-import { InventoryService } from '../inventory/inventory.service';
-import { InventoryTransactionType } from '../inventory/schemas/inventory-history.schema';
 import { BrandService } from '../brand/brand.service';
 import { CategoryService } from '../category/category.service';
+import { InventoryService } from '../inventory/inventory.service';
+import { InventoryTransactionType } from '../inventory/schemas/inventory-history.schema';
 
 import { ProductQueryDto } from './dto/product-query-options.dto';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
@@ -75,8 +75,8 @@ export class ProductService {
         ...createProductDto,
         slug,
         sku,
-        stock: createProductDto.initialStock || 0,
-        isInStock: (createProductDto.initialStock || 0) > 0,
+        stock: createProductDto.stock || 0,
+        isInStock: (createProductDto.stock || 0) > 0,
       });
 
       const savedProduct = await product.save({ session });
@@ -85,7 +85,7 @@ export class ProductService {
         {
           productId: (savedProduct._id as Types.ObjectId).toString(),
           sku: savedProduct.sku,
-          stockQuantity: createProductDto.initialStock || 0,
+          stockQuantity: createProductDto.stock || 0,
           lowStockThreshold: 5,
           variantStock:
             createProductDto.variants?.map((v) => ({

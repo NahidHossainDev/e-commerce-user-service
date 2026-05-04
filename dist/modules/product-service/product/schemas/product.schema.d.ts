@@ -20,14 +20,6 @@ export declare class ProductUnit {
     value: number;
     symbol: string;
 }
-export declare class CategoryRef {
-    _id: Types.ObjectId;
-    name: string;
-}
-export declare class BrandRef {
-    _id: Types.ObjectId;
-    name: string;
-}
 export declare class ProductAttribute {
     name: string;
     value: any;
@@ -64,9 +56,9 @@ export declare class Product {
     status: ProductStatus;
     thumbnail: string;
     media: ProductMedia[];
-    category: CategoryRef;
-    subCategories: CategoryRef[];
-    brand: BrandRef;
+    categoryId: Types.ObjectId;
+    subCategoryIds: Types.ObjectId[];
+    brandId: Types.ObjectId;
     vendorId: Types.ObjectId;
     price: Price;
     unit: ProductUnit;

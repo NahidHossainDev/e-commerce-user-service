@@ -23,6 +23,8 @@ const helpers_1 = require("../../../utils/helpers");
 const media_helper_1 = require("../../../utils/helpers/media-helper");
 const getPaginatedData_1 = require("../../../utils/mongodb/getPaginatedData");
 const product_helper_1 = require("../../../utils/product-helper");
+const brand_service_1 = require("../brand/brand.service");
+const category_service_1 = require("../category/category.service");
 const inventory_service_1 = require("../inventory/inventory.service");
 const inventory_history_schema_1 = require("../inventory/schemas/inventory-history.schema");
 const product_constants_1 = require("./product.constants");
@@ -30,11 +32,15 @@ const product_schema_1 = require("./schemas/product.schema");
 let ProductService = class ProductService {
     productModel;
     inventoryService;
+    categoryService;
+    brandService;
     eventEmitter;
     connection;
-    constructor(productModel, inventoryService, eventEmitter, connection) {
+    constructor(productModel, inventoryService, categoryService, brandService, eventEmitter, connection) {
         this.productModel = productModel;
         this.inventoryService = inventoryService;
+        this.categoryService = categoryService;
+        this.brandService = brandService;
         this.eventEmitter = eventEmitter;
         this.connection = connection;
     }
@@ -49,20 +55,24 @@ let ProductService = class ProductService {
             if (existing) {
                 throw new common_1.ConflictException('Product with this title already exists');
             }
+            const category = await this.categoryService.findOne(createProductDto.categoryId);
+            const brand = createProductDto.brandId
+                ? await this.brandService.findOne(createProductDto.brandId)
+                : null;
             const sku = createProductDto.sku ||
-                (0, product_helper_1.generateSKU)(createProductDto.brand?.name || 'GEN', createProductDto.category.name);
+                (0, product_helper_1.generateSKU)(brand?.name || 'GEN', category.name);
             const product = new this.productModel({
                 ...createProductDto,
                 slug,
                 sku,
-                stock: createProductDto.initialStock || 0,
-                isInStock: (createProductDto.initialStock || 0) > 0,
+                stock: createProductDto.stock || 0,
+                isInStock: (createProductDto.stock || 0) > 0,
             });
             const savedProduct = await product.save({ session });
             await this.inventoryService.create({
                 productId: savedProduct._id.toString(),
                 sku: savedProduct.sku,
-                stockQuantity: createProductDto.initialStock || 0,
+                stockQuantity: createProductDto.stock || 0,
                 lowStockThreshold: 5,
                 variantStock: createProductDto.variants?.map((v) => ({
                     variantSku: v.sku ||
@@ -100,6 +110,7 @@ let ProductService = class ProductService {
             model: this.productModel,
             paginationQuery: pagination,
             filterQuery,
+            populate: ['categoryId', 'brandId', 'subCategoryIds'],
         });
         result.data = result.data.map((item) => {
             const obj = item.toObject ? item.toObject() : item;
@@ -129,6 +140,7 @@ let ProductService = class ProductService {
             model: this.productModel,
             paginationQuery: pagination,
             filterQuery,
+            populate: ['categoryId', 'brandId', 'subCategoryIds'],
         });
     }
     async findOnePublic(idOrSlug) {
@@ -141,16 +153,19 @@ let ProductService = class ProductService {
             isDeleted: false,
             status: product_schema_1.ProductStatus.ACTIVE,
         })
-            .select('-vendorId -isDeleted -deletedAt -lastStockSyncAt -__v');
+            .select('-vendorId -isDeleted -deletedAt -lastStockSyncAt -__v')
+            .populate(['categoryId', 'brandId', 'subCategoryIds']);
         if (!product) {
             throw new common_1.NotFoundException('Product not found');
         }
         return product;
     }
     async findOneAdmin(id) {
-        const product = await this.productModel.findOne({
+        const product = await this.productModel
+            .findOne({
             _id: new mongoose_2.Types.ObjectId(id),
-        });
+        })
+            .populate(['categoryId', 'brandId', 'subCategoryIds']);
         if (!product) {
             throw new common_1.NotFoundException('Product not found');
         }
@@ -239,9 +254,9 @@ let ProductService = class ProductService {
     }
     applyIdFilters(filterQuery, categoryId, brandId) {
         if (categoryId)
-            filterQuery['category.id'] = new mongoose_2.Types.ObjectId(categoryId);
+            filterQuery.categoryId = new mongoose_2.Types.ObjectId(categoryId);
         if (brandId)
-            filterQuery['brand.id'] = new mongoose_2.Types.ObjectId(brandId);
+            filterQuery.brandId = new mongoose_2.Types.ObjectId(brandId);
     }
     applyPriceFilters(filterQuery, minPrice, maxPrice) {
         if (minPrice !== undefined || maxPrice !== undefined) {
@@ -287,9 +302,11 @@ exports.ProductService = ProductService;
 exports.ProductService = ProductService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(product_schema_1.Product.name)),
-    __param(3, (0, mongoose_1.InjectConnection)()),
+    __param(5, (0, mongoose_1.InjectConnection)()),
     __metadata("design:paramtypes", [mongoose_2.Model,
         inventory_service_1.InventoryService,
+        category_service_1.CategoryService,
+        brand_service_1.BrandService,
         event_emitter_1.EventEmitter2,
         mongoose_2.Connection])
 ], ProductService);

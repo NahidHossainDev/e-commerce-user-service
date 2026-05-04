@@ -259,12 +259,11 @@ let CategoryService = class CategoryService {
     }
     async getParentCategories() {
         const allCategories = await this.categoryModel
-            .find({ isActive: true })
+            .find({ isActive: true, level: 0 })
             .sort({ sortOrder: 1 })
             .lean()
             .exec();
-        const fullTree = (0, category_utils_1.buildCategoryTree)(allCategories);
-        return fullTree.filter((cat) => cat.level === 0);
+        return (0, category_utils_1.buildCategoryTree)(allCategories);
     }
     async getSubCategories(parentId) {
         const parentCategory = await this.categoryModel.findById(parentId).exec();

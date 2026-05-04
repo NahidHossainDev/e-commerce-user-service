@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateProductDto = exports.CreateProductDto = exports.PerishableInfoDto = exports.ProductVariantDto = exports.ProductAttributeDto = exports.BrandRefDto = exports.CategoryRefDto = exports.ProductUnitDto = exports.PriceDto = void 0;
+exports.UpdateProductDto = exports.CreateProductDto = exports.PerishableInfoDto = exports.ProductVariantDto = exports.ProductAttributeDto = exports.ProductUnitDto = exports.PriceDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
@@ -70,36 +70,6 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], ProductUnitDto.prototype, "symbol", void 0);
-class CategoryRefDto {
-    _id;
-    name;
-}
-exports.CategoryRefDto = CategoryRefDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Category ID' }),
-    (0, class_validator_1.IsMongoId)(),
-    __metadata("design:type", String)
-], CategoryRefDto.prototype, "_id", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Category name' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CategoryRefDto.prototype, "name", void 0);
-class BrandRefDto {
-    _id;
-    name;
-}
-exports.BrandRefDto = BrandRefDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Brand ID' }),
-    (0, class_validator_1.IsMongoId)(),
-    __metadata("design:type", String)
-], BrandRefDto.prototype, "_id", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Brand name' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], BrandRefDto.prototype, "name", void 0);
 class ProductAttributeDto {
     name;
     value;
@@ -220,9 +190,9 @@ class CreateProductDto {
     description;
     status;
     thumbnail;
-    category;
-    subCategories;
-    brand;
+    categoryId;
+    subCategoryIds;
+    brandId;
     vendorId;
     price;
     unit;
@@ -241,7 +211,7 @@ class CreateProductDto {
     weight;
     metaTitle;
     metaDescription;
-    initialStock;
+    stock;
 }
 exports.CreateProductDto = CreateProductDto;
 __decorate([
@@ -273,26 +243,27 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "thumbnail", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: CategoryRefDto }),
-    (0, class_validator_1.ValidateNested)(),
-    (0, class_transformer_1.Type)(() => CategoryRefDto),
-    __metadata("design:type", CategoryRefDto)
-], CreateProductDto.prototype, "category", void 0);
+    (0, swagger_1.ApiProperty)({ description: 'Category ID' }),
+    (0, class_validator_1.IsMongoId)(),
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "categoryId", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [CategoryRefDto], required: false }),
+    (0, swagger_1.ApiProperty)({
+        type: [String],
+        description: 'Sub category IDs',
+        required: false,
+    }),
     (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.ValidateNested)({ each: true }),
-    (0, class_transformer_1.Type)(() => CategoryRefDto),
+    (0, class_validator_1.IsMongoId)({ each: true }),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
-], CreateProductDto.prototype, "subCategories", void 0);
+], CreateProductDto.prototype, "subCategoryIds", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: BrandRefDto, required: false }),
-    (0, class_validator_1.ValidateNested)(),
-    (0, class_transformer_1.Type)(() => BrandRefDto),
+    (0, swagger_1.ApiProperty)({ description: 'Brand ID', required: false }),
+    (0, class_validator_1.IsMongoId)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", BrandRefDto)
-], CreateProductDto.prototype, "brand", void 0);
+    __metadata("design:type", String)
+], CreateProductDto.prototype, "brandId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Vendor ID', required: false }),
     (0, class_validator_1.IsMongoId)(),
@@ -413,7 +384,7 @@ __decorate([
     (0, class_validator_1.Min)(0),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
-], CreateProductDto.prototype, "initialStock", void 0);
+], CreateProductDto.prototype, "stock", void 0);
 class UpdateProductDto extends (0, swagger_1.PartialType)(CreateProductDto) {
 }
 exports.UpdateProductDto = UpdateProductDto;

@@ -38,13 +38,13 @@ __decorate([
 ], ProductQueryDto.prototype, "searchTerm", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ required: false }),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsMongoId)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], ProductQueryDto.prototype, "categoryId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ required: false }),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsMongoId)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], ProductQueryDto.prototype, "brandId", void 0);

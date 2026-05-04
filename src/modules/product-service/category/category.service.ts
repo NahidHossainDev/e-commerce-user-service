@@ -375,13 +375,12 @@ export class CategoryService {
 
   async getParentCategories(): Promise<Category[]> {
     const allCategories = await this.categoryModel
-      .find({ isActive: true })
+      .find({ isActive: true, level: 0 })
       .sort({ sortOrder: 1 })
       .lean()
       .exec();
 
-    const fullTree = buildCategoryTree(allCategories as any);
-    return fullTree.filter((cat) => cat.level === 0);
+    return buildCategoryTree(allCategories as any);
   }
 
   async getSubCategories(parentId: string): Promise<Category[]> {

@@ -11,14 +11,6 @@ export declare class ProductUnitDto {
     value: number;
     symbol: string;
 }
-export declare class CategoryRefDto {
-    _id: string;
-    name: string;
-}
-export declare class BrandRefDto {
-    _id: string;
-    name: string;
-}
 export declare class ProductAttributeDto {
     name: string;
     value: any;
@@ -46,9 +38,9 @@ export declare class CreateProductDto {
     description: string;
     status?: ProductStatus;
     thumbnail: string;
-    category: CategoryRefDto;
-    subCategories?: CategoryRefDto[];
-    brand?: BrandRefDto;
+    categoryId: string;
+    subCategoryIds?: string[];
+    brandId?: string;
     vendorId?: string;
     price: PriceDto;
     unit?: ProductUnitDto;
@@ -75,7 +67,7 @@ export declare class CreateProductDto {
     };
     metaTitle?: string;
     metaDescription?: string;
-    initialStock?: number;
+    stock?: number;
 }
 declare const UpdateProductDto_base: import("@nestjs/common").Type<Partial<CreateProductDto>>;
 export declare class UpdateProductDto extends UpdateProductDto_base {

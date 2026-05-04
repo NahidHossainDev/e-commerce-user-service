@@ -7687,17 +7687,20 @@
             "type": "string",
             "description": "Thumbnail image URL"
           },
-          "category": {
-            "$ref": "#/components/schemas/CategoryRefDto"
+          "categoryId": {
+            "type": "string",
+            "description": "Category ID"
           },
-          "subCategories": {
+          "subCategoryIds": {
+            "description": "Sub category IDs",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CategoryRefDto"
+              "type": "string"
             }
           },
-          "brand": {
-            "$ref": "#/components/schemas/BrandRefDto"
+          "brandId": {
+            "type": "string",
+            "description": "Brand ID"
           },
           "vendorId": {
             "type": "string",
@@ -7772,7 +7775,7 @@
           "metaDescription": {
             "type": "string"
           },
-          "initialStock": {
+          "stock": {
             "type": "number",
             "description": "Initial stock",
             "default": 0
@@ -7783,13 +7786,13 @@
           "description",
           "status",
           "thumbnail",
-          "category",
+          "categoryId",
           "price",
           "isBestSeller",
           "isFeatured",
           "isOnOffer",
           "isNew",
-          "initialStock"
+          "stock"
         ]
       },
       "UpdateProductDto": {
@@ -7822,17 +7825,20 @@
             "type": "string",
             "description": "Thumbnail image URL"
           },
-          "category": {
-            "$ref": "#/components/schemas/CategoryRefDto"
+          "categoryId": {
+            "type": "string",
+            "description": "Category ID"
           },
-          "subCategories": {
+          "subCategoryIds": {
+            "description": "Sub category IDs",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CategoryRefDto"
+              "type": "string"
             }
           },
-          "brand": {
-            "$ref": "#/components/schemas/BrandRefDto"
+          "brandId": {
+            "type": "string",
+            "description": "Brand ID"
           },
           "vendorId": {
             "type": "string",
@@ -7907,7 +7913,7 @@
           "metaDescription": {
             "type": "string"
           },
-          "initialStock": {
+          "stock": {
             "type": "number",
             "description": "Initial stock",
             "default": 0
