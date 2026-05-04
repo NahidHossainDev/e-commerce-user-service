@@ -5310,6 +5310,107 @@
         ]
       }
     },
+    "/admin/coupons/usage-history": {
+      "get": {
+        "operationId": "AdminCouponController_getCouponUsageHistory",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": false,
+            "in": "query",
+            "description": "Filter by coupon code",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by user ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "couponId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by coupon ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "usageCount",
+            "required": false,
+            "in": "query",
+            "description": "Sort by usage count",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "discountAmount",
+            "required": false,
+            "in": "query",
+            "description": "Sort by discount amount",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Admin / Coupons"
+        ]
+      }
+    },
     "/admin/coupons/{id}": {
       "get": {
         "operationId": "AdminCouponController_findById",
@@ -5408,107 +5509,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "Admin / Coupons"
-        ]
-      }
-    },
-    "/admin/coupons/usage-history": {
-      "get": {
-        "operationId": "AdminCouponController_getCouponUsageHistory",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "description": "Page number",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "Items per page",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "sortBy",
-            "required": false,
-            "in": "query",
-            "description": "Sort field",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sortOrder",
-            "required": false,
-            "in": "query",
-            "description": "Sort order",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "searchTerm",
-            "required": false,
-            "in": "query",
-            "description": "Filter by coupon code",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "required": false,
-            "in": "query",
-            "description": "Filter by user ID",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "couponId",
-            "required": false,
-            "in": "query",
-            "description": "Filter by coupon ID",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "usageCount",
-            "required": false,
-            "in": "query",
-            "description": "Sort by usage count",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "discountAmount",
-            "required": false,
-            "in": "query",
-            "description": "Sort by discount amount",
             "schema": {
               "type": "string"
             }

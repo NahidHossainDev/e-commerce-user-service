@@ -41,9 +41,18 @@ export class AdminCouponController {
     return this.couponService.findAll(query);
   }
 
+  @Get('usage-history')
+  getCouponUsageHistory(@Query() query: CouponUsageQueryOptions) {
+    return this.couponService.getCouponUsageHistory(query);
+  }
   @Get(':id')
   findById(@Param('id') id: string) {
     return this.couponService.findById(id);
+  }
+
+  @Patch(':id/toggle')
+  toggle(@Param('id') id: string) {
+    return this.couponService.toggle(id);
   }
 
   @Patch(':id')
@@ -54,15 +63,5 @@ export class AdminCouponController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.couponService.delete(id);
-  }
-
-  @Patch(':id/toggle')
-  toggle(@Param('id') id: string) {
-    return this.couponService.toggle(id);
-  }
-
-  @Get('usage-history')
-  getCouponUsageHistory(@Query() query: CouponUsageQueryOptions) {
-    return this.couponService.getCouponUsageHistory(query);
   }
 }

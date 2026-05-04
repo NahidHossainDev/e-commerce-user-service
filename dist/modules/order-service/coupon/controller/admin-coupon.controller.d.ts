@@ -14,7 +14,17 @@ export declare class AdminCouponController {
     }> & {
         __v: number;
     }>>;
+    getCouponUsageHistory(query: CouponUsageQueryOptions): Promise<import("../../../../common/interface").IPaginatedResponse<import("mongoose").Document<unknown, {}, import("../schemas/coupon-usage.schema").CouponUsage, {}, {}> & import("../schemas/coupon-usage.schema").CouponUsage & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    }>>;
     findById(id: string): Promise<import("mongoose").Document<unknown, {}, import("../schemas/coupon.schema").Coupon, {}, {}> & import("../schemas/coupon.schema").Coupon & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }>;
+    toggle(id: string): Promise<import("mongoose").Document<unknown, {}, import("../schemas/coupon.schema").Coupon, {}, {}> & import("../schemas/coupon.schema").Coupon & Required<{
         _id: import("mongoose").Types.ObjectId;
     }> & {
         __v: number;
@@ -29,14 +39,4 @@ export declare class AdminCouponController {
     }> & {
         __v: number;
     }>;
-    toggle(id: string): Promise<import("mongoose").Document<unknown, {}, import("../schemas/coupon.schema").Coupon, {}, {}> & import("../schemas/coupon.schema").Coupon & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }> & {
-        __v: number;
-    }>;
-    getCouponUsageHistory(query: CouponUsageQueryOptions): Promise<import("../../../../common/interface").IPaginatedResponse<import("mongoose").Document<unknown, {}, import("../schemas/coupon-usage.schema").CouponUsage, {}, {}> & import("../schemas/coupon-usage.schema").CouponUsage & {
-        _id: import("mongoose").Types.ObjectId;
-    } & {
-        __v: number;
-    }>>;
 }

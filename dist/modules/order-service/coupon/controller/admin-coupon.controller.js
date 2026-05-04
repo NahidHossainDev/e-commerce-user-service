@@ -33,20 +33,20 @@ let AdminCouponController = class AdminCouponController {
     findAll(query) {
         return this.couponService.findAll(query);
     }
+    getCouponUsageHistory(query) {
+        return this.couponService.getCouponUsageHistory(query);
+    }
     findById(id) {
         return this.couponService.findById(id);
+    }
+    toggle(id) {
+        return this.couponService.toggle(id);
     }
     update(id, dto) {
         return this.couponService.update(id, dto);
     }
     delete(id) {
         return this.couponService.delete(id);
-    }
-    toggle(id) {
-        return this.couponService.toggle(id);
-    }
-    getCouponUsageHistory(query) {
-        return this.couponService.getCouponUsageHistory(query);
     }
 };
 exports.AdminCouponController = AdminCouponController;
@@ -67,12 +67,26 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminCouponController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Get)('usage-history'),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [coupon_query_options_dto_1.CouponUsageQueryOptions]),
+    __metadata("design:returntype", void 0)
+], AdminCouponController.prototype, "getCouponUsageHistory", null);
+__decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AdminCouponController.prototype, "findById", null);
+__decorate([
+    (0, common_1.Patch)(':id/toggle'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminCouponController.prototype, "toggle", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -88,20 +102,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AdminCouponController.prototype, "delete", null);
-__decorate([
-    (0, common_1.Patch)(':id/toggle'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], AdminCouponController.prototype, "toggle", null);
-__decorate([
-    (0, common_1.Get)('usage-history'),
-    __param(0, (0, common_1.Query)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [coupon_query_options_dto_1.CouponUsageQueryOptions]),
-    __metadata("design:returntype", void 0)
-], AdminCouponController.prototype, "getCouponUsageHistory", null);
 exports.AdminCouponController = AdminCouponController = __decorate([
     (0, swagger_1.ApiTags)('Admin / Coupons'),
     (0, common_1.Controller)('admin/coupons'),
