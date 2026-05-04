@@ -5,12 +5,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Model } from 'mongoose';
+import { ClientSession, FilterQuery, Model } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
 import { IPaginatedResponse } from 'src/common/interface';
 import { paginationHelpers, pick } from 'src/utils/helpers';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
-import { couponSearchableFields } from './coupon.constants';
+import {
+  couponFilterableFields,
+  couponSearchableFields,
+  couponSortOptions,
+} from './coupon.constants';
 import { CouponValidationDto, CreateCouponDto } from './dto/coupon.dto';
 import {
   CouponQueryOptions,
@@ -46,9 +50,12 @@ export class CouponService {
     query: CouponQueryOptions,
   ): Promise<IPaginatedResponse<CouponDocument>> {
     const paginateQueries = pick(query, paginateOptions);
-    const { searchTerm, ...remainingFilters } = query;
+    const filterableFields = pick(query, couponFilterableFields as any);
+    const { searchTerm, ...remainingFilters } = filterableFields;
 
-    const filterQuery = {};
+    const filterQuery: FilterQuery<CouponDocument> = {
+      ...remainingFilters,
+    };
 
     if (searchTerm) {
       filterQuery['$or'] = couponSearchableFields.map((field) => ({
@@ -56,15 +63,16 @@ export class CouponService {
       }));
     }
 
-    if (Object.keys(remainingFilters).length) {
-      filterQuery['$and'] = Object.entries(remainingFilters).map(
-        ([key, value]) => ({
-          [key]: value,
-        }),
-      );
+    const pagination = paginationHelpers.calculatePagination(paginateQueries);
+
+    if (pagination.sortBy && (couponSortOptions as any)[pagination.sortBy]) {
+      const sortOption = (couponSortOptions as any)[pagination.sortBy];
+      const field = Object.keys(sortOption)[0];
+      pagination.sortBy = field;
+      pagination.sortOrder = sortOption[field];
     }
 
-    const pagination = paginationHelpers.calculatePagination(paginateQueries);
+    console.log({ filterQuery, pagination });
 
     return await getPaginatedData<CouponDocument>({
       model: this.couponModel,

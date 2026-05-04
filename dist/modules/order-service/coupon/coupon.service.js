@@ -42,19 +42,24 @@ let CouponService = class CouponService {
     }
     async findAll(query) {
         const paginateQueries = (0, helpers_1.pick)(query, constants_1.paginateOptions);
-        const { searchTerm, ...remainingFilters } = query;
-        const filterQuery = {};
+        const filterableFields = (0, helpers_1.pick)(query, coupon_constants_1.couponFilterableFields);
+        const { searchTerm, ...remainingFilters } = filterableFields;
+        const filterQuery = {
+            ...remainingFilters,
+        };
         if (searchTerm) {
             filterQuery['$or'] = coupon_constants_1.couponSearchableFields.map((field) => ({
                 [field]: { $regex: searchTerm, $options: 'i' },
             }));
         }
-        if (Object.keys(remainingFilters).length) {
-            filterQuery['$and'] = Object.entries(remainingFilters).map(([key, value]) => ({
-                [key]: value,
-            }));
-        }
         const pagination = helpers_1.paginationHelpers.calculatePagination(paginateQueries);
+        if (pagination.sortBy && coupon_constants_1.couponSortOptions[pagination.sortBy]) {
+            const sortOption = coupon_constants_1.couponSortOptions[pagination.sortBy];
+            const field = Object.keys(sortOption)[0];
+            pagination.sortBy = field;
+            pagination.sortOrder = sortOption[field];
+        }
+        console.log({ filterQuery, pagination });
         return await (0, getPaginatedData_1.getPaginatedData)({
             model: this.couponModel,
             paginationQuery: pagination,

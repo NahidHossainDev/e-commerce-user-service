@@ -7,10 +7,12 @@ export declare class CreateCouponDto {
     discountType: DiscountType;
     discountValue: number;
     maxDiscountAmount?: number;
+    minOrderAmount?: number;
     validFrom: Date;
     validTo: Date;
     usageLimit?: number;
     usageLimitPerUser?: number;
+    rules?: Record<string, any>;
 }
 export declare class CouponValidationDto {
     code?: string;

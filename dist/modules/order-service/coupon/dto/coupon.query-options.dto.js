@@ -41,8 +41,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by active/inactive' }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
+    __metadata("design:type", String)
 ], CouponQueryOptions.prototype, "isActive", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Sort by usage count' }),

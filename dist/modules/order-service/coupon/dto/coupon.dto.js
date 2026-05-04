@@ -22,10 +22,12 @@ class CreateCouponDto {
     discountType;
     discountValue;
     maxDiscountAmount;
+    minOrderAmount;
     validFrom;
     validTo;
     usageLimit;
     usageLimitPerUser;
+    rules;
 }
 exports.CreateCouponDto = CreateCouponDto;
 __decorate([
@@ -69,12 +71,22 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateCouponDto.prototype, "maxDiscountAmount", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateCouponDto.prototype, "minOrderAmount", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsDate)(),
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_transformer_1.Type)(() => Date),
     __metadata("design:type", Date)
 ], CreateCouponDto.prototype, "validFrom", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsDate)(),
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_transformer_1.Type)(() => Date),
     __metadata("design:type", Date)
 ], CreateCouponDto.prototype, "validTo", void 0);
@@ -90,6 +102,11 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateCouponDto.prototype, "usageLimitPerUser", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateCouponDto.prototype, "rules", void 0);
 class CouponValidationDto {
     code;
     couponId;

@@ -1,12 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { QueryOptions } from 'src/common/dto/queryOptions.dto';
 import { DiscountType } from '../schemas/coupon.schema';
 
@@ -26,8 +20,7 @@ export class CouponQueryOptions extends QueryOptions {
 
   @ApiPropertyOptional({ description: 'Filter by active/inactive' })
   @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
+  isActive?: 'true' | 'false';
 
   @ApiPropertyOptional({ description: 'Sort by usage count' })
   @IsOptional()

@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -45,11 +46,20 @@ export class CreateCouponDto {
   @IsOptional()
   maxDiscountAmount?: number;
 
+  @ApiProperty({ required: false })
+  @IsNumber()
+  @IsOptional()
+  minOrderAmount?: number;
+
   @ApiProperty()
+  @IsDate()
+  @IsNotEmpty()
   @Type(() => Date)
   validFrom: Date;
 
   @ApiProperty()
+  @IsDate()
+  @IsNotEmpty()
   @Type(() => Date)
   validTo: Date;
 
@@ -62,6 +72,10 @@ export class CreateCouponDto {
   @IsNumber()
   @IsOptional()
   usageLimitPerUser?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  rules?: Record<string, any>;
 }
 
 export class CouponValidationDto {

@@ -3,16 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.couponSortOptions = exports.couponSearchableFields = exports.couponFilterableFields = void 0;
 exports.couponFilterableFields = [
     'searchTerm',
-    'code',
-    'name',
     'discountType',
-    'discountValue',
-    'validFrom',
-    'validTo',
-    'usageLimit',
-    'usageCount',
-    'usageLimitPerUser',
     'isActive',
+    'usageCount',
+    'validTo',
 ];
 exports.couponSearchableFields = ['code', 'name'];
 exports.couponSortOptions = {

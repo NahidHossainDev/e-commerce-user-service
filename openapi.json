@@ -5271,7 +5271,7 @@
             "in": "query",
             "description": "Filter by active/inactive",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           },
           {
@@ -9308,6 +9308,9 @@
           "maxDiscountAmount": {
             "type": "number"
           },
+          "minOrderAmount": {
+            "type": "number"
+          },
           "validFrom": {
             "format": "date-time",
             "type": "string"
@@ -9323,6 +9326,9 @@
           "usageLimitPerUser": {
             "type": "number",
             "default": 1
+          },
+          "rules": {
+            "type": "object"
           }
         },
         "required": [

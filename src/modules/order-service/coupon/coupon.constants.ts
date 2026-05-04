@@ -1,15 +1,9 @@
 export const couponFilterableFields = [
   'searchTerm',
-  'code',
-  'name',
   'discountType',
-  'discountValue',
-  'validFrom',
-  'validTo',
-  'usageLimit',
-  'usageCount',
-  'usageLimitPerUser',
   'isActive',
+  'usageCount',
+  'validTo',
 ];
 
 export const couponSearchableFields = ['code', 'name'];

@@ -3,7 +3,7 @@ import { DiscountType } from '../schemas/coupon.schema';
 export declare class CouponQueryOptions extends QueryOptions {
     searchTerm?: string;
     discountType?: DiscountType;
-    isActive?: boolean;
+    isActive?: 'true' | 'false';
     usageCount?: 'asc' | 'desc';
     validTo?: Date;
 }
