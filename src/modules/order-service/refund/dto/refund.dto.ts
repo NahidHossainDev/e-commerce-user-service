@@ -16,6 +16,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import {
+  Refund,
   RefundMethod,
   RefundReason,
   RefundStatus,
@@ -241,4 +242,31 @@ export class CancelRefundRequestDto {
   @IsOptional()
   @MaxLength(500)
   cancellationReason?: string;
+}
+
+// --- Pagination Meta DTO ---
+export class PaginationMetaDto {
+  @ApiProperty({ example: 100 })
+  totalCount: number;
+
+  @ApiProperty({ example: 10 })
+  totalPages: number;
+
+  @ApiProperty({ example: 10 })
+  limit: number;
+
+  @ApiProperty({ example: 1 })
+  page: number;
+
+  @ApiProperty({ example: 2, nullable: true })
+  nextPage: number | null;
+}
+
+// --- Paginated Refund Response DTO ---
+export class PaginatedRefundResponseDto {
+  @ApiProperty({ type: [Refund] })
+  data: Refund[];
+
+  @ApiProperty({ type: PaginationMetaDto })
+  meta: PaginationMetaDto;
 }

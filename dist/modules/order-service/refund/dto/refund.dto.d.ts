@@ -1,4 +1,4 @@
-import { RefundMethod, RefundReason, RefundStatus, RefundType } from '../schemas/refund.schema';
+import { Refund, RefundMethod, RefundReason, RefundStatus, RefundType } from '../schemas/refund.schema';
 export declare class RefundItemDto {
     productId: string;
     variantSku?: string;
@@ -42,4 +42,15 @@ export declare class AddRefundNoteDto {
 }
 export declare class CancelRefundRequestDto {
     cancellationReason?: string;
+}
+export declare class PaginationMetaDto {
+    totalCount: number;
+    totalPages: number;
+    limit: number;
+    page: number;
+    nextPage: number | null;
+}
+export declare class PaginatedRefundResponseDto {
+    data: Refund[];
+    meta: PaginationMetaDto;
 }

@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RefundSchema = exports.Refund = exports.PaymentGatewayResponse = exports.AdminAction = exports.RefundTimeline = exports.RefundEvidence = exports.RefundAmount = exports.RefundItem = exports.RefundMethod = exports.RefundReason = exports.RefundType = exports.RefundStatus = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const swagger_1 = require("@nestjs/swagger");
 const mongoose_2 = require("mongoose");
 var RefundStatus;
 (function (RefundStatus) {
@@ -61,30 +62,37 @@ let RefundItem = class RefundItem {
 };
 exports.RefundItem = RefundItem;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '64b1f2c3d4e5f6a7b8c9d0e1' }),
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Product', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], RefundItem.prototype, "productId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Wireless Headphones' }),
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], RefundItem.prototype, "name", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'SKU-123-WH' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], RefundItem.prototype, "variantSku", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 1 }),
     (0, mongoose_1.Prop)({ required: true, min: 1 }),
     __metadata("design:type", Number)
 ], RefundItem.prototype, "quantity", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 1500 }),
     (0, mongoose_1.Prop)({ required: true, min: 0 }),
     __metadata("design:type", Number)
 ], RefundItem.prototype, "unitPrice", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 1500 }),
     (0, mongoose_1.Prop)({ required: true, min: 0 }),
     __metadata("design:type", Number)
 ], RefundItem.prototype, "totalAmount", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Damaged during shipping' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], RefundItem.prototype, "reason", void 0);
@@ -104,38 +112,47 @@ let RefundAmount = class RefundAmount {
 };
 exports.RefundAmount = RefundAmount;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 1500 }),
     (0, mongoose_1.Prop)({ required: true, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "itemsTotal", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 0 }),
     (0, mongoose_1.Prop)({ default: 0, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "shippingRefund", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 0 }),
     (0, mongoose_1.Prop)({ default: 0, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "taxRefund", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 0 }),
     (0, mongoose_1.Prop)({ default: 0, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "couponRefund", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 0 }),
     (0, mongoose_1.Prop)({ default: 0, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "walletRefund", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 0 }),
     (0, mongoose_1.Prop)({ default: 0, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "processingFee", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 0 }),
     (0, mongoose_1.Prop)({ default: 0, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "restockingFee", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 1500 }),
     (0, mongoose_1.Prop)({ required: true, min: 0 }),
     __metadata("design:type", Number)
 ], RefundAmount.prototype, "totalRefundAmount", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'BDT' }),
     (0, mongoose_1.Prop)({ required: true, default: 'BDT' }),
     __metadata("design:type", String)
 ], RefundAmount.prototype, "currency", void 0);
@@ -150,18 +167,22 @@ let RefundEvidence = class RefundEvidence {
 };
 exports.RefundEvidence = RefundEvidence;
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: [String], example: ['http://example.com/image1.jpg'] }),
     (0, mongoose_1.Prop)({ type: [String], default: [] }),
     __metadata("design:type", Array)
 ], RefundEvidence.prototype, "images", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: [String], example: [] }),
     (0, mongoose_1.Prop)({ type: [String], default: [] }),
     __metadata("design:type", Array)
 ], RefundEvidence.prototype, "videos", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'The box was torn when I received it.' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], RefundEvidence.prototype, "description", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: [String], example: [] }),
     (0, mongoose_1.Prop)({ type: [String], default: [] }),
     __metadata("design:type", Array)
 ], RefundEvidence.prototype, "documents", void 0);
@@ -179,30 +200,37 @@ let RefundTimeline = class RefundTimeline {
 };
 exports.RefundTimeline = RefundTimeline;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T10:00:00Z' }),
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", Date)
 ], RefundTimeline.prototype, "requestedAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T12:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], RefundTimeline.prototype, "approvedAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T12:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], RefundTimeline.prototype, "rejectedAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T14:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], RefundTimeline.prototype, "processingStartedAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T16:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], RefundTimeline.prototype, "completedAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T16:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], RefundTimeline.prototype, "failedAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T11:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], RefundTimeline.prototype, "cancelledAt", void 0);
@@ -217,18 +245,22 @@ let AdminAction = class AdminAction {
 };
 exports.AdminAction = AdminAction;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '64b1f2c3d4e5f6a7b8c9d0e1' }),
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], AdminAction.prototype, "adminId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'APPROVED' }),
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], AdminAction.prototype, "action", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Looks valid.' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], AdminAction.prototype, "note", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T12:00:00Z' }),
     (0, mongoose_1.Prop)({ required: true, default: Date.now }),
     __metadata("design:type", Date)
 ], AdminAction.prototype, "timestamp", void 0);
@@ -245,26 +277,32 @@ let PaymentGatewayResponse = class PaymentGatewayResponse {
 };
 exports.PaymentGatewayResponse = PaymentGatewayResponse;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'sslcommerz' }),
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], PaymentGatewayResponse.prototype, "gateway", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'txn_123456' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], PaymentGatewayResponse.prototype, "transactionId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ref_123456' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], PaymentGatewayResponse.prototype, "refundId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'SUCCESS' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], PaymentGatewayResponse.prototype, "status", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: Object }),
     (0, mongoose_1.Prop)({ type: Object }),
     __metadata("design:type", Object)
 ], PaymentGatewayResponse.prototype, "rawResponse", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T16:00:00Z' }),
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], PaymentGatewayResponse.prototype, "timestamp", void 0);
@@ -298,22 +336,27 @@ let Refund = class Refund {
 };
 exports.Refund = Refund;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '#REF-12345' }),
     (0, mongoose_1.Prop)({ required: true, unique: true, index: true }),
     __metadata("design:type", String)
 ], Refund.prototype, "refundId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '64b1f2c3d4e5f6a7b8c9d0e1' }),
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Order', required: true, index: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Refund.prototype, "orderId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'ORD-12345' }),
     (0, mongoose_1.Prop)({ required: true, index: true }),
     __metadata("design:type", String)
 ], Refund.prototype, "orderNumber", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '64b1f2c3d4e5f6a7b8c9d0e1' }),
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true, index: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Refund.prototype, "userId", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ enum: RefundType, example: RefundType.FULL }),
     (0, mongoose_1.Prop)({
         required: true,
         enum: RefundType,
@@ -322,6 +365,7 @@ __decorate([
     __metadata("design:type", String)
 ], Refund.prototype, "refundType", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ enum: RefundStatus, example: RefundStatus.PENDING_APPROVAL }),
     (0, mongoose_1.Prop)({
         required: true,
         enum: RefundStatus,
@@ -331,6 +375,7 @@ __decorate([
     __metadata("design:type", String)
 ], Refund.prototype, "status", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ enum: RefundReason, example: RefundReason.DAMAGED_PRODUCT }),
     (0, mongoose_1.Prop)({
         required: true,
         enum: RefundReason,
@@ -338,18 +383,22 @@ __decorate([
     __metadata("design:type", String)
 ], Refund.prototype, "reason", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'The product was broken upon arrival.' }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Refund.prototype, "reasonDetails", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: [RefundItem] }),
     (0, mongoose_1.Prop)({ type: [RefundItem] }),
     __metadata("design:type", Array)
 ], Refund.prototype, "items", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: RefundAmount }),
     (0, mongoose_1.Prop)({ required: true, type: RefundAmount }),
     __metadata("design:type", RefundAmount)
 ], Refund.prototype, "refundAmount", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ enum: RefundMethod, example: RefundMethod.ORIGINAL_PAYMENT }),
     (0, mongoose_1.Prop)({
         required: true,
         enum: RefundMethod,
@@ -358,50 +407,62 @@ __decorate([
     __metadata("design:type", String)
 ], Refund.prototype, "refundMethod", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: RefundEvidence }),
     (0, mongoose_1.Prop)({ type: RefundEvidence }),
     __metadata("design:type", RefundEvidence)
 ], Refund.prototype, "evidence", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: RefundTimeline }),
     (0, mongoose_1.Prop)({ type: RefundTimeline, required: true }),
     __metadata("design:type", RefundTimeline)
 ], Refund.prototype, "timeline", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: [AdminAction] }),
     (0, mongoose_1.Prop)({ type: [AdminAction], default: [] }),
     __metadata("design:type", Array)
 ], Refund.prototype, "adminActions", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: PaymentGatewayResponse }),
     (0, mongoose_1.Prop)({ type: PaymentGatewayResponse }),
     __metadata("design:type", PaymentGatewayResponse)
 ], Refund.prototype, "paymentGatewayResponse", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Insufficient evidence.', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Refund.prototype, "rejectionReason", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Gateway timeout.', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Refund.prototype, "failureReason", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
     (0, mongoose_1.Prop)({ default: false }),
     __metadata("design:type", Boolean)
 ], Refund.prototype, "isStockRestored", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T12:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], Refund.prototype, "stockRestoredAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: false }),
     (0, mongoose_1.Prop)({ default: false }),
     __metadata("design:type", Boolean)
 ], Refund.prototype, "isCouponRestored", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-01T12:00:00Z', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], Refund.prototype, "couponRestoredAt", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ type: Object, required: false }),
     (0, mongoose_1.Prop)({ type: Object }),
     __metadata("design:type", Object)
 ], Refund.prototype, "metadata", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Customer called to follow up.', required: false }),
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Refund.prototype, "internalNotes", void 0);

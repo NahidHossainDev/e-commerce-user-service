@@ -19,9 +19,11 @@ const roles_decorator_1 = require("../../../../common/decorators/roles.decorator
 const jwt_auth_guard_1 = require("../../../../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../../../../common/guards/roles.guard");
 const user_schema_1 = require("../../../user-service/user/user.schema");
+const swagger_helper_1 = require("../../../../utils/response/swagger.helper");
 const refund_dto_1 = require("../dto/refund.dto");
 const refund_query_options_dto_1 = require("../dto/refund.query-options.dto");
 const refund_service_1 = require("../refund.service");
+const refund_schema_1 = require("../schemas/refund.schema");
 let AdminRefundController = class AdminRefundController {
     refundService;
     constructor(refundService) {
@@ -50,6 +52,11 @@ exports.AdminRefundController = AdminRefundController;
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all refunds (Admin)' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'List of refunds with pagination',
+        type: refund_dto_1.PaginatedRefundResponseDto,
+    }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [refund_query_options_dto_1.RefundQueryOptions]),
@@ -58,6 +65,11 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Get refund details (Admin)' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Refund details',
+        type: refund_schema_1.Refund,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -66,6 +78,11 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id/action'),
     (0, swagger_1.ApiOperation)({ summary: 'Approve or Reject refund (Admin)' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Refund updated after action',
+        type: refund_schema_1.Refund,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Req)()),
@@ -76,6 +93,11 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':id/process'),
     (0, swagger_1.ApiOperation)({ summary: 'Process refund payment (Admin)' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Refund processed successfully',
+        type: refund_schema_1.Refund,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Req)()),
@@ -86,6 +108,11 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id/status'),
     (0, swagger_1.ApiOperation)({ summary: 'Update refund status manually (Admin)' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'Refund status updated',
+        type: refund_schema_1.Refund,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Req)()),
@@ -96,6 +123,11 @@ __decorate([
 __decorate([
     (0, common_1.Post)(':id/notes'),
     (0, swagger_1.ApiOperation)({ summary: 'Add internal note to refund (Admin)' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 201,
+        description: 'Internal note added to refund',
+        type: refund_schema_1.Refund,
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Req)()),

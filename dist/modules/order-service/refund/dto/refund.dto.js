@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CancelRefundRequestDto = exports.AddRefundNoteDto = exports.UpdateRefundStatusDto = exports.ProcessRefundDto = exports.AdminRefundActionDto = exports.CreateRefundRequestDto = exports.RefundEvidenceDto = exports.RefundItemDto = void 0;
+exports.PaginatedRefundResponseDto = exports.PaginationMetaDto = exports.CancelRefundRequestDto = exports.AddRefundNoteDto = exports.UpdateRefundStatusDto = exports.ProcessRefundDto = exports.AdminRefundActionDto = exports.CreateRefundRequestDto = exports.RefundEvidenceDto = exports.RefundItemDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
@@ -291,4 +291,45 @@ __decorate([
     (0, class_validator_1.MaxLength)(500),
     __metadata("design:type", String)
 ], CancelRefundRequestDto.prototype, "cancellationReason", void 0);
+class PaginationMetaDto {
+    totalCount;
+    totalPages;
+    limit;
+    page;
+    nextPage;
+}
+exports.PaginationMetaDto = PaginationMetaDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 100 }),
+    __metadata("design:type", Number)
+], PaginationMetaDto.prototype, "totalCount", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 10 }),
+    __metadata("design:type", Number)
+], PaginationMetaDto.prototype, "totalPages", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 10 }),
+    __metadata("design:type", Number)
+], PaginationMetaDto.prototype, "limit", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 1 }),
+    __metadata("design:type", Number)
+], PaginationMetaDto.prototype, "page", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 2, nullable: true }),
+    __metadata("design:type", Object)
+], PaginationMetaDto.prototype, "nextPage", void 0);
+class PaginatedRefundResponseDto {
+    data;
+    meta;
+}
+exports.PaginatedRefundResponseDto = PaginatedRefundResponseDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [refund_schema_1.Refund] }),
+    __metadata("design:type", Array)
+], PaginatedRefundResponseDto.prototype, "data", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: PaginationMetaDto }),
+    __metadata("design:type", PaginationMetaDto)
+], PaginatedRefundResponseDto.prototype, "meta", void 0);
 //# sourceMappingURL=refund.dto.js.map

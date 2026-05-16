@@ -11,13 +11,14 @@ const common_1 = require("@nestjs/common");
 const cart_module_1 = require("./cart/cart.module");
 const coupon_module_1 = require("./coupon/coupon.module");
 const order_module_1 = require("./order/order.module");
+const refund_module_1 = require("./refund/refund.module");
 let OrderServiceModule = class OrderServiceModule {
 };
 exports.OrderServiceModule = OrderServiceModule;
 exports.OrderServiceModule = OrderServiceModule = __decorate([
     (0, common_1.Module)({
-        imports: [order_module_1.OrderModule, cart_module_1.CartModule, coupon_module_1.CouponModule],
-        exports: [order_module_1.OrderModule, cart_module_1.CartModule, coupon_module_1.CouponModule],
+        imports: [order_module_1.OrderModule, cart_module_1.CartModule, coupon_module_1.CouponModule, refund_module_1.RefundModule],
+        exports: [order_module_1.OrderModule, cart_module_1.CartModule, coupon_module_1.CouponModule, refund_module_1.RefundModule],
     })
 ], OrderServiceModule);
 //# sourceMappingURL=order-service.module.js.map

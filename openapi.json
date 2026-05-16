@@ -5553,6 +5553,863 @@
         ]
       }
     },
+    "/refunds": {
+      "post": {
+        "operationId": "RefundController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRefundRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Refund request created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new refund request (Customer)",
+        "tags": [
+          "Private / Refunds"
+        ]
+      },
+      "get": {
+        "operationId": "RefundController_findAllByUser",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "REQUESTED",
+                "PENDING_APPROVAL",
+                "APPROVED",
+                "REJECTED",
+                "PROCESSING",
+                "COMPLETED",
+                "FAILED",
+                "CANCELLED"
+              ]
+            }
+          },
+          {
+            "name": "refundType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FULL",
+                "PARTIAL",
+                "SHIPPING"
+              ]
+            }
+          },
+          {
+            "name": "reason",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DAMAGED_PRODUCT",
+                "WRONG_ITEM",
+                "DEFECTIVE_PRODUCT",
+                "NOT_AS_DESCRIBED",
+                "QUALITY_ISSUE",
+                "SIZE_FIT_ISSUE",
+                "LATE_DELIVERY",
+                "CUSTOMER_CHANGED_MIND",
+                "DUPLICATE_ORDER",
+                "FRAUDULENT_ORDER",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user refunds with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedRefundResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all refunds for current user",
+        "tags": [
+          "Private / Refunds"
+        ]
+      }
+    },
+    "/refunds/{id}": {
+      "get": {
+        "operationId": "RefundController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Refund details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get refund details",
+        "tags": [
+          "Private / Refunds"
+        ]
+      }
+    },
+    "/refunds/{id}/cancel": {
+      "patch": {
+        "operationId": "RefundController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelRefundRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund request cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel a refund request",
+        "tags": [
+          "Private / Refunds"
+        ]
+      }
+    },
+    "/admin/refunds": {
+      "get": {
+        "operationId": "AdminRefundController_findAll",
+        "parameters": [
+          {
+            "name": "searchTerm",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orderId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "REQUESTED",
+                "PENDING_APPROVAL",
+                "APPROVED",
+                "REJECTED",
+                "PROCESSING",
+                "COMPLETED",
+                "FAILED",
+                "CANCELLED"
+              ]
+            }
+          },
+          {
+            "name": "refundType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FULL",
+                "PARTIAL",
+                "SHIPPING"
+              ]
+            }
+          },
+          {
+            "name": "reason",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DAMAGED_PRODUCT",
+                "WRONG_ITEM",
+                "DEFECTIVE_PRODUCT",
+                "NOT_AS_DESCRIBED",
+                "QUALITY_ISSUE",
+                "SIZE_FIT_ISSUE",
+                "LATE_DELIVERY",
+                "CUSTOMER_CHANGED_MIND",
+                "DUPLICATE_ORDER",
+                "FRAUDULENT_ORDER",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of refunds with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedRefundResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all refunds (Admin)",
+        "tags": [
+          "Admin / Refunds"
+        ]
+      }
+    },
+    "/admin/refunds/{id}": {
+      "get": {
+        "operationId": "AdminRefundController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Refund details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get refund details (Admin)",
+        "tags": [
+          "Admin / Refunds"
+        ]
+      }
+    },
+    "/admin/refunds/{id}/action": {
+      "patch": {
+        "operationId": "AdminRefundController_approveOrReject",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminRefundActionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund updated after action",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Approve or Reject refund (Admin)",
+        "tags": [
+          "Admin / Refunds"
+        ]
+      }
+    },
+    "/admin/refunds/{id}/process": {
+      "post": {
+        "operationId": "AdminRefundController_processPayment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessRefundDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Process refund payment (Admin)",
+        "tags": [
+          "Admin / Refunds"
+        ]
+      }
+    },
+    "/admin/refunds/{id}/status": {
+      "patch": {
+        "operationId": "AdminRefundController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRefundStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund status updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update refund status manually (Admin)",
+        "tags": [
+          "Admin / Refunds"
+        ]
+      }
+    },
+    "/admin/refunds/{id}/notes": {
+      "post": {
+        "operationId": "AdminRefundController_addNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddRefundNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Internal note added to refund",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Refund"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add internal note to refund (Admin)",
+        "tags": [
+          "Admin / Refunds"
+        ]
+      }
+    },
     "/payments/initiate": {
       "post": {
         "operationId": "PaymentController_initiate",
@@ -9359,6 +10216,666 @@
             "type": "number"
           }
         }
+      },
+      "ObjectId": {
+        "type": "object",
+        "properties": {}
+      },
+      "RefundItem": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "example": "Wireless Headphones"
+          },
+          "variantSku": {
+            "type": "string",
+            "example": "SKU-123-WH"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1
+          },
+          "unitPrice": {
+            "type": "number",
+            "example": 1500
+          },
+          "totalAmount": {
+            "type": "number",
+            "example": 1500
+          },
+          "reason": {
+            "type": "string",
+            "example": "Damaged during shipping"
+          }
+        },
+        "required": [
+          "productId",
+          "name",
+          "variantSku",
+          "quantity",
+          "unitPrice",
+          "totalAmount",
+          "reason"
+        ]
+      },
+      "RefundAmount": {
+        "type": "object",
+        "properties": {
+          "itemsTotal": {
+            "type": "number",
+            "example": 1500
+          },
+          "shippingRefund": {
+            "type": "number",
+            "example": 0
+          },
+          "taxRefund": {
+            "type": "number",
+            "example": 0
+          },
+          "couponRefund": {
+            "type": "number",
+            "example": 0
+          },
+          "walletRefund": {
+            "type": "number",
+            "example": 0
+          },
+          "processingFee": {
+            "type": "number",
+            "example": 0
+          },
+          "restockingFee": {
+            "type": "number",
+            "example": 0
+          },
+          "totalRefundAmount": {
+            "type": "number",
+            "example": 1500
+          },
+          "currency": {
+            "type": "string",
+            "example": "BDT"
+          }
+        },
+        "required": [
+          "itemsTotal",
+          "shippingRefund",
+          "taxRefund",
+          "couponRefund",
+          "walletRefund",
+          "processingFee",
+          "restockingFee",
+          "totalRefundAmount",
+          "currency"
+        ]
+      },
+      "RefundEvidence": {
+        "type": "object",
+        "properties": {
+          "images": {
+            "example": [
+              "http://example.com/image1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "videos": {
+            "example": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string",
+            "example": "The box was torn when I received it."
+          },
+          "documents": {
+            "example": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "images",
+          "videos",
+          "description",
+          "documents"
+        ]
+      },
+      "RefundTimeline": {
+        "type": "object",
+        "properties": {
+          "requestedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T10:00:00Z"
+          },
+          "approvedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T12:00:00Z"
+          },
+          "rejectedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T12:00:00Z"
+          },
+          "processingStartedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T14:00:00Z"
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T16:00:00Z"
+          },
+          "failedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T16:00:00Z"
+          },
+          "cancelledAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T11:00:00Z"
+          }
+        },
+        "required": [
+          "requestedAt"
+        ]
+      },
+      "AdminAction": {
+        "type": "object",
+        "properties": {
+          "adminId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "action": {
+            "type": "string",
+            "example": "APPROVED"
+          },
+          "note": {
+            "type": "string",
+            "example": "Looks valid."
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T12:00:00Z"
+          }
+        },
+        "required": [
+          "adminId",
+          "action",
+          "note",
+          "timestamp"
+        ]
+      },
+      "PaymentGatewayResponse": {
+        "type": "object",
+        "properties": {
+          "gateway": {
+            "type": "string",
+            "example": "sslcommerz"
+          },
+          "transactionId": {
+            "type": "string",
+            "example": "txn_123456"
+          },
+          "refundId": {
+            "type": "string",
+            "example": "ref_123456"
+          },
+          "status": {
+            "type": "string",
+            "example": "SUCCESS"
+          },
+          "rawResponse": {
+            "type": "object"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T16:00:00Z"
+          }
+        },
+        "required": [
+          "gateway",
+          "transactionId",
+          "refundId",
+          "status",
+          "rawResponse",
+          "timestamp"
+        ]
+      },
+      "Refund": {
+        "type": "object",
+        "properties": {
+          "refundId": {
+            "type": "string",
+            "example": "#REF-12345"
+          },
+          "orderId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "orderNumber": {
+            "type": "string",
+            "example": "ORD-12345"
+          },
+          "userId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "refundType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "PARTIAL",
+              "SHIPPING"
+            ],
+            "example": "FULL"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "REQUESTED",
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "REJECTED",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ],
+            "example": "PENDING_APPROVAL"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "DAMAGED_PRODUCT",
+              "WRONG_ITEM",
+              "DEFECTIVE_PRODUCT",
+              "NOT_AS_DESCRIBED",
+              "QUALITY_ISSUE",
+              "SIZE_FIT_ISSUE",
+              "LATE_DELIVERY",
+              "CUSTOMER_CHANGED_MIND",
+              "DUPLICATE_ORDER",
+              "FRAUDULENT_ORDER",
+              "OTHER"
+            ],
+            "example": "DAMAGED_PRODUCT"
+          },
+          "reasonDetails": {
+            "type": "string",
+            "example": "The product was broken upon arrival."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundItem"
+            }
+          },
+          "refundAmount": {
+            "$ref": "#/components/schemas/RefundAmount"
+          },
+          "refundMethod": {
+            "type": "string",
+            "enum": [
+              "ORIGINAL_PAYMENT",
+              "WALLET",
+              "BANK_TRANSFER",
+              "STORE_CREDIT"
+            ],
+            "example": "ORIGINAL_PAYMENT"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/RefundEvidence"
+          },
+          "timeline": {
+            "$ref": "#/components/schemas/RefundTimeline"
+          },
+          "adminActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminAction"
+            }
+          },
+          "paymentGatewayResponse": {
+            "$ref": "#/components/schemas/PaymentGatewayResponse"
+          },
+          "rejectionReason": {
+            "type": "string",
+            "example": "Insufficient evidence."
+          },
+          "failureReason": {
+            "type": "string",
+            "example": "Gateway timeout."
+          },
+          "isStockRestored": {
+            "type": "boolean",
+            "example": false
+          },
+          "stockRestoredAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T12:00:00Z"
+          },
+          "isCouponRestored": {
+            "type": "boolean",
+            "example": false
+          },
+          "couponRestoredAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T12:00:00Z"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "internalNotes": {
+            "type": "string",
+            "example": "Customer called to follow up."
+          }
+        },
+        "required": [
+          "refundId",
+          "orderId",
+          "orderNumber",
+          "userId",
+          "refundType",
+          "status",
+          "reason",
+          "reasonDetails",
+          "items",
+          "refundAmount",
+          "refundMethod",
+          "evidence",
+          "timeline",
+          "adminActions",
+          "paymentGatewayResponse",
+          "isStockRestored",
+          "isCouponRestored"
+        ]
+      },
+      "RefundItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Product ID to refund"
+          },
+          "variantSku": {
+            "type": "string",
+            "description": "Variant SKU if applicable"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantity to refund",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "description": "Item-specific refund reason"
+          }
+        },
+        "required": [
+          "productId",
+          "quantity"
+        ]
+      },
+      "RefundEvidenceDto": {
+        "type": "object",
+        "properties": {
+          "images": {
+            "description": "Image URLs as evidence",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "videos": {
+            "description": "Video URLs as evidence",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the issue"
+          },
+          "documents": {
+            "description": "Supporting document URLs",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateRefundRequestDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "Order ID to refund"
+          },
+          "refundType": {
+            "type": "string",
+            "description": "Type of refund",
+            "enum": [
+              "FULL",
+              "PARTIAL",
+              "SHIPPING"
+            ],
+            "example": "FULL"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for refund",
+            "enum": [
+              "DAMAGED_PRODUCT",
+              "WRONG_ITEM",
+              "DEFECTIVE_PRODUCT",
+              "NOT_AS_DESCRIBED",
+              "QUALITY_ISSUE",
+              "SIZE_FIT_ISSUE",
+              "LATE_DELIVERY",
+              "CUSTOMER_CHANGED_MIND",
+              "DUPLICATE_ORDER",
+              "FRAUDULENT_ORDER",
+              "OTHER"
+            ],
+            "example": "DAMAGED_PRODUCT"
+          },
+          "reasonDetails": {
+            "type": "string",
+            "description": "Additional details about the reason"
+          },
+          "items": {
+            "description": "Items to refund (required for PARTIAL refunds)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundItemDto"
+            }
+          },
+          "refundMethod": {
+            "type": "string",
+            "description": "Preferred refund method",
+            "enum": [
+              "ORIGINAL_PAYMENT",
+              "WALLET",
+              "BANK_TRANSFER",
+              "STORE_CREDIT"
+            ],
+            "example": "ORIGINAL_PAYMENT"
+          },
+          "evidence": {
+            "description": "Evidence supporting the refund request",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RefundEvidenceDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "orderId",
+          "refundType",
+          "reason"
+        ]
+      },
+      "PaginatedRefundResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Refund"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "CancelRefundRequestDto": {
+        "type": "object",
+        "properties": {
+          "cancellationReason": {
+            "type": "string",
+            "description": "Reason for cancellation"
+          }
+        }
+      },
+      "AdminRefundActionDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Action to take",
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ],
+            "example": "APPROVE"
+          },
+          "note": {
+            "type": "string",
+            "description": "Admin note/comment"
+          },
+          "rejectionReason": {
+            "type": "string",
+            "description": "Rejection reason (required if action is REJECT)"
+          },
+          "restoreStock": {
+            "type": "boolean",
+            "description": "Whether to restore stock",
+            "default": true
+          },
+          "restoreCoupon": {
+            "type": "boolean",
+            "description": "Whether to restore coupon",
+            "default": false
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "ProcessRefundDto": {
+        "type": "object",
+        "properties": {
+          "processingFee": {
+            "type": "number",
+            "description": "Processing fee to deduct"
+          },
+          "restockingFee": {
+            "type": "number",
+            "description": "Restocking fee to deduct"
+          },
+          "note": {
+            "type": "string",
+            "description": "Admin note"
+          }
+        }
+      },
+      "UpdateRefundStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "New refund status",
+            "enum": [
+              "REQUESTED",
+              "PENDING_APPROVAL",
+              "APPROVED",
+              "REJECTED",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "description": "Note about status change"
+          },
+          "failureReason": {
+            "type": "string",
+            "description": "Failure reason (if status is FAILED)"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "AddRefundNoteDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Internal note to add"
+          }
+        },
+        "required": [
+          "note"
+        ]
       },
       "InitiatePaymentDto": {
         "type": "object",
