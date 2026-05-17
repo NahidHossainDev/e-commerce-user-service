@@ -196,7 +196,7 @@ export class ProductService {
       model: this.productModel,
       paginationQuery: pagination,
       filterQuery,
-      populate: ['categoryId', 'brandId', 'subCategoryIds'],
+      // populate: ['categoryId', 'brandId', 'subCategoryIds'],
     });
   }
 

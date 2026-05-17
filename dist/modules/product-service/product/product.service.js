@@ -140,7 +140,6 @@ let ProductService = class ProductService {
             model: this.productModel,
             paginationQuery: pagination,
             filterQuery,
-            populate: ['categoryId', 'brandId', 'subCategoryIds'],
         });
     }
     async findOnePublic(idOrSlug) {
