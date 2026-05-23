@@ -21,6 +21,7 @@ const order_service_module_1 = require("./modules/order-service/order-service.mo
 const payment_service_module_1 = require("./modules/payment-service/payment-service.module");
 const product_service_module_1 = require("./modules/product-service/product-service.module");
 const user_service_module_1 = require("./modules/user-service/user-service.module");
+const cms_module_1 = require("./modules/cms/cms.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -55,6 +56,7 @@ exports.AppModule = AppModule = __decorate([
             communication_service_module_1.CommunicationServiceModule,
             payment_service_module_1.PaymentServiceModule,
             media_module_1.MediaModule,
+            cms_module_1.CmsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

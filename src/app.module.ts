@@ -12,6 +12,7 @@ import { OrderServiceModule } from './modules/order-service/order-service.module
 import { PaymentServiceModule } from './modules/payment-service/payment-service.module';
 import { ProductServiceModule } from './modules/product-service/product-service.module';
 import { UserServiceModule } from './modules/user-service/user-service.module';
+import { CmsModule } from './modules/cms/cms.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { UserServiceModule } from './modules/user-service/user-service.module';
     CommunicationServiceModule,
     PaymentServiceModule,
     MediaModule,
+    CmsModule,
   ],
   controllers: [AppController],
   providers: [
