@@ -30,7 +30,7 @@ export class AdminCmsComponentsController {
     summary: 'Retrieve metadata definitions and configurable fields for all component types',
   })
   @HttpCode(HttpStatus.OK)
-  async getComponentTypes() {
+  getComponentTypes() {
     return COMPONENT_REGISTRY;
   }
 

@@ -87,6 +87,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Object, description: 'Dynamic component properties mapping' }),
     (0, class_validator_1.IsObject)(),
+    (0, class_validator_1.IsNotEmptyObject)(),
     __metadata("design:type", Object)
 ], CreateCmsComponentDto.prototype, "data", void 0);
 class UpdateCmsComponentDto extends (0, swagger_1.PartialType)(CreateCmsComponentDto) {

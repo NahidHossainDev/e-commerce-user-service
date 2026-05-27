@@ -7106,6 +7106,621 @@
           "Admin / Media"
         ]
       }
+    },
+    "/cms/{slug}": {
+      "get": {
+        "operationId": "CmsPagesController_getPage",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "previewToken",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Fetch fully assembled page and component schemas by slug for storefront rendering",
+        "tags": [
+          "CMS Public Storefront"
+        ]
+      }
+    },
+    "/admin/cms/pages": {
+      "post": {
+        "operationId": "AdminCmsPagesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCmsPageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Page successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CmsPage"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a new CMS page",
+        "tags": [
+          "Admin CMS Pages"
+        ]
+      },
+      "get": {
+        "operationId": "AdminCmsPagesController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter pages by status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PUBLISHED"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter pages by lock type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SYSTEM",
+                "CUSTOM"
+              ]
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": false,
+            "in": "query",
+            "description": "Fuzzy search by page title or slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Retrieve all pages with search, filters and pagination",
+        "tags": [
+          "Admin CMS Pages"
+        ]
+      }
+    },
+    "/admin/cms/pages/{id}": {
+      "get": {
+        "operationId": "AdminCmsPagesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Retrieve details of a page by ID (including child components)",
+        "tags": [
+          "Admin CMS Pages"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminCmsPagesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCmsPageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Page successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CmsPage"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update page options, status, SEO, and title",
+        "tags": [
+          "Admin CMS Pages"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminCmsPagesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a page and cascade-delete its components",
+        "tags": [
+          "Admin CMS Pages"
+        ]
+      }
+    },
+    "/admin/cms/pages/{id}/duplicate": {
+      "post": {
+        "operationId": "AdminCmsPagesController_duplicate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Page successfully duplicated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CmsPage"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Duplicate an entire CMS page alongside all its child components",
+        "tags": [
+          "Admin CMS Pages"
+        ]
+      }
+    },
+    "/admin/cms/component-types": {
+      "get": {
+        "operationId": "AdminCmsComponentsController_getComponentTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Retrieve metadata definitions and configurable fields for all component types",
+        "tags": [
+          "Admin CMS Components"
+        ]
+      }
+    },
+    "/admin/cms/pages/{pageId}/components": {
+      "post": {
+        "operationId": "AdminCmsComponentsController_create",
+        "parameters": [
+          {
+            "name": "pageId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCmsComponentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Component successfully added.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CmsComponent"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Add a new CMS component to a specific page",
+        "tags": [
+          "Admin CMS Components"
+        ]
+      }
+    },
+    "/admin/cms/components/{id}": {
+      "patch": {
+        "operationId": "AdminCmsComponentsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCmsComponentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CmsComponent"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update settings or properties of a specific component",
+        "tags": [
+          "Admin CMS Components"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminCmsComponentsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component successfully deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CmsComponent"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Remove a specific CMS component",
+        "tags": [
+          "Admin CMS Components"
+        ]
+      }
+    },
+    "/admin/cms/components/{id}/duplicate": {
+      "post": {
+        "operationId": "AdminCmsComponentsController_duplicate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Component successfully duplicated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CmsComponent"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Duplicate an existing CMS component",
+        "tags": [
+          "Admin CMS Components"
+        ]
+      }
+    },
+    "/admin/cms/components/reorder": {
+      "patch": {
+        "operationId": "AdminCmsComponentsController_reorder",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderComponentsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Reorder multiple components in a batch",
+        "tags": [
+          "Admin CMS Components"
+        ]
+      }
     }
   },
   "info": {
@@ -10990,6 +11605,277 @@
           "deletedCount",
           "deletedIds",
           "message"
+        ]
+      },
+      "CmsPage": {
+        "type": "object",
+        "properties": {}
+      },
+      "CmsPageSeoDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "HTML head meta title override"
+          },
+          "description": {
+            "type": "string",
+            "description": "HTML head description content"
+          },
+          "keywords": {
+            "description": "Keywords for search engine tags",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateCmsPageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Visual title of the page"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Unique url pathname slug. If empty, is automatically generated from title."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SYSTEM",
+              "CUSTOM"
+            ],
+            "description": "Page lock status type",
+            "default": "CUSTOM"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED"
+            ],
+            "description": "Page publishing status",
+            "default": "DRAFT"
+          },
+          "isHomePage": {
+            "type": "boolean",
+            "description": "Set as the main home landing page",
+            "default": false
+          },
+          "seo": {
+            "description": "SEO properties mapping",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CmsPageSeoDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "UpdateCmsPageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Visual title of the page"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Unique url pathname slug. If empty, is automatically generated from title."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SYSTEM",
+              "CUSTOM"
+            ],
+            "description": "Page lock status type",
+            "default": "CUSTOM"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED"
+            ],
+            "description": "Page publishing status",
+            "default": "DRAFT"
+          },
+          "isHomePage": {
+            "type": "boolean",
+            "description": "Set as the main home landing page",
+            "default": false
+          },
+          "seo": {
+            "description": "SEO properties mapping",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CmsPageSeoDto"
+              }
+            ]
+          }
+        }
+      },
+      "CmsComponent": {
+        "type": "object",
+        "properties": {}
+      },
+      "ComponentSettingsDto": {
+        "type": "object",
+        "properties": {
+          "container": {
+            "type": "string",
+            "description": "Layout container type",
+            "default": "boxed"
+          },
+          "fullWidth": {
+            "type": "boolean",
+            "description": "Force edge-to-edge content display",
+            "default": false
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "CSS background-color override"
+          },
+          "paddingTop": {
+            "type": "string",
+            "description": "CSS padding-top value (e.g. 20px, 2rem)"
+          },
+          "paddingBottom": {
+            "type": "string",
+            "description": "CSS padding-bottom value (e.g. 20px, 2rem)"
+          }
+        }
+      },
+      "CreateCmsComponentDto": {
+        "type": "object",
+        "properties": {
+          "componentType": {
+            "type": "string",
+            "enum": [
+              "HERO_SLIDER",
+              "FEATURE_ICONS",
+              "PRODUCT_GRID",
+              "CATEGORY_GRID",
+              "PROMO_BANNER",
+              "BRAND_SLIDER",
+              "BLOG_GRID",
+              "VIDEO_SECTION",
+              "TESTIMONIALS",
+              "RICH_TEXT",
+              "CUSTOM_HTML"
+            ],
+            "description": "Component renderer type"
+          },
+          "order": {
+            "type": "number",
+            "description": "Display order index number",
+            "minimum": 0
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Visibility status flag",
+            "default": true
+          },
+          "settings": {
+            "description": "Component container settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ComponentSettingsDto"
+              }
+            ]
+          },
+          "data": {
+            "type": "object",
+            "description": "Dynamic component properties mapping"
+          }
+        },
+        "required": [
+          "componentType",
+          "order",
+          "data"
+        ]
+      },
+      "UpdateCmsComponentDto": {
+        "type": "object",
+        "properties": {
+          "componentType": {
+            "type": "string",
+            "enum": [
+              "HERO_SLIDER",
+              "FEATURE_ICONS",
+              "PRODUCT_GRID",
+              "CATEGORY_GRID",
+              "PROMO_BANNER",
+              "BRAND_SLIDER",
+              "BLOG_GRID",
+              "VIDEO_SECTION",
+              "TESTIMONIALS",
+              "RICH_TEXT",
+              "CUSTOM_HTML"
+            ],
+            "description": "Component renderer type"
+          },
+          "order": {
+            "type": "number",
+            "description": "Display order index number",
+            "minimum": 0
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Visibility status flag",
+            "default": true
+          },
+          "settings": {
+            "description": "Component container settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ComponentSettingsDto"
+              }
+            ]
+          },
+          "data": {
+            "type": "object",
+            "description": "Dynamic component properties mapping"
+          }
+        }
+      },
+      "ReorderItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Database ID of the CmsComponent"
+          },
+          "order": {
+            "type": "number",
+            "description": "New sequential order index mapping"
+          }
+        },
+        "required": [
+          "id",
+          "order"
+        ]
+      },
+      "ReorderComponentsDto": {
+        "type": "object",
+        "properties": {
+          "components": {
+            "description": "Ordered list of components",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReorderItemDto"
+            }
+          }
+        },
+        "required": [
+          "components"
         ]
       }
     }

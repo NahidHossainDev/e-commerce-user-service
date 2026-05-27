@@ -8,8 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComponentValidationService = void 0;
 const common_1 = require("@nestjs/common");
-const class_transformer_1 = require("class-transformer");
-const class_validator_1 = require("class-validator");
 const component_data_dto_1 = require("./dto/component-data.dto");
 const component_enum_1 = require("./enums/component.enum");
 const DTO_MAP = {
@@ -26,36 +24,16 @@ const DTO_MAP = {
     [component_enum_1.CmsComponentType.CUSTOM_HTML]: component_data_dto_1.CustomHtmlDataDto,
 };
 let ComponentValidationService = class ComponentValidationService {
-    async validateData(type, rawData) {
-        const DtoClass = DTO_MAP[type];
-        if (!DtoClass) {
-            throw new common_1.BadRequestException(`No validation schema registered for component type: ${type}`);
-        }
-        const objectInstance = (0, class_transformer_1.plainToInstance)(DtoClass, rawData || {});
-        const validationErrors = await (0, class_validator_1.validate)(objectInstance, {
-            whitelist: true,
-            forbidNonWhitelisted: true,
-        });
-        if (validationErrors.length > 0) {
-            const formattedErrors = this.flattenErrors(validationErrors);
+    validateData(type, rawData) {
+        if (!rawData ||
+            typeof rawData !== 'object' ||
+            Object.keys(rawData).length === 0) {
             throw new common_1.BadRequestException({
                 message: `Validation failed for component type ${type}`,
-                errors: formattedErrors,
+                errors: ['Component data should not be empty'],
             });
         }
-        return objectInstance;
-    }
-    flattenErrors(errors) {
-        const result = [];
-        for (const error of errors) {
-            if (error.constraints) {
-                result.push(...Object.values(error.constraints));
-            }
-            if (error.children && error.children.length > 0) {
-                result.push(...this.flattenErrors(error.children));
-            }
-        }
-        return result;
+        return Promise.resolve(rawData);
     }
 };
 exports.ComponentValidationService = ComponentValidationService;

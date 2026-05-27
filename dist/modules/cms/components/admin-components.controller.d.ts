@@ -3,7 +3,7 @@ import { CreateCmsComponentDto, ReorderComponentsDto, UpdateCmsComponentDto } fr
 export declare class AdminCmsComponentsController {
     private readonly componentsService;
     constructor(componentsService: CmsComponentsService);
-    getComponentTypes(): Promise<import("./constants/component.constants").ComponentTypeDefinition[]>;
+    getComponentTypes(): import("./constants/component.constants").ComponentTypeDefinition[];
     create(pageId: string, dto: CreateCmsComponentDto): Promise<import("./schemas/component.schema").CmsComponentDocument>;
     update(id: string, dto: UpdateCmsComponentDto): Promise<import("./schemas/component.schema").CmsComponentDocument>;
     remove(id: string): Promise<import("./schemas/component.schema").CmsComponentDocument>;

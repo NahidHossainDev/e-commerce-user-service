@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ClientSession } from 'mongoose';
 import { CmsComponentsRepository } from './components.repository';
-import { CreateCmsComponentDto, ReorderComponentsDto, UpdateCmsComponentDto } from './dto/component.dto';
+import {
+  CreateCmsComponentDto,
+  ReorderComponentsDto,
+  UpdateCmsComponentDto,
+} from './dto/component.dto';
 import { CmsComponentDocument } from './schemas/component.schema';
 import { ComponentValidationService } from './validation.service';
 
@@ -17,14 +21,11 @@ export class CmsComponentsService {
     dto: CreateCmsComponentDto,
     session?: ClientSession,
   ): Promise<CmsComponentDocument> {
-    // 1. Dynamic Payload Validation based on Component Type
     const validatedData = await this.validationService.validateData(
       dto.componentType,
       dto.data,
     );
     dto.data = validatedData;
-
-    // 2. Persist in DB
     return await this.componentsRepository.create(pageId, dto, session);
   }
 
@@ -36,7 +37,10 @@ export class CmsComponentsService {
     return component;
   }
 
-  async findByPageId(pageId: string, filterVisible = false): Promise<CmsComponentDocument[]> {
+  async findByPageId(
+    pageId: string,
+    filterVisible = false,
+  ): Promise<CmsComponentDocument[]> {
     return await this.componentsRepository.findByPageId(pageId, filterVisible);
   }
 
@@ -47,17 +51,22 @@ export class CmsComponentsService {
   ): Promise<CmsComponentDocument> {
     const existing = await this.findOne(id);
 
-    // If data payload is updated, dynamically validate it
     if (dto.data) {
       const type = dto.componentType || existing.componentType;
-      const validatedData = await this.validationService.validateData(type, dto.data);
+      const validatedData = await this.validationService.validateData(
+        type,
+        dto.data,
+      );
       dto.data = validatedData;
     }
 
     return await this.componentsRepository.update(id, dto, session);
   }
 
-  async remove(id: string, session?: ClientSession): Promise<CmsComponentDocument> {
+  async remove(
+    id: string,
+    session?: ClientSession,
+  ): Promise<CmsComponentDocument> {
     return await this.componentsRepository.delete(id, session);
   }
 
@@ -65,13 +74,19 @@ export class CmsComponentsService {
     await this.componentsRepository.deleteByPageId(pageId, session);
   }
 
-  async reorder(dto: ReorderComponentsDto, session?: ClientSession): Promise<void> {
+  async reorder(
+    dto: ReorderComponentsDto,
+    session?: ClientSession,
+  ): Promise<void> {
     await this.componentsRepository.reorder(dto.components, session);
   }
 
-  async duplicateComponent(id: string, session?: ClientSession): Promise<CmsComponentDocument> {
+  async duplicateComponent(
+    id: string,
+    session?: ClientSession,
+  ): Promise<CmsComponentDocument> {
     const source = await this.findOne(id);
-    
+
     // Create cloned component incrementing order index by 1
     const createDto: CreateCmsComponentDto = {
       componentType: source.componentType,

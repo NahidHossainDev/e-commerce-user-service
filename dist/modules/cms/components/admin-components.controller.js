@@ -25,7 +25,7 @@ let AdminCmsComponentsController = class AdminCmsComponentsController {
     constructor(componentsService) {
         this.componentsService = componentsService;
     }
-    async getComponentTypes() {
+    getComponentTypes() {
         return component_constants_1.COMPONENT_REGISTRY;
     }
     async create(pageId, dto) {
@@ -54,7 +54,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], AdminCmsComponentsController.prototype, "getComponentTypes", null);
 __decorate([
     (0, common_1.Post)('admin/cms/pages/:pageId/components'),

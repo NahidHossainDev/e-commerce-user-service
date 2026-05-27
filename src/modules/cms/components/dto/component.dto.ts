@@ -4,6 +4,7 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsNotEmptyObject,
   IsNumber,
   IsObject,
   IsOptional,
@@ -63,6 +64,7 @@ export class CreateCmsComponentDto {
 
   @ApiProperty({ type: Object, description: 'Dynamic component properties mapping' })
   @IsObject()
+  @IsNotEmptyObject()
   data!: Record<string, any>;
 }
 
