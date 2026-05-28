@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CustomHtmlDataDto = exports.RichTextDataDto = exports.TestimonialsDataDto = exports.TestimonialItemDto = exports.VideoSectionDataDto = exports.BlogGridDataDto = exports.BrandSliderDataDto = exports.PromoBannerDataDto = exports.CategoryGridDataDto = exports.ProductGridDataDto = exports.FeatureIconsDataDto = exports.FeatureIconDto = exports.HeroSliderDataDto = exports.HeroSlideDto = void 0;
+exports.CustomHtmlDataDto = exports.RichTextDataDto = exports.TestimonialsDataDto = exports.TestimonialItemDto = exports.VideoSectionDataDto = exports.BlogGridDataDto = exports.ImageGridDataDto = exports.ImageGridItemDto = exports.PromoBannerDataDto = exports.CategoryGridDataDto = exports.ProductGridDataDto = exports.FeatureIconsDataDto = exports.FeatureIconDto = exports.HeroSliderDataDto = exports.HeroSlideDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
@@ -189,23 +189,109 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], PromoBannerDataDto.prototype, "discountText", void 0);
-class BrandSliderDataDto {
-    brandIds;
-    autoplay = true;
+class ImageGridItemDto {
+    image;
+    altText;
+    name;
+    link;
 }
-exports.BrandSliderDataDto = BrandSliderDataDto;
+exports.ImageGridItemDto = ImageGridItemDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [String], description: 'Array of brand reference IDs' }),
+    (0, swagger_1.ApiProperty)({ description: 'Full image URL' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridItemDto.prototype, "image", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Image alt text description' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridItemDto.prototype, "altText", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Optional label or name text' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridItemDto.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Optional redirect URL' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridItemDto.prototype, "link", void 0);
+class ImageGridDataDto {
+    images;
+    layoutMode = 'grid';
+    columns = 5;
+    gapWidth = 24;
+    gapType = 'middle';
+    showDivider = false;
+    backgroundColor;
+    itemBgColor;
+    paddingTop;
+    paddingBottom;
+}
+exports.ImageGridDataDto = ImageGridDataDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [ImageGridItemDto], description: 'Array of grid images' }),
     (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => ImageGridItemDto),
     __metadata("design:type", Array)
-], BrandSliderDataDto.prototype, "brandIds", void 0);
+], ImageGridDataDto.prototype, "images", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Enable automatic sliding', default: true }),
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Grid display layout style', default: 'grid' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridDataDto.prototype, "layoutMode", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Columns in grid', default: 5 }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], ImageGridDataDto.prototype, "columns", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Custom gap spacing in pixels', default: 24 }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], ImageGridDataDto.prototype, "gapWidth", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Gap coverage type', default: 'middle' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridDataDto.prototype, "gapType", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Show dividers borders between images', default: false }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], BrandSliderDataDto.prototype, "autoplay", void 0);
+], ImageGridDataDto.prototype, "showDivider", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Section background color' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridDataDto.prototype, "backgroundColor", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Logo card/tile background color' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ImageGridDataDto.prototype, "itemBgColor", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Padding top in pixels' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], ImageGridDataDto.prototype, "paddingTop", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Padding bottom in pixels' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], ImageGridDataDto.prototype, "paddingBottom", void 0);
 class BlogGridDataDto {
     title;
     limit = 3;

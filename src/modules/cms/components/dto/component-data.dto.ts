@@ -143,17 +143,78 @@ export class PromoBannerDataDto {
   discountText?: string;
 }
 
-// ================= BRAND_SLIDER DTO =================
-export class BrandSliderDataDto {
-  @ApiProperty({ type: [String], description: 'Array of brand reference IDs' })
-  @IsArray()
-  @IsString({ each: true })
-  brandIds!: string[];
+// ================= IMAGE_GRID DTO =================
+export class ImageGridItemDto {
+  @ApiProperty({ description: 'Full image URL' })
+  @IsString()
+  image!: string;
 
-  @ApiPropertyOptional({ description: 'Enable automatic sliding', default: true })
+  @ApiProperty({ description: 'Image alt text description' })
+  @IsString()
+  altText!: string;
+
+  @ApiPropertyOptional({ description: 'Optional label or name text' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({ description: 'Optional redirect URL' })
+  @IsOptional()
+  @IsString()
+  link?: string;
+}
+
+export class ImageGridDataDto {
+  @ApiProperty({ type: [ImageGridItemDto], description: 'Array of grid images' })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ImageGridItemDto)
+  images!: ImageGridItemDto[];
+
+  @ApiPropertyOptional({ description: 'Grid display layout style', default: 'grid' })
+  @IsOptional()
+  @IsString()
+  layoutMode: string = 'grid';
+
+  @ApiPropertyOptional({ description: 'Columns in grid', default: 5 })
+  @IsOptional()
+  @IsNumber()
+  columns: number = 5;
+
+  @ApiPropertyOptional({ description: 'Custom gap spacing in pixels', default: 24 })
+  @IsOptional()
+  @IsNumber()
+  gapWidth: number = 24;
+
+  @ApiPropertyOptional({ description: 'Gap coverage type', default: 'middle' })
+  @IsOptional()
+  @IsString()
+  gapType: string = 'middle';
+
+  @ApiPropertyOptional({ description: 'Show dividers borders between images', default: false })
   @IsOptional()
   @IsBoolean()
-  autoplay: boolean = true;
+  showDivider: boolean = false;
+
+  @ApiPropertyOptional({ description: 'Section background color' })
+  @IsOptional()
+  @IsString()
+  backgroundColor?: string;
+
+  @ApiPropertyOptional({ description: 'Logo card/tile background color' })
+  @IsOptional()
+  @IsString()
+  itemBgColor?: string;
+
+  @ApiPropertyOptional({ description: 'Padding top in pixels' })
+  @IsOptional()
+  @IsNumber()
+  paddingTop?: number;
+
+  @ApiPropertyOptional({ description: 'Padding bottom in pixels' })
+  @IsOptional()
+  @IsNumber()
+  paddingBottom?: number;
 }
 
 // ================= BLOG_GRID DTO =================

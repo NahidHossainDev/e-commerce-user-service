@@ -31,6 +31,10 @@ let AdminCmsComponentsController = class AdminCmsComponentsController {
     async create(pageId, dto) {
         return await this.componentsService.create(pageId, dto);
     }
+    async reorder(dto) {
+        await this.componentsService.reorder(dto);
+        return { message: 'Components successfully reordered' };
+    }
     async update(id, dto) {
         return await this.componentsService.update(id, dto);
     }
@@ -39,10 +43,6 @@ let AdminCmsComponentsController = class AdminCmsComponentsController {
     }
     async duplicate(id) {
         return await this.componentsService.duplicateComponent(id);
-    }
-    async reorder(dto) {
-        await this.componentsService.reorder(dto);
-        return { message: 'Components successfully reordered' };
     }
 };
 exports.AdminCmsComponentsController = AdminCmsComponentsController;
@@ -70,6 +70,15 @@ __decorate([
     __metadata("design:paramtypes", [String, component_dto_1.CreateCmsComponentDto]),
     __metadata("design:returntype", Promise)
 ], AdminCmsComponentsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)('admin/cms/components/reorder'),
+    (0, swagger_1.ApiOperation)({ summary: 'Reorder multiple components in a batch' }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [component_dto_1.ReorderComponentsDto]),
+    __metadata("design:returntype", Promise)
+], AdminCmsComponentsController.prototype, "reorder", null);
 __decorate([
     (0, common_1.Patch)('admin/cms/components/:id'),
     (0, swagger_1.ApiOperation)({ summary: 'Update settings or properties of a specific component' }),
@@ -110,15 +119,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AdminCmsComponentsController.prototype, "duplicate", null);
-__decorate([
-    (0, common_1.Patch)('admin/cms/components/reorder'),
-    (0, swagger_1.ApiOperation)({ summary: 'Reorder multiple components in a batch' }),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [component_dto_1.ReorderComponentsDto]),
-    __metadata("design:returntype", Promise)
-], AdminCmsComponentsController.prototype, "reorder", null);
 exports.AdminCmsComponentsController = AdminCmsComponentsController = __decorate([
     (0, swagger_1.ApiTags)('Admin CMS Components'),
     (0, common_1.Controller)(),

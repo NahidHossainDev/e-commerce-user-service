@@ -7524,6 +7524,31 @@
         ]
       }
     },
+    "/admin/cms/components/reorder": {
+      "patch": {
+        "operationId": "AdminCmsComponentsController_reorder",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderComponentsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Reorder multiple components in a batch",
+        "tags": [
+          "Admin CMS Components"
+        ]
+      }
+    },
     "/admin/cms/components/{id}": {
       "patch": {
         "operationId": "AdminCmsComponentsController_update",
@@ -7692,31 +7717,6 @@
           }
         },
         "summary": "Duplicate an existing CMS component",
-        "tags": [
-          "Admin CMS Components"
-        ]
-      }
-    },
-    "/admin/cms/components/reorder": {
-      "patch": {
-        "operationId": "AdminCmsComponentsController_reorder",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReorderComponentsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "summary": "Reorder multiple components in a batch",
         "tags": [
           "Admin CMS Components"
         ]
@@ -11760,11 +11760,13 @@
             "type": "string",
             "enum": [
               "HERO_SLIDER",
+              "SECTION_HEADER",
               "FEATURE_ICONS",
               "PRODUCT_GRID",
               "CATEGORY_GRID",
               "PROMO_BANNER",
-              "BRAND_SLIDER",
+              "CTA_BANNER",
+              "IMAGE_GRID",
               "BLOG_GRID",
               "VIDEO_SECTION",
               "TESTIMONIALS",
@@ -11802,50 +11804,6 @@
           "data"
         ]
       },
-      "UpdateCmsComponentDto": {
-        "type": "object",
-        "properties": {
-          "componentType": {
-            "type": "string",
-            "enum": [
-              "HERO_SLIDER",
-              "FEATURE_ICONS",
-              "PRODUCT_GRID",
-              "CATEGORY_GRID",
-              "PROMO_BANNER",
-              "BRAND_SLIDER",
-              "BLOG_GRID",
-              "VIDEO_SECTION",
-              "TESTIMONIALS",
-              "RICH_TEXT",
-              "CUSTOM_HTML"
-            ],
-            "description": "Component renderer type"
-          },
-          "order": {
-            "type": "number",
-            "description": "Display order index number",
-            "minimum": 0
-          },
-          "isVisible": {
-            "type": "boolean",
-            "description": "Visibility status flag",
-            "default": true
-          },
-          "settings": {
-            "description": "Component container settings",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ComponentSettingsDto"
-              }
-            ]
-          },
-          "data": {
-            "type": "object",
-            "description": "Dynamic component properties mapping"
-          }
-        }
-      },
       "ReorderItemDto": {
         "type": "object",
         "properties": {
@@ -11877,6 +11835,52 @@
         "required": [
           "components"
         ]
+      },
+      "UpdateCmsComponentDto": {
+        "type": "object",
+        "properties": {
+          "componentType": {
+            "type": "string",
+            "enum": [
+              "HERO_SLIDER",
+              "SECTION_HEADER",
+              "FEATURE_ICONS",
+              "PRODUCT_GRID",
+              "CATEGORY_GRID",
+              "PROMO_BANNER",
+              "CTA_BANNER",
+              "IMAGE_GRID",
+              "BLOG_GRID",
+              "VIDEO_SECTION",
+              "TESTIMONIALS",
+              "RICH_TEXT",
+              "CUSTOM_HTML"
+            ],
+            "description": "Component renderer type"
+          },
+          "order": {
+            "type": "number",
+            "description": "Display order index number",
+            "minimum": 0
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Visibility status flag",
+            "default": true
+          },
+          "settings": {
+            "description": "Component container settings",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ComponentSettingsDto"
+              }
+            ]
+          },
+          "data": {
+            "type": "object",
+            "description": "Dynamic component properties mapping"
+          }
+        }
       }
     }
   }

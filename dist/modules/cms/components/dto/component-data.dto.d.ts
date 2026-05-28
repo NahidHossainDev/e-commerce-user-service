@@ -34,9 +34,23 @@ export declare class PromoBannerDataDto {
     linkUrl?: string;
     discountText?: string;
 }
-export declare class BrandSliderDataDto {
-    brandIds: string[];
-    autoplay: boolean;
+export declare class ImageGridItemDto {
+    image: string;
+    altText: string;
+    name?: string;
+    link?: string;
+}
+export declare class ImageGridDataDto {
+    images: ImageGridItemDto[];
+    layoutMode: string;
+    columns: number;
+    gapWidth: number;
+    gapType: string;
+    showDivider: boolean;
+    backgroundColor?: string;
+    itemBgColor?: string;
+    paddingTop?: number;
+    paddingBottom?: number;
 }
 export declare class BlogGridDataDto {
     title?: string;

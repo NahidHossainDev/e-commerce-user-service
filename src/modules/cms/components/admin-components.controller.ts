@@ -48,6 +48,14 @@ export class AdminCmsComponentsController {
     return await this.componentsService.create(pageId, dto);
   }
 
+  @Patch('admin/cms/components/reorder')
+  @ApiOperation({ summary: 'Reorder multiple components in a batch' })
+  @HttpCode(HttpStatus.OK)
+  async reorder(@Body() dto: ReorderComponentsDto) {
+    await this.componentsService.reorder(dto);
+    return { message: 'Components successfully reordered' };
+  }
+
   @Patch('admin/cms/components/:id')
   @ApiOperation({ summary: 'Update settings or properties of a specific component' })
   @ApiWrappedResponse({
@@ -82,13 +90,5 @@ export class AdminCmsComponentsController {
   })
   async duplicate(@Param('id') id: string) {
     return await this.componentsService.duplicateComponent(id);
-  }
-
-  @Patch('admin/cms/components/reorder')
-  @ApiOperation({ summary: 'Reorder multiple components in a batch' })
-  @HttpCode(HttpStatus.OK)
-  async reorder(@Body() dto: ReorderComponentsDto) {
-    await this.componentsService.reorder(dto);
-    return { message: 'Components successfully reordered' };
   }
 }

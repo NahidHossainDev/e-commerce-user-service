@@ -4,11 +4,13 @@ exports.CmsComponentType = void 0;
 var CmsComponentType;
 (function (CmsComponentType) {
     CmsComponentType["HERO_SLIDER"] = "HERO_SLIDER";
+    CmsComponentType["SECTION_HEADER"] = "SECTION_HEADER";
     CmsComponentType["FEATURE_ICONS"] = "FEATURE_ICONS";
     CmsComponentType["PRODUCT_GRID"] = "PRODUCT_GRID";
     CmsComponentType["CATEGORY_GRID"] = "CATEGORY_GRID";
     CmsComponentType["PROMO_BANNER"] = "PROMO_BANNER";
-    CmsComponentType["BRAND_SLIDER"] = "BRAND_SLIDER";
+    CmsComponentType["CTA_BANNER"] = "CTA_BANNER";
+    CmsComponentType["IMAGE_GRID"] = "IMAGE_GRID";
     CmsComponentType["BLOG_GRID"] = "BLOG_GRID";
     CmsComponentType["VIDEO_SECTION"] = "VIDEO_SECTION";
     CmsComponentType["TESTIMONIALS"] = "TESTIMONIALS";
