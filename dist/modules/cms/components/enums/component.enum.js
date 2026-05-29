@@ -16,5 +16,6 @@ var CmsComponentType;
     CmsComponentType["TESTIMONIALS"] = "TESTIMONIALS";
     CmsComponentType["RICH_TEXT"] = "RICH_TEXT";
     CmsComponentType["CUSTOM_HTML"] = "CUSTOM_HTML";
+    CmsComponentType["INFO_BOX"] = "INFO_BOX";
 })(CmsComponentType || (exports.CmsComponentType = CmsComponentType = {}));
 //# sourceMappingURL=component.enum.js.map

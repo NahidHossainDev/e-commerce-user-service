@@ -12,4 +12,5 @@ export enum CmsComponentType {
   TESTIMONIALS = 'TESTIMONIALS',
   RICH_TEXT = 'RICH_TEXT',
   CUSTOM_HTML = 'CUSTOM_HTML',
+  INFO_BOX = 'INFO_BOX',
 }
