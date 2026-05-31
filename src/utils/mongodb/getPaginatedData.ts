@@ -10,7 +10,7 @@ interface IPropsType<T> {
   project?: Record<string, unknown>;
   stageArr?: PipelineStage[];
   useAggregate?: boolean; // allow manual override
-  populate?: string | string[];
+  populate?: any; // it's value can be string like "category", "brandId" or array like ["category", "brandId"] or object like { path: "category", select: "name" } or object array like [{ path: "category", select: "name" }] or any other value mongoose allow to query .
 }
 
 export async function getPaginatedData<T extends Document>({

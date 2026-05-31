@@ -196,7 +196,10 @@ export class ProductService {
       model: this.productModel,
       paginationQuery: pagination,
       filterQuery,
-      // populate: ['categoryId', 'brandId', 'subCategoryIds'],
+      populate: [
+        { path: 'categoryId', select: 'name' },
+        { path: 'brandId', select: 'name logo' },
+      ],
     });
   }
 
@@ -267,7 +270,6 @@ export class ProductService {
   }
 
   async remove(id: string): Promise<void> {
-    const product = await this.findOneAdmin(id);
     const result = await this.productModel.updateOne(
       { _id: new Types.ObjectId(id) },
       {
@@ -282,8 +284,6 @@ export class ProductService {
     if (result.matchedCount === 0) {
       throw new NotFoundException('Product not found');
     }
-
-    this.emitMediaEvents(product, 'detach');
   }
 
   async hardDelete(id: string): Promise<void> {

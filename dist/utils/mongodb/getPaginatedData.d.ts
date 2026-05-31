@@ -7,7 +7,7 @@ interface IPropsType<T> {
     project?: Record<string, unknown>;
     stageArr?: PipelineStage[];
     useAggregate?: boolean;
-    populate?: string | string[];
+    populate?: any;
 }
 export declare function getPaginatedData<T extends Document>({ model, paginationQuery, project, filterQuery, stageArr, useAggregate, populate, }: IPropsType<T>): Promise<IPaginatedResponse<T>>;
 export {};

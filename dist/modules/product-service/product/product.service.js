@@ -140,6 +140,10 @@ let ProductService = class ProductService {
             model: this.productModel,
             paginationQuery: pagination,
             filterQuery,
+            populate: [
+                { path: 'categoryId', select: 'name' },
+                { path: 'brandId', select: 'name logo' },
+            ],
         });
     }
     async findOnePublic(idOrSlug) {
@@ -190,7 +194,6 @@ let ProductService = class ProductService {
         return product;
     }
     async remove(id) {
-        const product = await this.findOneAdmin(id);
         const result = await this.productModel.updateOne({ _id: new mongoose_2.Types.ObjectId(id) }, {
             $set: {
                 isDeleted: true,
@@ -201,7 +204,6 @@ let ProductService = class ProductService {
         if (result.matchedCount === 0) {
             throw new common_1.NotFoundException('Product not found');
         }
-        this.emitMediaEvents(product, 'detach');
     }
     async hardDelete(id) {
         const product = await this.findOneAdmin(id);
