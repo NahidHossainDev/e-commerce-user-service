@@ -16,6 +16,7 @@ exports.PRODUCT_FILTER_FIELDS = [
     'maxPrice',
 ];
 exports.PRODUCT_SEARCH_FIELDS = [
+    '_id',
     'title',
     'slug',
     'sku',

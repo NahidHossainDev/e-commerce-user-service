@@ -271,11 +271,15 @@ let ProductService = class ProductService {
         });
     }
     applySearchFilters(filterQuery, searchTerm) {
-        if (searchTerm) {
-            filterQuery['$or'] = product_constants_1.PRODUCT_SEARCH_FIELDS.map((field) => ({
-                [field]: { $regex: searchTerm, $options: 'i' },
-            }));
+        if (!searchTerm)
+            return;
+        if (mongoose_2.Types.ObjectId.isValid(searchTerm)) {
+            filterQuery._id = new mongoose_2.Types.ObjectId(searchTerm);
+            return;
         }
+        filterQuery['$or'] = product_constants_1.PRODUCT_SEARCH_FIELDS
+            .filter((field) => field !== '_id')
+            .map((field) => ({ [field]: { $regex: searchTerm, $options: 'i' } }));
     }
     applyIdFilters(filterQuery, categoryId, brandId) {
         if (categoryId)

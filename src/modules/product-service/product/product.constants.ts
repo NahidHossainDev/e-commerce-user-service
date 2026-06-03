@@ -15,6 +15,7 @@ export const PRODUCT_FILTER_FIELDS: (keyof ProductQueryDto)[] = [
 ];
 
 export const PRODUCT_SEARCH_FIELDS = [
+  '_id',
   'title',
   'slug',
   'sku',

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Connection, FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
+import { Connection, FilterQuery, Model, Types } from 'mongoose';
 import { paginateOptions } from '../../../common/constants';
 import {
   ImageAttachedEvent,
@@ -382,11 +382,16 @@ export class ProductService {
   // --- Private Helpers ---
 
   private applySearchFilters(filterQuery: any, searchTerm?: string) {
-    if (searchTerm) {
-      filterQuery['$or'] = PRODUCT_SEARCH_FIELDS.map((field) => ({
-        [field]: { $regex: searchTerm, $options: 'i' },
-      }));
+    if (!searchTerm) return;
+
+    if (Types.ObjectId.isValid(searchTerm)) {
+      filterQuery._id = new Types.ObjectId(searchTerm);
+      return;
     }
+
+    filterQuery['$or'] = PRODUCT_SEARCH_FIELDS
+      .filter((field) => field !== '_id')
+      .map((field) => ({ [field]: { $regex: searchTerm, $options: 'i' } }));
   }
 
   private applyIdFilters(
