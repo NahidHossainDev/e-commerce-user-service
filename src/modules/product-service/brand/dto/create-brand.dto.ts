@@ -44,9 +44,10 @@ class BrandMetaDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ example: ['brand', 'products'], type: [String] })
+  @ApiPropertyOptional({ example: ['brand', 'products'], type: [String] })
+  @IsOptional()
   @IsString({ each: true })
-  keywords: string[];
+  keywords?: string[];
 }
 
 export class CreateBrandDto {

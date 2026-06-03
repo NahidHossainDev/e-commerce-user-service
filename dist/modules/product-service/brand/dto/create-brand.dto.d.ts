@@ -7,7 +7,7 @@ declare class SocialMediaDto {
 declare class BrandMetaDto {
     title: string;
     description: string;
-    keywords: string[];
+    keywords?: string[];
 }
 export declare class CreateBrandDto {
     name: string;

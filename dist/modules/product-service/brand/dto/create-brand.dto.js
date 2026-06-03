@@ -61,7 +61,8 @@ __decorate([
     __metadata("design:type", String)
 ], BrandMetaDto.prototype, "description", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: ['brand', 'products'], type: [String] }),
+    (0, swagger_1.ApiPropertyOptional)({ example: ['brand', 'products'], type: [String] }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], BrandMetaDto.prototype, "keywords", void 0);
