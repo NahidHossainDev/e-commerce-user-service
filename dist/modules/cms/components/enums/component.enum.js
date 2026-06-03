@@ -17,5 +17,7 @@ var CmsComponentType;
     CmsComponentType["RICH_TEXT"] = "RICH_TEXT";
     CmsComponentType["CUSTOM_HTML"] = "CUSTOM_HTML";
     CmsComponentType["INFO_BOX"] = "INFO_BOX";
+    CmsComponentType["PRODUCT_HALF_BORDER"] = "PRODUCT_HALF_BORDER";
+    CmsComponentType["PRODUCT_FULL_BORDER"] = "PRODUCT_FULL_BORDER";
 })(CmsComponentType || (exports.CmsComponentType = CmsComponentType = {}));
 //# sourceMappingURL=component.enum.js.map

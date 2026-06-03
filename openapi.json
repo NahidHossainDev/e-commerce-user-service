@@ -11772,7 +11772,9 @@
               "TESTIMONIALS",
               "RICH_TEXT",
               "CUSTOM_HTML",
-              "INFO_BOX"
+              "INFO_BOX",
+              "PRODUCT_HALF_BORDER",
+              "PRODUCT_FULL_BORDER"
             ],
             "description": "Component renderer type"
           },
@@ -11856,7 +11858,9 @@
               "TESTIMONIALS",
               "RICH_TEXT",
               "CUSTOM_HTML",
-              "INFO_BOX"
+              "INFO_BOX",
+              "PRODUCT_HALF_BORDER",
+              "PRODUCT_FULL_BORDER"
             ],
             "description": "Component renderer type"
           },
