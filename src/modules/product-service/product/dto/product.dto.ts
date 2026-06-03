@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -107,6 +107,13 @@ export class ProductVariantDto {
   @ApiProperty({ description: 'Barcode', required: false })
   @IsString()
   @IsOptional()
+  @Transform(({ value }) =>
+    value === '' || value === null || (typeof value === 'string' && value.trim() === '')
+      ? undefined
+      : typeof value === 'string'
+        ? value.trim()
+        : value,
+  )
   barcode?: string;
 
   @ApiProperty({ description: 'Is available', default: true })
@@ -203,6 +210,13 @@ export class CreateProductDto {
   @ApiProperty({ description: 'Barcode', required: false })
   @IsString()
   @IsOptional()
+  @Transform(({ value }) =>
+    value === '' || value === null || (typeof value === 'string' && value.trim() === '')
+      ? undefined
+      : typeof value === 'string'
+        ? value.trim()
+        : value,
+  )
   barcode?: string;
 
   @ApiProperty({ type: [ProductVariantDto], required: false })

@@ -61,10 +61,17 @@ let ProductService = class ProductService {
                 : null;
             const sku = createProductDto.sku ||
                 (0, product_helper_1.generateSKU)(brand?.name || 'GEN', category.name);
+            const barcode = createProductDto.barcode === undefined ||
+                createProductDto.barcode === null ||
+                (typeof createProductDto.barcode === 'string' &&
+                    createProductDto.barcode.trim() === '')
+                ? undefined
+                : createProductDto.barcode.trim();
             const product = new this.productModel({
                 ...createProductDto,
                 slug,
                 sku,
+                barcode,
                 stock: createProductDto.stock || 0,
                 isInStock: (createProductDto.stock || 0) > 0,
             });
@@ -182,7 +189,24 @@ let ProductService = class ProductService {
         if (updateProductDto.title) {
             updateData.slug = (0, product_helper_1.generateSlug)(updateProductDto.title);
         }
-        const product = await this.productModel.findOneAndUpdate({ _id: new mongoose_2.Types.ObjectId(id) }, { $set: updateData }, { new: true });
+        const updateQuery = {};
+        const unsetQuery = {};
+        if (updateProductDto.barcode === null ||
+            (typeof updateProductDto.barcode === 'string' &&
+                updateProductDto.barcode.trim() === '')) {
+            delete updateData.barcode;
+            unsetQuery.barcode = '';
+        }
+        else if (updateProductDto.barcode !== undefined) {
+            updateData.barcode = updateProductDto.barcode.trim();
+        }
+        if (Object.keys(updateData).length > 0) {
+            updateQuery.$set = updateData;
+        }
+        if (Object.keys(unsetQuery).length > 0) {
+            updateQuery.$unset = unsetQuery;
+        }
+        const product = await this.productModel.findOneAndUpdate({ _id: new mongoose_2.Types.ObjectId(id) }, updateQuery, { new: true });
         if (!product) {
             throw new common_1.NotFoundException('Product not found');
         }

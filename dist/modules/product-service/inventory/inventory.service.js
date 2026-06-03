@@ -43,10 +43,17 @@ let InventoryService = class InventoryService {
             throw new common_1.ConflictException('Inventory or SKU already exists');
         }
         const normalizedSku = createInventoryDto.sku.toLowerCase();
+        const barcode = createInventoryDto.barcode === undefined ||
+            createInventoryDto.barcode === null ||
+            (typeof createInventoryDto.barcode === 'string' &&
+                createInventoryDto.barcode.trim() === '')
+            ? undefined
+            : createInventoryDto.barcode.trim();
         const inventory = new this.inventoryModel({
             ...createInventoryDto,
             productId: new mongoose_2.Types.ObjectId(createInventoryDto.productId),
             sku: normalizedSku,
+            barcode,
         });
         const savedInventory = await inventory.save({ session: session });
         const history = new this.historyModel({
@@ -145,7 +152,27 @@ let InventoryService = class InventoryService {
             .sort({ createdAt: -1 });
     }
     async update(productId, updateInventoryDto) {
-        const inventory = await this.inventoryModel.findOneAndUpdate({ productId: new mongoose_2.Types.ObjectId(productId) }, { $set: updateInventoryDto }, { new: true });
+        const updateData = {
+            ...updateInventoryDto,
+        };
+        const updateQuery = {};
+        const unsetQuery = {};
+        if (updateInventoryDto.barcode === null ||
+            (typeof updateInventoryDto.barcode === 'string' &&
+                updateInventoryDto.barcode.trim() === '')) {
+            delete updateData.barcode;
+            unsetQuery.barcode = '';
+        }
+        else if (updateInventoryDto.barcode !== undefined) {
+            updateData.barcode = updateInventoryDto.barcode.trim();
+        }
+        if (Object.keys(updateData).length > 0) {
+            updateQuery.$set = updateData;
+        }
+        if (Object.keys(unsetQuery).length > 0) {
+            updateQuery.$unset = unsetQuery;
+        }
+        const inventory = await this.inventoryModel.findOneAndUpdate({ productId: new mongoose_2.Types.ObjectId(productId) }, updateQuery, { new: true });
         if (!inventory) {
             throw new common_1.NotFoundException(`Inventory for product ${productId} not found`);
         }

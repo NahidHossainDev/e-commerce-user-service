@@ -77,6 +77,13 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Barcode of the product', required: false }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Transform)(({ value }) => value === '' ||
+        value === null ||
+        (typeof value === 'string' && value.trim() === '')
+        ? undefined
+        : typeof value === 'string'
+            ? value.trim()
+            : value),
     __metadata("design:type", String)
 ], CreateInventoryDto.prototype, "barcode", void 0);
 __decorate([

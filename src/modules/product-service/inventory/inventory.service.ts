@@ -56,10 +56,19 @@ export class InventoryService {
     }
 
     const normalizedSku = createInventoryDto.sku.toLowerCase();
+    const barcode =
+      createInventoryDto.barcode === undefined ||
+      createInventoryDto.barcode === null ||
+      (typeof createInventoryDto.barcode === 'string' &&
+        createInventoryDto.barcode.trim() === '')
+        ? undefined
+        : createInventoryDto.barcode.trim();
+
     const inventory = new this.inventoryModel({
       ...createInventoryDto,
       productId: new Types.ObjectId(createInventoryDto.productId),
       sku: normalizedSku,
+      barcode,
     });
 
     const savedInventory = await inventory.save({ session: session as any });
@@ -207,9 +216,34 @@ export class InventoryService {
     productId: string,
     updateInventoryDto: UpdateInventoryDto,
   ): Promise<ProductInventoryDocument> {
+    const updateData: any = {
+      ...updateInventoryDto,
+    };
+
+    const updateQuery: any = {};
+    const unsetQuery: any = {};
+
+    if (
+      updateInventoryDto.barcode === null ||
+      (typeof updateInventoryDto.barcode === 'string' &&
+        updateInventoryDto.barcode.trim() === '')
+    ) {
+      delete updateData.barcode;
+      unsetQuery.barcode = '';
+    } else if (updateInventoryDto.barcode !== undefined) {
+      updateData.barcode = updateInventoryDto.barcode.trim();
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      updateQuery.$set = updateData;
+    }
+    if (Object.keys(unsetQuery).length > 0) {
+      updateQuery.$unset = unsetQuery;
+    }
+
     const inventory = await this.inventoryModel.findOneAndUpdate(
       { productId: new Types.ObjectId(productId) },
-      { $set: updateInventoryDto },
+      updateQuery,
       { new: true },
     );
 

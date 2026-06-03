@@ -157,7 +157,17 @@ export class Product {
   @Prop({ unique: true, sparse: true, trim: true, index: true })
   sku: string;
 
-  @Prop({ unique: true, sparse: true, trim: true })
+  @Prop({
+    unique: true,
+    sparse: true,
+    trim: true,
+    set: (val: any) =>
+      val === '' || val === null || (typeof val === 'string' && val.trim() === '')
+        ? undefined
+        : typeof val === 'string'
+          ? val.trim()
+          : val,
+  })
   barcode: string;
 
   @Prop({ required: true, min: 0, default: 0, index: true })

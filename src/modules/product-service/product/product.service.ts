@@ -71,10 +71,19 @@ export class ProductService {
         createProductDto.sku ||
         generateSKU(brand?.name || 'GEN', category.name);
 
+      const barcode =
+        createProductDto.barcode === undefined ||
+        createProductDto.barcode === null ||
+        (typeof createProductDto.barcode === 'string' &&
+          createProductDto.barcode.trim() === '')
+          ? undefined
+          : createProductDto.barcode.trim();
+
       const product = new this.productModel({
         ...createProductDto,
         slug,
         sku,
+        barcode,
         stock: createProductDto.stock || 0,
         isInStock: (createProductDto.stock || 0) > 0,
       });
@@ -240,7 +249,7 @@ export class ProductService {
     updateProductDto: UpdateProductDto,
   ): Promise<ProductDocument> {
     const oldProduct = await this.findOneAdmin(id);
-    const updateData: UpdateProductDto & { slug?: string } = {
+    const updateData: any = {
       ...updateProductDto,
     };
 
@@ -248,9 +257,30 @@ export class ProductService {
       updateData.slug = generateSlug(updateProductDto.title);
     }
 
+    const updateQuery: any = {};
+    const unsetQuery: any = {};
+
+    if (
+      updateProductDto.barcode === null ||
+      (typeof updateProductDto.barcode === 'string' &&
+        updateProductDto.barcode.trim() === '')
+    ) {
+      delete updateData.barcode;
+      unsetQuery.barcode = '';
+    } else if (updateProductDto.barcode !== undefined) {
+      updateData.barcode = updateProductDto.barcode.trim();
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      updateQuery.$set = updateData;
+    }
+    if (Object.keys(unsetQuery).length > 0) {
+      updateQuery.$unset = unsetQuery;
+    }
+
     const product = await this.productModel.findOneAndUpdate(
       { _id: new Types.ObjectId(id) },
-      { $set: updateData as UpdateQuery<ProductDocument> },
+      updateQuery,
       { new: true },
     );
 

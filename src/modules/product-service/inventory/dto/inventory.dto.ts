@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -55,6 +55,15 @@ export class CreateInventoryDto {
   @ApiProperty({ description: 'Barcode of the product', required: false })
   @IsString()
   @IsOptional()
+  @Transform(({ value }) =>
+    value === '' ||
+    value === null ||
+    (typeof value === 'string' && value.trim() === '')
+      ? undefined
+      : typeof value === 'string'
+        ? value.trim()
+        : value,
+  )
   barcode?: string;
 
   @ApiProperty({ description: 'Stock quantity of the product', default: 0 })

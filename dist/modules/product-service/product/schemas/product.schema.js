@@ -273,7 +273,16 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "sku", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ unique: true, sparse: true, trim: true }),
+    (0, mongoose_1.Prop)({
+        unique: true,
+        sparse: true,
+        trim: true,
+        set: (val) => val === '' || val === null || (typeof val === 'string' && val.trim() === '')
+            ? undefined
+            : typeof val === 'string'
+                ? val.trim()
+                : val,
+    }),
     __metadata("design:type", String)
 ], Product.prototype, "barcode", void 0);
 __decorate([
