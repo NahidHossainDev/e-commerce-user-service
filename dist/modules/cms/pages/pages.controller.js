@@ -21,11 +21,24 @@ let CmsPagesController = class CmsPagesController {
     constructor(pagesService) {
         this.pagesService = pagesService;
     }
+    async getHomePage(previewToken) {
+        return await this.pagesService.getPageForStorefront(undefined, previewToken);
+    }
     async getPage(slug, previewToken) {
         return await this.pagesService.getPageForStorefront(slug, previewToken);
     }
 };
 exports.CmsPagesController = CmsPagesController;
+__decorate([
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Fetch fully assembled homepage schema for storefront rendering',
+    }),
+    __param(0, (0, common_1.Query)('previewToken')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CmsPagesController.prototype, "getHomePage", null);
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, swagger_1.ApiOperation)({

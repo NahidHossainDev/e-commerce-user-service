@@ -7107,6 +7107,30 @@
         ]
       }
     },
+    "/cms": {
+      "get": {
+        "operationId": "CmsPagesController_getHomePage",
+        "parameters": [
+          {
+            "name": "previewToken",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Fetch fully assembled homepage schema for storefront rendering",
+        "tags": [
+          "CMS Public Storefront"
+        ]
+      }
+    },
     "/cms/{slug}": {
       "get": {
         "operationId": "CmsPagesController_getPage",

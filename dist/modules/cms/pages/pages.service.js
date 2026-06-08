@@ -68,11 +68,28 @@ let CmsPagesService = class CmsPagesService {
         return page;
     }
     async getPageForStorefront(slug, previewToken) {
-        const page = await this.findOneBySlug(slug);
+        let page = null;
+        if (!slug) {
+            page = await this.pagesRepository.findHomePage();
+            if (!page) {
+                throw new common_1.NotFoundException('Homepage not found');
+            }
+        }
+        else {
+            if (slug.toLowerCase() === 'home' || slug.toLowerCase() === 'homepage') {
+                page = await this.pagesRepository.findHomePage();
+            }
+            if (!page) {
+                page = await this.pagesRepository.findBySlug(slug);
+            }
+            if (!page) {
+                throw new common_1.NotFoundException(`CMS Page with slug '${slug}' not found`);
+            }
+        }
         if (page.status === page_enum_1.CmsPageStatus.DRAFT) {
             const isValidToken = previewToken && this.validatePreviewToken(page._id.toString(), previewToken);
             if (!isValidToken) {
-                throw new common_1.NotFoundException(`CMS Page with slug '${slug}' not found`);
+                throw new common_1.NotFoundException(`CMS Page ${slug ? `with slug '${slug}' ` : ''}not found`);
             }
         }
         const components = await this.componentsService.findByPageId(page._id.toString(), true);

@@ -12,7 +12,7 @@ export declare class CmsPagesService {
     create(dto: CreateCmsPageDto): Promise<CmsPageDocument>;
     findOne(id: string): Promise<CmsPageDocument>;
     findOneBySlug(slug: string): Promise<CmsPageDocument>;
-    getPageForStorefront(slug: string, previewToken?: string): Promise<any>;
+    getPageForStorefront(slug?: string, previewToken?: string): Promise<any>;
     getAdminPageDetails(id: string): Promise<any>;
     findAll(queryDto: QueryCmsPageDto): Promise<IPaginatedResponse<CmsPageDocument>>;
     update(id: string, dto: UpdateCmsPageDto): Promise<CmsPageDocument>;

@@ -67,14 +67,33 @@ export class CmsPagesService {
     return page;
   }
 
-  async getPageForStorefront(slug: string, previewToken?: string): Promise<any> {
-    const page = await this.findOneBySlug(slug);
+  async getPageForStorefront(slug?: string, previewToken?: string): Promise<any> {
+    let page: CmsPageDocument | null = null;
+
+    if (!slug) {
+      page = await this.pagesRepository.findHomePage();
+      if (!page) {
+        throw new NotFoundException('Homepage not found');
+      }
+    } else {
+      if (slug.toLowerCase() === 'home' || slug.toLowerCase() === 'homepage') {
+        page = await this.pagesRepository.findHomePage();
+      }
+      if (!page) {
+        page = await this.pagesRepository.findBySlug(slug);
+      }
+      if (!page) {
+        throw new NotFoundException(`CMS Page with slug '${slug}' not found`);
+      }
+    }
 
     // If page is draft, allow loading ONLY if preview token matches
     if (page.status === CmsPageStatus.DRAFT) {
       const isValidToken = previewToken && this.validatePreviewToken((page._id as any).toString(), previewToken);
       if (!isValidToken) {
-        throw new NotFoundException(`CMS Page with slug '${slug}' not found`);
+        throw new NotFoundException(
+          `CMS Page ${slug ? `with slug '${slug}' ` : ''}not found`,
+        );
       }
     }
 
