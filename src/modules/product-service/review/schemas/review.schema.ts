@@ -20,7 +20,7 @@ class Vote {
   user: Types.ObjectId;
 
   @Prop({ enum: VoteType })
-  voteType: string;
+  voteType: VoteType;
 }
 
 @Schema({ timestamps: true })

@@ -11,7 +11,7 @@ export declare enum VoteType {
 }
 declare class Vote {
     user: Types.ObjectId;
-    voteType: string;
+    voteType: VoteType;
 }
 export declare class Review {
     productId: Types.ObjectId;
