@@ -170,11 +170,15 @@ class PerishableInfoDto {
 exports.PerishableInfoDto = PerishableInfoDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Expiry date' }),
+    (0, class_validator_1.IsDate)(),
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_transformer_1.Type)(() => Date),
     __metadata("design:type", Date)
 ], PerishableInfoDto.prototype, "expiryDate", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Manufacture date' }),
+    (0, class_validator_1.IsDate)(),
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_transformer_1.Type)(() => Date),
     __metadata("design:type", Date)
 ], PerishableInfoDto.prototype, "manufactureDate", void 0);

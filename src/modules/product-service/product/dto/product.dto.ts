@@ -3,6 +3,7 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsDate,
   IsEnum,
   IsMongoId,
   IsNotEmpty,
@@ -124,10 +125,14 @@ export class ProductVariantDto {
 
 export class PerishableInfoDto {
   @ApiProperty({ description: 'Expiry date' })
+  @IsDate()
+  @IsNotEmpty()
   @Type(() => Date)
   expiryDate: Date;
 
   @ApiProperty({ description: 'Manufacture date' })
+  @IsDate()
+  @IsNotEmpty()
   @Type(() => Date)
   manufactureDate: Date;
 
