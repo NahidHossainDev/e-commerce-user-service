@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiWrappedResponse } from 'src/utils/response/swagger.helper';
 import { CategoryService } from '../category.service';
@@ -63,6 +63,22 @@ export class PublicCategoryController {
   ): Promise<MinimalCategoryTreeDto[]> {
     const categories = await this.categoryService.getSubCategories(parentId);
     return categories as unknown as MinimalCategoryTreeDto[];
+  }
+
+  @Get('by-ids')
+  @ApiOperation({ summary: 'Get categories by a list of IDs' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'List of categories matching the IDs.',
+    type: CategoryResponseDto,
+    isArray: true,
+  })
+  async findByIds(
+    @Query('ids') ids: string,
+  ): Promise<CategoryResponseDto[]> {
+    const idList = ids ? ids.split(',') : [];
+    const categories = await this.categoryService.findByIds(idList);
+    return categories as unknown as CategoryResponseDto[];
   }
 
   @Get(':slug')

@@ -7,5 +7,6 @@ export declare class PublicCategoryController {
     getTree(): Promise<CategoryTreeResponseDto[]>;
     getParentCategories(): Promise<MinimalCategoryTreeDto[]>;
     getSubCategories(parentId: string): Promise<MinimalCategoryTreeDto[]>;
+    findByIds(ids: string): Promise<CategoryResponseDto[]>;
     getBySlug(slug: string): Promise<CategoryResponseDto>;
 }

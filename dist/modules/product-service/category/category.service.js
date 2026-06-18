@@ -305,6 +305,26 @@ let CategoryService = class CategoryService {
         const fullTree = (0, category_utils_1.buildCategoryTree)(subCategories);
         return fullTree.filter((cat) => cat.parentCategoryId?.toString() === parentId);
     }
+    async findByIds(ids) {
+        if (!ids || ids.length === 0) {
+            return [];
+        }
+        const objectIds = ids
+            .filter((id) => mongoose_2.Types.ObjectId.isValid(id))
+            .map((id) => new mongoose_2.Types.ObjectId(id));
+        const categories = await this.categoryModel
+            .find({ _id: { $in: objectIds }, isActive: true })
+            .exec();
+        const categoryMap = new Map(categories.map((cat) => [cat._id.toString(), cat]));
+        const result = [];
+        for (const id of ids) {
+            const found = categoryMap.get(id);
+            if (found) {
+                result.push(found);
+            }
+        }
+        return result;
+    }
 };
 exports.CategoryService = CategoryService;
 exports.CategoryService = CategoryService = __decorate([

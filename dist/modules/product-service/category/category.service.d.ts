@@ -1,5 +1,5 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CategoryQueryOptionsDto } from './dto/category-query-options.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -12,7 +12,7 @@ export declare class CategoryService {
     private generateNextSortOrder;
     private validateSortOrderUniqueness;
     findAll(query: CategoryQueryOptionsDto): Promise<import("../../../common/interface").IPaginatedResponse<import("mongoose").Document<unknown, {}, Category, {}, {}> & Category & Required<{
-        _id: import("mongoose").Types.ObjectId;
+        _id: Types.ObjectId;
     }> & {
         __v: number;
     }>>;
@@ -26,4 +26,5 @@ export declare class CategoryService {
     getSubCategories(parentId: string): Promise<Category[]>;
     getParentCategoriesAdmin(): Promise<Category[]>;
     getSubCategoriesAdmin(parentId: string): Promise<Category[]>;
+    findByIds(ids: string[]): Promise<CategoryDocument[]>;
 }

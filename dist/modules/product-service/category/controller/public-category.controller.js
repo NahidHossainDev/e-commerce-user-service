@@ -37,6 +37,11 @@ let PublicCategoryController = class PublicCategoryController {
         const categories = await this.categoryService.getSubCategories(parentId);
         return categories;
     }
+    async findByIds(ids) {
+        const idList = ids ? ids.split(',') : [];
+        const categories = await this.categoryService.findByIds(idList);
+        return categories;
+    }
     async getBySlug(slug) {
         return (await this.categoryService.getBySlug(slug));
     }
@@ -95,6 +100,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PublicCategoryController.prototype, "getSubCategories", null);
+__decorate([
+    (0, common_1.Get)('by-ids'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get categories by a list of IDs' }),
+    (0, swagger_helper_1.ApiWrappedResponse)({
+        status: 200,
+        description: 'List of categories matching the IDs.',
+        type: category_response_dto_1.CategoryResponseDto,
+        isArray: true,
+    }),
+    __param(0, (0, common_1.Query)('ids')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PublicCategoryController.prototype, "findByIds", null);
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, swagger_1.ApiOperation)({ summary: 'Get a category by slug' }),

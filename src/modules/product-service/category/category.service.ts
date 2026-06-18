@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
 import {
   ImageAttachedEvent,
@@ -441,5 +441,31 @@ export class CategoryService {
     return fullTree.filter(
       (cat) => cat.parentCategoryId?.toString() === parentId,
     );
+  }
+
+  async findByIds(ids: string[]): Promise<CategoryDocument[]> {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+    const objectIds = ids
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    const categories = await this.categoryModel
+      .find({ _id: { $in: objectIds }, isActive: true })
+      .exec();
+
+    // Return the categories in the order of the requested ids
+    const categoryMap = new Map(
+      categories.map((cat) => [cat._id.toString(), cat]),
+    );
+    const result: CategoryDocument[] = [];
+    for (const id of ids) {
+      const found = categoryMap.get(id);
+      if (found) {
+        result.push(found);
+      }
+    }
+    return result;
   }
 }
