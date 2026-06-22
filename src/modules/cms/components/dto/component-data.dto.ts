@@ -13,13 +13,46 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+// ================= COMMON CMS DTOs =================
+export class CmsImageDto {
+  @ApiProperty({ description: 'Image asset target URL' })
+  @IsString()
+  imageUrl!: string;
+
+  @ApiProperty({ description: 'Accessibility tag descriptive text' })
+  @IsString()
+  altText!: string;
+
+  @ApiPropertyOptional({ description: 'Image click redirect URL link' })
+  @IsOptional()
+  @IsString()
+  actionLink?: string;
+}
+
+export class CmsActionDto {
+  @ApiProperty({ description: 'Action button label text' })
+  @IsString()
+  label!: string;
+
+  @ApiProperty({ description: 'Action button redirect destination URL' })
+  @IsString()
+  actionLink!: string;
+}
+
 // ================= HERO_SLIDER DTOs =================
 export class HeroSliderSlideDto {
-  @ApiProperty({ description: 'Slide background image URL' })
-  @IsString()
-  image!: string;
+  @ApiProperty({
+    type: () => CmsImageDto,
+    description: 'Slide background image',
+  })
+  @ValidateNested()
+  @Type(() => CmsImageDto)
+  image!: CmsImageDto;
 
-  @ApiPropertyOptional({ description: 'Show title overlay text flag', default: true })
+  @ApiPropertyOptional({
+    description: 'Show title overlay text flag',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   showTitle?: boolean;
@@ -34,20 +67,56 @@ export class HeroSliderSlideDto {
   @IsString()
   subtitle?: string;
 
-  @ApiPropertyOptional({ description: 'Show action button flag', default: false })
+  @ApiPropertyOptional({
+    description: 'Show action button flag',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   showButton?: boolean;
 
-  @ApiPropertyOptional({ description: 'Action button label text' })
+  @ApiPropertyOptional({
+    type: () => CmsActionDto,
+    description: 'Action button parameters configuration',
+  })
   @IsOptional()
-  @IsString()
-  buttonText?: string;
+  @ValidateNested()
+  @Type(() => CmsActionDto)
+  button?: CmsActionDto;
+}
 
-  @ApiPropertyOptional({ description: 'Action button redirect destination URL' })
+export class CmsSliderSettingsDto {
+  @ApiPropertyOptional({
+    description: 'Enable slide transitions automatic rotations flag',
+    default: true,
+  })
   @IsOptional()
-  @IsString()
-  buttonLink?: string;
+  @IsBoolean()
+  autoplay?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Slider rotation duration interval in ms',
+    default: 4000,
+  })
+  @IsOptional()
+  @IsNumber()
+  interval?: number;
+
+  @ApiPropertyOptional({
+    description: 'Display next/prev navigator arrow indicators flag',
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  showArrows?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Display slide dots paginator controls flag',
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  showDots?: boolean;
 }
 
 export class HeroSliderDataDto {
@@ -57,32 +126,24 @@ export class HeroSliderDataDto {
   @Type(() => HeroSliderSlideDto)
   slides!: HeroSliderSlideDto[];
 
-  @ApiPropertyOptional({ description: 'Enable slide transitions automatic rotations flag', default: true })
-  @IsOptional()
-  @IsBoolean()
-  autoplay?: boolean;
-
-  @ApiPropertyOptional({ description: 'Slider rotation duration interval in ms', default: 4000 })
-  @IsOptional()
-  @IsNumber()
-  interval?: number;
-
-  @ApiPropertyOptional({ description: 'Display next/prev navigator arrow indicators flag', default: true })
-  @IsOptional()
-  @IsBoolean()
-  showArrows?: boolean;
-
-  @ApiPropertyOptional({ description: 'Display slide dots paginator controls flag', default: true })
-  @IsOptional()
-  @IsBoolean()
-  showDots?: boolean;
+  @ApiProperty({
+    type: () => CmsSliderSettingsDto,
+    description: 'Slider settings parameters configuration',
+  })
+  @ValidateNested()
+  @Type(() => CmsSliderSettingsDto)
+  sliderSettings!: CmsSliderSettingsDto;
 }
 
 // ================= FEATURE_ICONS DTOs =================
 export class FeatureIconItemDto {
-  @ApiProperty({ description: 'Icon name (e.g. Truck, CustomerService)' })
-  @IsString()
-  icon!: string;
+  @ApiProperty({
+    type: () => CmsImageDto,
+    description: 'Feature highlight icon details',
+  })
+  @ValidateNested()
+  @Type(() => CmsImageDto)
+  image!: CmsImageDto;
 
   @ApiProperty({ description: 'Heading label title text' })
   @IsString()
@@ -94,7 +155,10 @@ export class FeatureIconItemDto {
 }
 
 export class FeatureIconsDataDto {
-  @ApiPropertyOptional({ description: 'Show grid layout borders divide lines flag', default: true })
+  @ApiPropertyOptional({
+    description: 'Show grid layout borders divide lines flag',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   showDivider?: boolean;
@@ -104,17 +168,26 @@ export class FeatureIconsDataDto {
   @IsString()
   titleColor?: string;
 
-  @ApiPropertyOptional({ description: 'Title size font index override', default: 14 })
+  @ApiPropertyOptional({
+    description: 'Title size font index override',
+    default: 14,
+  })
   @IsOptional()
   @IsNumber()
   titleSize?: number;
 
-  @ApiPropertyOptional({ description: 'Subtitle size font index override', default: 12 })
+  @ApiPropertyOptional({
+    description: 'Subtitle size font index override',
+    default: 12,
+  })
   @IsOptional()
   @IsNumber()
   subTextSize?: number;
 
-  @ApiProperty({ type: [FeatureIconItemDto], description: 'Feature highlights list items' })
+  @ApiProperty({
+    type: [FeatureIconItemDto],
+    description: 'Feature highlights list items',
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => FeatureIconItemDto)
@@ -122,144 +195,127 @@ export class FeatureIconsDataDto {
 }
 
 // ================= PRODUCT_SECTION DTO =================
-export class ProductSectionSliderSettingsDto {
-  @ApiPropertyOptional({ description: 'Autoplay slider flag', default: false })
-  @IsOptional()
-  @IsBoolean()
-  autoplay?: boolean;
-
-  @ApiPropertyOptional({ description: 'Show slider navigation arrows flag', default: true })
-  @IsOptional()
-  @IsBoolean()
-  showArrows?: boolean;
-
-  @ApiPropertyOptional({ description: 'Show slider dots pagination flag', default: false })
-  @IsOptional()
-  @IsBoolean()
-  showDots?: boolean;
-
-  @ApiPropertyOptional({ description: 'Autoplay transition duration speed in ms', default: 3000 })
-  @IsOptional()
-  @IsNumber()
-  interval?: number;
-}
 
 export class ProductSectionDataDto {
-  @ApiPropertyOptional({ description: 'Optional Section Title heading text' })
-  @IsOptional()
-  @IsString()
-  title?: string;
-
   @ApiProperty({ type: [String], description: 'Selected Product IDs list' })
   @IsArray()
   @IsString({ each: true })
   productIds!: string[];
 
-  @ApiProperty({ description: 'Visual border style pattern for product cards', enum: ['half_border', 'full_border'] })
+  @ApiProperty({
+    description: 'Visual border style pattern for product cards',
+    enum: ['half_border', 'full_border'],
+  })
   @IsString()
   @IsIn(['half_border', 'full_border'])
   cardType!: 'half_border' | 'full_border';
 
-  @ApiPropertyOptional({ description: 'Enable slider layout mode view option', default: false })
+  @ApiPropertyOptional({
+    description: 'Enable slider layout mode view option',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   enableSlider?: boolean;
 
-  @ApiPropertyOptional({ description: 'Count of visible card items per page row view', default: 4 })
+  @ApiPropertyOptional({
+    description: 'Count of visible card items per page row view',
+    default: 4,
+  })
   @IsOptional()
   @IsNumber()
   slidesPerView?: number;
 
-  @ApiPropertyOptional({ description: 'Count of card items to shift per swipe pagination', default: 1 })
+  @ApiPropertyOptional({
+    description: 'Count of card items to shift per swipe pagination',
+    default: 1,
+  })
   @IsOptional()
   @IsNumber()
   slidesToScroll?: number;
 
-  @ApiPropertyOptional({ type: ProductSectionSliderSettingsDto, description: 'Slider specific configurations' })
+  @ApiPropertyOptional({
+    type: CmsSliderSettingsDto,
+    description: 'Slider specific configurations',
+  })
   @IsOptional()
   @ValidateNested()
-  @Type(() => ProductSectionSliderSettingsDto)
-  sliderSettings?: ProductSectionSliderSettingsDto;
+  @Type(() => CmsSliderSettingsDto)
+  sliderSettings?: CmsSliderSettingsDto;
 }
 
 // ================= CATEGORY_GRID DTO =================
-export class CategoryGridItemDto {
-  @ApiProperty({ description: 'Category image asset cover URL' })
-  @IsString()
-  image!: string;
-
-  @ApiProperty({ description: 'Category name header text' })
-  @IsString()
-  title!: string;
-
-  @ApiProperty({ description: 'Category secondary info description' })
-  @IsString()
-  subtitle!: string;
-}
-
 export class CategoryGridDataDto {
-  @ApiPropertyOptional({ type: [String], description: 'Mapped category database reference IDs' })
-  @IsOptional()
+  @ApiProperty({
+    type: [String],
+    description: 'Mapped category database reference IDs',
+  })
   @IsArray()
   @IsString({ each: true })
-  categoryIds?: string[];
+  categoryIds!: string[];
 
-  @ApiPropertyOptional({ description: 'Show card divide borders lines flag', default: false })
-  @IsOptional()
+  @ApiProperty({
+    description: 'Show card divide borders lines flag',
+    default: false,
+  })
   @IsBoolean()
-  showDivider?: boolean;
-
-  @ApiProperty({ type: [CategoryGridItemDto], description: 'Category grid list cards items' })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CategoryGridItemDto)
-  items!: CategoryGridItemDto[];
+  showDivider!: boolean;
 }
 
 // ================= IMAGE_GRID DTO =================
 export class ImageGridItemDto {
-  @ApiProperty({ description: 'Image asset target URL' })
-  @IsString()
-  image!: string;
+  @ApiProperty({ type: () => CmsImageDto, description: 'Image details' })
+  @ValidateNested()
+  @Type(() => CmsImageDto)
+  image!: CmsImageDto;
 
-  @ApiPropertyOptional({ description: 'Accessibility tag descriptive text' })
-  @IsOptional()
+  @ApiProperty({ description: 'Overlay name tag label text' })
   @IsString()
-  altText?: string;
-
-  @ApiPropertyOptional({ description: 'Overlay name tag label text' })
-  @IsOptional()
-  @IsString()
-  name?: string;
+  title!: string;
 
   @ApiPropertyOptional({ description: 'Image card click redirect URL link' })
   @IsOptional()
   @IsString()
-  link?: string;
+  actionLink?: string;
 }
 
 export class ImageGridDataDto {
-  @ApiProperty({ description: 'Image display layout mode structure style', enum: ['grid', 'carousel'] })
+  @ApiProperty({
+    description: 'Image display layout mode structure style',
+    enum: ['grid', 'carousel'],
+  })
   @IsString()
   @IsIn(['grid', 'carousel'])
   layoutMode!: 'grid' | 'carousel';
 
-  @ApiPropertyOptional({ description: 'Max row columns count display layout', default: 4 })
+  @ApiPropertyOptional({
+    description: 'Max row columns count display layout',
+    default: 4,
+  })
   @IsOptional()
   @IsNumber()
   columns?: number;
 
-  @ApiPropertyOptional({ description: 'Custom grid cell gutter width size in pixels', default: 16 })
+  @ApiPropertyOptional({
+    description: 'Custom grid cell gutter width size in pixels',
+    default: 16,
+  })
   @IsOptional()
   @IsNumber()
   gapWidth?: number;
 
-  @ApiPropertyOptional({ description: 'Gutter mapping coverage pattern', default: 'middle' })
+  @ApiPropertyOptional({
+    description: 'Gutter mapping coverage pattern',
+    default: 'middle',
+  })
   @IsOptional()
   @IsString()
   gapType?: string;
 
-  @ApiPropertyOptional({ description: 'Show dividers lines borders between image tiles flag', default: false })
+  @ApiPropertyOptional({
+    description: 'Show dividers lines borders between image tiles flag',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   showDivider?: boolean;
@@ -284,7 +340,10 @@ export class ImageGridDataDto {
   @IsNumber()
   paddingBottom?: number;
 
-  @ApiProperty({ type: [ImageGridItemDto], description: 'Grid image list array' })
+  @ApiProperty({
+    type: [ImageGridItemDto],
+    description: 'Grid image list array',
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ImageGridItemDto)
@@ -292,19 +351,11 @@ export class ImageGridDataDto {
 }
 
 // ================= PROMO_BANNER DTO =================
-export class PromoBannerItemDto {
-  @ApiProperty({ description: 'Promo banner asset cover image URL' })
-  @IsString()
-  image!: string;
-
-  @ApiPropertyOptional({ description: 'Promo banner click destination redirect URL' })
-  @IsOptional()
-  @IsString()
-  link?: string;
-}
-
 export class PromoBannerDataDto {
-  @ApiPropertyOptional({ description: 'Banner spacing gutter width size in pixels', default: 16 })
+  @ApiPropertyOptional({
+    description: 'Banner spacing gutter width size in pixels',
+    default: 16,
+  })
   @IsOptional()
   @IsNumber()
   gapWidth?: number;
@@ -314,17 +365,24 @@ export class PromoBannerDataDto {
   @IsString()
   gapColor?: string;
 
-  @ApiPropertyOptional({ description: 'Gutter coverage layout pattern', enum: ['middle', 'none', 'around'], default: 'middle' })
+  @ApiPropertyOptional({
+    description: 'Gutter coverage layout pattern',
+    enum: ['middle', 'none', 'around'],
+    default: 'middle',
+  })
   @IsOptional()
   @IsString()
   @IsIn(['middle', 'none', 'around'])
   gapType?: 'middle' | 'none' | 'around';
 
-  @ApiProperty({ type: [PromoBannerItemDto], description: 'Campaign banners list array' })
+  @ApiProperty({
+    type: [CmsImageDto],
+    description: 'Campaign banners list array',
+  })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => PromoBannerItemDto)
-  banners!: PromoBannerItemDto[];
+  @Type(() => CmsImageDto)
+  banners!: CmsImageDto[];
 }
 
 // ================= BLOG_GRID DTO =================
@@ -333,18 +391,28 @@ export class BlogGridDataDto {
   @IsString()
   title!: string;
 
-  @ApiPropertyOptional({ description: 'Max articles fetch limit count', default: 3 })
+  @ApiPropertyOptional({
+    description: 'Max articles fetch limit count',
+    default: 3,
+  })
   @IsOptional()
   @IsNumber()
   limit?: number;
 
-  @ApiPropertyOptional({ description: 'Display layout presentation mode', enum: ['grid', 'list'], default: 'grid' })
+  @ApiPropertyOptional({
+    description: 'Display layout presentation mode',
+    enum: ['grid', 'list'],
+    default: 'grid',
+  })
   @IsOptional()
   @IsString()
   @IsIn(['grid', 'list'])
   layout?: 'grid' | 'list';
 
-  @ApiPropertyOptional({ description: 'Show view all CTA button option flag', default: true })
+  @ApiPropertyOptional({
+    description: 'Show view all CTA button option flag',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   showViewAll?: boolean;
@@ -361,7 +429,9 @@ export class VideoSectionDataDto {
   @IsString()
   title!: string;
 
-  @ApiPropertyOptional({ description: 'Section description subtitle detail text' })
+  @ApiPropertyOptional({
+    description: 'Section description subtitle detail text',
+  })
   @IsOptional()
   @IsString()
   subtitle?: string;
@@ -370,7 +440,9 @@ export class VideoSectionDataDto {
   @IsString()
   videoUrl!: string;
 
-  @ApiPropertyOptional({ description: 'Fallback thumbnail preview cover image URL' })
+  @ApiPropertyOptional({
+    description: 'Fallback thumbnail preview cover image URL',
+  })
   @IsOptional()
   @IsString()
   thumbnail?: string;
@@ -380,12 +452,18 @@ export class VideoSectionDataDto {
   @IsString()
   altText?: string;
 
-  @ApiPropertyOptional({ description: 'Enable autoplay playback flag', default: false })
+  @ApiPropertyOptional({
+    description: 'Enable autoplay playback flag',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   autoplay?: boolean;
 
-  @ApiPropertyOptional({ description: 'Audio output muted default flag', default: false })
+  @ApiPropertyOptional({
+    description: 'Audio output muted default flag',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   muted?: boolean;
@@ -407,7 +485,9 @@ export class TestimonialItemDto {
   @IsString()
   altText?: string;
 
-  @ApiPropertyOptional({ description: 'Author business job title or role tag text' })
+  @ApiPropertyOptional({
+    description: 'Author business job title or role tag text',
+  })
   @IsOptional()
   @IsString()
   role?: string;
@@ -428,13 +508,19 @@ export class TestimonialsDataDto {
   @IsString()
   title!: string;
 
-  @ApiProperty({ type: [TestimonialItemDto], description: 'Review cards list array' })
+  @ApiProperty({
+    type: [TestimonialItemDto],
+    description: 'Review cards list array',
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => TestimonialItemDto)
   items!: TestimonialItemDto[];
 
-  @ApiPropertyOptional({ description: 'Autoplay slider transition rotate option flag', default: true })
+  @ApiPropertyOptional({
+    description: 'Autoplay slider transition rotate option flag',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   autoplay?: boolean;
@@ -492,7 +578,10 @@ export class SectionHeaderDataDto {
   @IsString()
   title!: string;
 
-  @ApiProperty({ description: 'Title text alignment positioning', enum: ['left', 'center', 'right'] })
+  @ApiProperty({
+    description: 'Title text alignment positioning',
+    enum: ['left', 'center', 'right'],
+  })
   @IsEnum(['left', 'center', 'right'])
   titleAlign!: 'left' | 'center' | 'right';
 
@@ -505,13 +594,19 @@ export class SectionHeaderDataDto {
   @IsBoolean()
   showButton!: boolean;
 
-  @ApiPropertyOptional({ type: SectionHeaderButtonDto, description: 'Button parameters configuration' })
+  @ApiPropertyOptional({
+    type: SectionHeaderButtonDto,
+    description: 'Button parameters configuration',
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => SectionHeaderButtonDto)
   button?: SectionHeaderButtonDto;
 
-  @ApiPropertyOptional({ type: SectionHeaderPaddingDto, description: 'Custom padding dimensions configuration' })
+  @ApiPropertyOptional({
+    type: SectionHeaderPaddingDto,
+    description: 'Custom padding dimensions configuration',
+  })
   @IsOptional()
   @ValidateNested()
   @Type(() => SectionHeaderPaddingDto)
@@ -543,17 +638,25 @@ export class CtaBannerDataDto {
   @IsString()
   buttonText?: string;
 
-  @ApiPropertyOptional({ description: 'Action button click redirect destination URL' })
+  @ApiPropertyOptional({
+    description: 'Action button click redirect destination URL',
+  })
   @IsOptional()
   @IsString()
   buttonLink?: string;
 
-  @ApiProperty({ description: 'Content positioning layout alignment style', enum: ['left', 'right', 'center'] })
+  @ApiProperty({
+    description: 'Content positioning layout alignment style',
+    enum: ['left', 'right', 'center'],
+  })
   @IsString()
   @IsIn(['left', 'right', 'center'])
   position!: 'left' | 'right' | 'center';
 
-  @ApiProperty({ description: 'Visual style theme mode', enum: ['light', 'dark'] })
+  @ApiProperty({
+    description: 'Visual style theme mode',
+    enum: ['light', 'dark'],
+  })
   @IsString()
   @IsIn(['light', 'dark'])
   theme!: 'light' | 'dark';
@@ -587,47 +690,38 @@ export class InfoBoxDataDto {
 }
 
 // ================= BRAND_GRID DTO =================
-export class BrandGridSliderSettingsDto {
-  @ApiPropertyOptional({ description: 'Autoplay slider transitions flag', default: false })
-  @IsOptional()
-  @IsBoolean()
-  autoplay?: boolean;
-
-  @ApiPropertyOptional({ description: 'Show navigation arrows controls flag', default: true })
-  @IsOptional()
-  @IsBoolean()
-  showArrows?: boolean;
-
-  @ApiPropertyOptional({ description: 'Show slider dots pagination flag', default: false })
-  @IsOptional()
-  @IsBoolean()
-  showDots?: boolean;
-
-  @ApiPropertyOptional({ description: 'Autoplay transition duration speed in ms', default: 3000 })
-  @IsOptional()
-  @IsNumber()
-  interval?: number;
-}
 
 export class BrandGridDataDto {
-  @ApiProperty({ type: [String], description: 'Selected Brand reference IDs list' })
+  @ApiProperty({
+    type: [String],
+    description: 'Selected Brand reference IDs list',
+  })
   @IsArray()
   @IsString({ each: true })
   brandIds!: string[];
 
-  @ApiPropertyOptional({ description: 'Show card divide borders lines flag', default: true })
+  @ApiPropertyOptional({
+    description: 'Show card divide borders lines flag',
+    default: true,
+  })
   @IsOptional()
   @IsBoolean()
   showDivider?: boolean;
 
-  @ApiPropertyOptional({ description: 'Enable slider layout mode option flag', default: false })
+  @ApiPropertyOptional({
+    description: 'Enable slider layout mode option flag',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   enableSlider?: boolean;
 
-  @ApiPropertyOptional({ type: BrandGridSliderSettingsDto, description: 'Slider specific configurations' })
+  @ApiPropertyOptional({
+    type: CmsSliderSettingsDto,
+    description: 'Slider specific configurations',
+  })
   @IsOptional()
   @ValidateNested()
-  @Type(() => BrandGridSliderSettingsDto)
-  sliderSettings?: BrandGridSliderSettingsDto;
+  @Type(() => CmsSliderSettingsDto)
+  sliderSettings?: CmsSliderSettingsDto;
 }
