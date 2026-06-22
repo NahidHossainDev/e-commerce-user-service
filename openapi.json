@@ -12349,6 +12349,44 @@
           "html"
         ]
       },
+      "SectionHeaderButtonDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Call-to-action button label text"
+          },
+          "link": {
+            "type": "string",
+            "description": "Call-to-action redirect link destination URL"
+          }
+        },
+        "required": [
+          "label",
+          "link"
+        ]
+      },
+      "SectionHeaderPaddingDto": {
+        "type": "object",
+        "properties": {
+          "top": {
+            "type": "number",
+            "description": "Top padding in pixels"
+          },
+          "bottom": {
+            "type": "number",
+            "description": "Bottom padding in pixels"
+          },
+          "left": {
+            "type": "number",
+            "description": "Left padding in pixels"
+          },
+          "right": {
+            "type": "number",
+            "description": "Right padding in pixels"
+          }
+        }
+      },
       "SectionHeaderDataDto": {
         "type": "object",
         "properties": {
@@ -12356,47 +12394,44 @@
             "type": "string",
             "description": "Header text title heading"
           },
+          "titleAlign": {
+            "type": "string",
+            "description": "Title text alignment positioning",
+            "enum": [
+              "left",
+              "center",
+              "right"
+            ]
+          },
           "subtitle": {
             "type": "string",
             "description": "Secondary header subtitle"
           },
-          "textCenter": {
-            "type": "boolean",
-            "description": "Center align text flag",
-            "default": false
-          },
           "showButton": {
             "type": "boolean",
-            "description": "Display header right call-to-action button",
-            "default": false
+            "description": "Display header right call-to-action button"
           },
-          "buttonText": {
-            "type": "string",
-            "description": "Action button label text"
+          "button": {
+            "description": "Button parameters configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SectionHeaderButtonDto"
+              }
+            ]
           },
-          "buttonLink": {
-            "type": "string",
-            "description": "Action button redirect destination URL"
-          },
-          "paddingTop": {
-            "type": "number",
-            "description": "Top padding size in pixels"
-          },
-          "paddingBottom": {
-            "type": "number",
-            "description": "Bottom padding size in pixels"
-          },
-          "paddingLeft": {
-            "type": "number",
-            "description": "Left padding size in pixels"
-          },
-          "paddingRight": {
-            "type": "number",
-            "description": "Right padding size in pixels"
+          "padding": {
+            "description": "Custom padding dimensions configuration",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SectionHeaderPaddingDto"
+              }
+            ]
           }
         },
         "required": [
-          "title"
+          "title",
+          "titleAlign",
+          "showButton"
         ]
       },
       "CtaBannerDataDto": {

@@ -455,55 +455,67 @@ export class CustomHtmlDataDto {
 }
 
 // ================= SECTION_HEADER DTO =================
+export class SectionHeaderButtonDto {
+  @ApiProperty({ description: 'Call-to-action button label text' })
+  @IsString()
+  label!: string;
+
+  @ApiProperty({ description: 'Call-to-action redirect link destination URL' })
+  @IsString()
+  link!: string;
+}
+
+export class SectionHeaderPaddingDto {
+  @ApiPropertyOptional({ description: 'Top padding in pixels' })
+  @IsOptional()
+  @IsNumber()
+  top?: number;
+
+  @ApiPropertyOptional({ description: 'Bottom padding in pixels' })
+  @IsOptional()
+  @IsNumber()
+  bottom?: number;
+
+  @ApiPropertyOptional({ description: 'Left padding in pixels' })
+  @IsOptional()
+  @IsNumber()
+  left?: number;
+
+  @ApiPropertyOptional({ description: 'Right padding in pixels' })
+  @IsOptional()
+  @IsNumber()
+  right?: number;
+}
+
 export class SectionHeaderDataDto {
   @ApiProperty({ description: 'Header text title heading' })
   @IsString()
   title!: string;
+
+  @ApiProperty({ description: 'Title text alignment positioning', enum: ['left', 'center', 'right'] })
+  @IsEnum(['left', 'center', 'right'])
+  titleAlign!: 'left' | 'center' | 'right';
 
   @ApiPropertyOptional({ description: 'Secondary header subtitle' })
   @IsOptional()
   @IsString()
   subtitle?: string;
 
-  @ApiPropertyOptional({ description: 'Center align text flag', default: false })
-  @IsOptional()
+  @ApiProperty({ description: 'Display header right call-to-action button' })
   @IsBoolean()
-  textCenter?: boolean;
+  showButton!: boolean;
 
-  @ApiPropertyOptional({ description: 'Display header right call-to-action button', default: false })
+  @ApiPropertyOptional({ type: SectionHeaderButtonDto, description: 'Button parameters configuration' })
   @IsOptional()
-  @IsBoolean()
-  showButton?: boolean;
+  @ValidateNested()
+  @Type(() => SectionHeaderButtonDto)
+  button?: SectionHeaderButtonDto;
 
-  @ApiPropertyOptional({ description: 'Action button label text' })
+  @ApiPropertyOptional({ type: SectionHeaderPaddingDto, description: 'Custom padding dimensions configuration' })
   @IsOptional()
-  @IsString()
-  buttonText?: string;
-
-  @ApiPropertyOptional({ description: 'Action button redirect destination URL' })
-  @IsOptional()
-  @IsString()
-  buttonLink?: string;
-
-  @ApiPropertyOptional({ description: 'Top padding size in pixels' })
-  @IsOptional()
-  @IsNumber()
-  paddingTop?: number;
-
-  @ApiPropertyOptional({ description: 'Bottom padding size in pixels' })
-  @IsOptional()
-  @IsNumber()
-  paddingBottom?: number;
-
-  @ApiPropertyOptional({ description: 'Left padding size in pixels' })
-  @IsOptional()
-  @IsNumber()
-  paddingLeft?: number;
-
-  @ApiPropertyOptional({ description: 'Right padding size in pixels' })
-  @IsOptional()
-  @IsNumber()
-  paddingRight?: number;
+  @ValidateNested()
+  @Type(() => SectionHeaderPaddingDto)
+  padding?: SectionHeaderPaddingDto;
 }
 
 // ================= CTA_BANNER DTO =================
