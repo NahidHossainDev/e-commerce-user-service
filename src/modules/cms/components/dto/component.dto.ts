@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty, ApiPropertyOptional, PartialType, getSchemaPath } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -13,6 +13,23 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CmsComponentType } from '../enums/component.enum';
+import {
+  BlogGridDataDto,
+  BrandGridDataDto,
+  CategoryGridDataDto,
+  CtaBannerDataDto,
+  CustomHtmlDataDto,
+  FeatureIconsDataDto,
+  HeroSliderDataDto,
+  ImageGridDataDto,
+  InfoBoxDataDto,
+  ProductSectionDataDto,
+  PromoBannerDataDto,
+  RichTextDataDto,
+  SectionHeaderDataDto,
+  TestimonialsDataDto,
+  VideoSectionDataDto,
+} from './component-data.dto';
 
 export class ComponentSettingsDto {
   @ApiPropertyOptional({ description: 'Layout container type', default: 'boxed' })
@@ -41,6 +58,23 @@ export class ComponentSettingsDto {
   paddingBottom?: string;
 }
 
+@ApiExtraModels(
+  HeroSliderDataDto,
+  FeatureIconsDataDto,
+  ProductSectionDataDto,
+  CategoryGridDataDto,
+  PromoBannerDataDto,
+  ImageGridDataDto,
+  BlogGridDataDto,
+  VideoSectionDataDto,
+  TestimonialsDataDto,
+  RichTextDataDto,
+  CustomHtmlDataDto,
+  SectionHeaderDataDto,
+  CtaBannerDataDto,
+  InfoBoxDataDto,
+  BrandGridDataDto,
+)
 export class CreateCmsComponentDto {
   @ApiProperty({ enum: CmsComponentType, description: 'Component renderer type' })
   @IsEnum(CmsComponentType)
@@ -62,7 +96,26 @@ export class CreateCmsComponentDto {
   @Type(() => ComponentSettingsDto)
   settings?: ComponentSettingsDto;
 
-  @ApiProperty({ type: Object, description: 'Dynamic component properties mapping' })
+  @ApiProperty({
+    description: 'Dynamic component properties mapping',
+    oneOf: [
+      { $ref: getSchemaPath(HeroSliderDataDto) },
+      { $ref: getSchemaPath(FeatureIconsDataDto) },
+      { $ref: getSchemaPath(ProductSectionDataDto) },
+      { $ref: getSchemaPath(CategoryGridDataDto) },
+      { $ref: getSchemaPath(PromoBannerDataDto) },
+      { $ref: getSchemaPath(ImageGridDataDto) },
+      { $ref: getSchemaPath(BlogGridDataDto) },
+      { $ref: getSchemaPath(VideoSectionDataDto) },
+      { $ref: getSchemaPath(TestimonialsDataDto) },
+      { $ref: getSchemaPath(RichTextDataDto) },
+      { $ref: getSchemaPath(CustomHtmlDataDto) },
+      { $ref: getSchemaPath(SectionHeaderDataDto) },
+      { $ref: getSchemaPath(CtaBannerDataDto) },
+      { $ref: getSchemaPath(InfoBoxDataDto) },
+      { $ref: getSchemaPath(BrandGridDataDto) },
+    ],
+  })
   @IsObject()
   @IsNotEmptyObject()
   data!: Record<string, any>;

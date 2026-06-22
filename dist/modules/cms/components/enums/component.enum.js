@@ -6,7 +6,7 @@ var CmsComponentType;
     CmsComponentType["HERO_SLIDER"] = "HERO_SLIDER";
     CmsComponentType["SECTION_HEADER"] = "SECTION_HEADER";
     CmsComponentType["FEATURE_ICONS"] = "FEATURE_ICONS";
-    CmsComponentType["PRODUCT_GRID"] = "PRODUCT_GRID";
+    CmsComponentType["PRODUCT_SECTION"] = "PRODUCT_SECTION";
     CmsComponentType["CATEGORY_GRID"] = "CATEGORY_GRID";
     CmsComponentType["PROMO_BANNER"] = "PROMO_BANNER";
     CmsComponentType["CTA_BANNER"] = "CTA_BANNER";
@@ -17,7 +17,6 @@ var CmsComponentType;
     CmsComponentType["RICH_TEXT"] = "RICH_TEXT";
     CmsComponentType["CUSTOM_HTML"] = "CUSTOM_HTML";
     CmsComponentType["INFO_BOX"] = "INFO_BOX";
-    CmsComponentType["PRODUCT_HALF_BORDER"] = "PRODUCT_HALF_BORDER";
-    CmsComponentType["PRODUCT_FULL_BORDER"] = "PRODUCT_FULL_BORDER";
+    CmsComponentType["BRAND_GRID"] = "BRAND_GRID";
 })(CmsComponentType || (exports.CmsComponentType = CmsComponentType = {}));
 //# sourceMappingURL=component.enum.js.map

@@ -14,6 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const component_enum_1 = require("../enums/component.enum");
+const component_data_dto_1 = require("./component-data.dto");
 class ComponentSettingsDto {
     container = 'boxed';
     fullWidth = false;
@@ -52,13 +53,13 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], ComponentSettingsDto.prototype, "paddingBottom", void 0);
-class CreateCmsComponentDto {
+let CreateCmsComponentDto = class CreateCmsComponentDto {
     componentType;
     order;
     isVisible = true;
     settings;
     data;
-}
+};
 exports.CreateCmsComponentDto = CreateCmsComponentDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ enum: component_enum_1.CmsComponentType, description: 'Component renderer type' }),
@@ -85,11 +86,33 @@ __decorate([
     __metadata("design:type", ComponentSettingsDto)
 ], CreateCmsComponentDto.prototype, "settings", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Object, description: 'Dynamic component properties mapping' }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Dynamic component properties mapping',
+        oneOf: [
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.HeroSliderDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.FeatureIconsDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.ProductSectionDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.CategoryGridDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.PromoBannerDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.ImageGridDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.BlogGridDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.VideoSectionDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.TestimonialsDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.RichTextDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.CustomHtmlDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.SectionHeaderDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.CtaBannerDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.InfoBoxDataDto) },
+            { $ref: (0, swagger_1.getSchemaPath)(component_data_dto_1.BrandGridDataDto) },
+        ],
+    }),
     (0, class_validator_1.IsObject)(),
     (0, class_validator_1.IsNotEmptyObject)(),
     __metadata("design:type", Object)
 ], CreateCmsComponentDto.prototype, "data", void 0);
+exports.CreateCmsComponentDto = CreateCmsComponentDto = __decorate([
+    (0, swagger_1.ApiExtraModels)(component_data_dto_1.HeroSliderDataDto, component_data_dto_1.FeatureIconsDataDto, component_data_dto_1.ProductSectionDataDto, component_data_dto_1.CategoryGridDataDto, component_data_dto_1.PromoBannerDataDto, component_data_dto_1.ImageGridDataDto, component_data_dto_1.BlogGridDataDto, component_data_dto_1.VideoSectionDataDto, component_data_dto_1.TestimonialsDataDto, component_data_dto_1.RichTextDataDto, component_data_dto_1.CustomHtmlDataDto, component_data_dto_1.SectionHeaderDataDto, component_data_dto_1.CtaBannerDataDto, component_data_dto_1.InfoBoxDataDto, component_data_dto_1.BrandGridDataDto)
+], CreateCmsComponentDto);
 class UpdateCmsComponentDto extends (0, swagger_1.PartialType)(CreateCmsComponentDto) {
 }
 exports.UpdateCmsComponentDto = UpdateCmsComponentDto;

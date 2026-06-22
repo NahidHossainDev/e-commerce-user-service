@@ -11804,9 +11804,901 @@
           }
         }
       },
+      "HeroSliderSlideDto": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Slide background image URL"
+          },
+          "showTitle": {
+            "type": "boolean",
+            "description": "Show title overlay text flag",
+            "default": true
+          },
+          "title": {
+            "type": "string",
+            "description": "Slide title text"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Slide subtitle text"
+          },
+          "showButton": {
+            "type": "boolean",
+            "description": "Show action button flag",
+            "default": false
+          },
+          "buttonText": {
+            "type": "string",
+            "description": "Action button label text"
+          },
+          "buttonLink": {
+            "type": "string",
+            "description": "Action button redirect destination URL"
+          }
+        },
+        "required": [
+          "image"
+        ]
+      },
+      "HeroSliderDataDto": {
+        "type": "object",
+        "properties": {
+          "slides": {
+            "description": "List of slides",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HeroSliderSlideDto"
+            }
+          },
+          "autoplay": {
+            "type": "boolean",
+            "description": "Enable slide transitions automatic rotations flag",
+            "default": true
+          },
+          "interval": {
+            "type": "number",
+            "description": "Slider rotation duration interval in ms",
+            "default": 4000
+          },
+          "showArrows": {
+            "type": "boolean",
+            "description": "Display next/prev navigator arrow indicators flag",
+            "default": true
+          },
+          "showDots": {
+            "type": "boolean",
+            "description": "Display slide dots paginator controls flag",
+            "default": true
+          }
+        },
+        "required": [
+          "slides"
+        ]
+      },
+      "FeatureIconItemDto": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "description": "Icon name (e.g. Truck, CustomerService)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Heading label title text"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Description sub-detail tag text"
+          }
+        },
+        "required": [
+          "icon",
+          "title",
+          "subtitle"
+        ]
+      },
+      "FeatureIconsDataDto": {
+        "type": "object",
+        "properties": {
+          "showDivider": {
+            "type": "boolean",
+            "description": "Show grid layout borders divide lines flag",
+            "default": true
+          },
+          "titleColor": {
+            "type": "string",
+            "description": "Title color CSS override hex code"
+          },
+          "titleSize": {
+            "type": "number",
+            "description": "Title size font index override",
+            "default": 14
+          },
+          "subTextSize": {
+            "type": "number",
+            "description": "Subtitle size font index override",
+            "default": 12
+          },
+          "items": {
+            "description": "Feature highlights list items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureIconItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "ProductSectionSliderSettingsDto": {
+        "type": "object",
+        "properties": {
+          "autoplay": {
+            "type": "boolean",
+            "description": "Autoplay slider flag",
+            "default": false
+          },
+          "showArrows": {
+            "type": "boolean",
+            "description": "Show slider navigation arrows flag",
+            "default": true
+          },
+          "showDots": {
+            "type": "boolean",
+            "description": "Show slider dots pagination flag",
+            "default": false
+          },
+          "interval": {
+            "type": "number",
+            "description": "Autoplay transition duration speed in ms",
+            "default": 3000
+          }
+        }
+      },
+      "ProductSectionDataDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Optional Section Title heading text"
+          },
+          "productIds": {
+            "description": "Selected Product IDs list",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cardType": {
+            "type": "string",
+            "description": "Visual border style pattern for product cards",
+            "enum": [
+              "half_border",
+              "full_border"
+            ]
+          },
+          "enableSlider": {
+            "type": "boolean",
+            "description": "Enable slider layout mode view option",
+            "default": false
+          },
+          "slidesPerView": {
+            "type": "number",
+            "description": "Count of visible card items per page row view",
+            "default": 4
+          },
+          "slidesToScroll": {
+            "type": "number",
+            "description": "Count of card items to shift per swipe pagination",
+            "default": 1
+          },
+          "sliderSettings": {
+            "description": "Slider specific configurations",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductSectionSliderSettingsDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "productIds",
+          "cardType"
+        ]
+      },
+      "CategoryGridItemDto": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Category image asset cover URL"
+          },
+          "title": {
+            "type": "string",
+            "description": "Category name header text"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Category secondary info description"
+          }
+        },
+        "required": [
+          "image",
+          "title",
+          "subtitle"
+        ]
+      },
+      "CategoryGridDataDto": {
+        "type": "object",
+        "properties": {
+          "categoryIds": {
+            "description": "Mapped category database reference IDs",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "showDivider": {
+            "type": "boolean",
+            "description": "Show card divide borders lines flag",
+            "default": false
+          },
+          "items": {
+            "description": "Category grid list cards items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryGridItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "PromoBannerItemDto": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Promo banner asset cover image URL"
+          },
+          "link": {
+            "type": "string",
+            "description": "Promo banner click destination redirect URL"
+          }
+        },
+        "required": [
+          "image"
+        ]
+      },
+      "PromoBannerDataDto": {
+        "type": "object",
+        "properties": {
+          "gapWidth": {
+            "type": "number",
+            "description": "Banner spacing gutter width size in pixels",
+            "default": 16
+          },
+          "gapColor": {
+            "type": "string",
+            "description": "Banner gap color hex"
+          },
+          "gapType": {
+            "type": "string",
+            "description": "Gutter coverage layout pattern",
+            "enum": [
+              "middle",
+              "none",
+              "around"
+            ],
+            "default": "middle"
+          },
+          "banners": {
+            "description": "Campaign banners list array",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PromoBannerItemDto"
+            }
+          }
+        },
+        "required": [
+          "banners"
+        ]
+      },
+      "ImageGridItemDto": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Image asset target URL"
+          },
+          "altText": {
+            "type": "string",
+            "description": "Accessibility tag descriptive text"
+          },
+          "name": {
+            "type": "string",
+            "description": "Overlay name tag label text"
+          },
+          "link": {
+            "type": "string",
+            "description": "Image card click redirect URL link"
+          }
+        },
+        "required": [
+          "image"
+        ]
+      },
+      "ImageGridDataDto": {
+        "type": "object",
+        "properties": {
+          "layoutMode": {
+            "type": "string",
+            "description": "Image display layout mode structure style",
+            "enum": [
+              "grid",
+              "carousel"
+            ]
+          },
+          "columns": {
+            "type": "number",
+            "description": "Max row columns count display layout",
+            "default": 4
+          },
+          "gapWidth": {
+            "type": "number",
+            "description": "Custom grid cell gutter width size in pixels",
+            "default": 16
+          },
+          "gapType": {
+            "type": "string",
+            "description": "Gutter mapping coverage pattern",
+            "default": "middle"
+          },
+          "showDivider": {
+            "type": "boolean",
+            "description": "Show dividers lines borders between image tiles flag",
+            "default": false
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Outer section background color hex"
+          },
+          "itemBgColor": {
+            "type": "string",
+            "description": "Inner element background color hex"
+          },
+          "paddingTop": {
+            "type": "number",
+            "description": "Top padding in pixels"
+          },
+          "paddingBottom": {
+            "type": "number",
+            "description": "Bottom padding in pixels"
+          },
+          "images": {
+            "description": "Grid image list array",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImageGridItemDto"
+            }
+          }
+        },
+        "required": [
+          "layoutMode",
+          "images"
+        ]
+      },
+      "BlogGridDataDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Section title header text"
+          },
+          "limit": {
+            "type": "number",
+            "description": "Max articles fetch limit count",
+            "default": 3
+          },
+          "layout": {
+            "type": "string",
+            "description": "Display layout presentation mode",
+            "enum": [
+              "grid",
+              "list"
+            ],
+            "default": "grid"
+          },
+          "showViewAll": {
+            "type": "boolean",
+            "description": "Show view all CTA button option flag",
+            "default": true
+          },
+          "viewAllLink": {
+            "type": "string",
+            "description": "View all page route redirect URL link"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "VideoSectionDataDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Section overlay title heading text"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Section description subtitle detail text"
+          },
+          "videoUrl": {
+            "type": "string",
+            "description": "Video source target playback URL"
+          },
+          "thumbnail": {
+            "type": "string",
+            "description": "Fallback thumbnail preview cover image URL"
+          },
+          "altText": {
+            "type": "string",
+            "description": "Thumbnail tag descriptive alt text"
+          },
+          "autoplay": {
+            "type": "boolean",
+            "description": "Enable autoplay playback flag",
+            "default": false
+          },
+          "muted": {
+            "type": "boolean",
+            "description": "Audio output muted default flag",
+            "default": false
+          }
+        },
+        "required": [
+          "title",
+          "videoUrl"
+        ]
+      },
+      "TestimonialItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Customer feedback name"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "Customer avatar logo image URL"
+          },
+          "altText": {
+            "type": "string",
+            "description": "Avatar descriptive accessibility text"
+          },
+          "role": {
+            "type": "string",
+            "description": "Author business job title or role tag text"
+          },
+          "rating": {
+            "type": "number",
+            "description": "Product rating score points count (1-5)"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Feedback review comment text details"
+          }
+        },
+        "required": [
+          "name",
+          "rating",
+          "comment"
+        ]
+      },
+      "TestimonialsDataDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Section title header text"
+          },
+          "items": {
+            "description": "Review cards list array",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestimonialItemDto"
+            }
+          },
+          "autoplay": {
+            "type": "boolean",
+            "description": "Autoplay slider transition rotate option flag",
+            "default": true
+          }
+        },
+        "required": [
+          "title",
+          "items"
+        ]
+      },
+      "RichTextDataDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "WYSIWYG generated HTML content string"
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "CustomHtmlDataDto": {
+        "type": "object",
+        "properties": {
+          "html": {
+            "type": "string",
+            "description": "Unescaped dynamic custom raw HTML output code"
+          }
+        },
+        "required": [
+          "html"
+        ]
+      },
+      "SectionHeaderDataDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Header text title heading"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Secondary header subtitle"
+          },
+          "textCenter": {
+            "type": "boolean",
+            "description": "Center align text flag",
+            "default": false
+          },
+          "showButton": {
+            "type": "boolean",
+            "description": "Display header right call-to-action button",
+            "default": false
+          },
+          "buttonText": {
+            "type": "string",
+            "description": "Action button label text"
+          },
+          "buttonLink": {
+            "type": "string",
+            "description": "Action button redirect destination URL"
+          },
+          "paddingTop": {
+            "type": "number",
+            "description": "Top padding size in pixels"
+          },
+          "paddingBottom": {
+            "type": "number",
+            "description": "Bottom padding size in pixels"
+          },
+          "paddingLeft": {
+            "type": "number",
+            "description": "Left padding size in pixels"
+          },
+          "paddingRight": {
+            "type": "number",
+            "description": "Right padding size in pixels"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "CtaBannerDataDto": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "description": "Cover background image URL"
+          },
+          "badge": {
+            "type": "string",
+            "description": "Visual overlay mini badge tag text"
+          },
+          "title": {
+            "type": "string",
+            "description": "Banner title heading text"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Banner subtitle description message"
+          },
+          "buttonText": {
+            "type": "string",
+            "description": "Action button text label"
+          },
+          "buttonLink": {
+            "type": "string",
+            "description": "Action button click redirect destination URL"
+          },
+          "position": {
+            "type": "string",
+            "description": "Content positioning layout alignment style",
+            "enum": [
+              "left",
+              "right",
+              "center"
+            ]
+          },
+          "theme": {
+            "type": "string",
+            "description": "Visual style theme mode",
+            "enum": [
+              "light",
+              "dark"
+            ]
+          }
+        },
+        "required": [
+          "image",
+          "title",
+          "position",
+          "theme"
+        ]
+      },
+      "InfoBoxDataDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Box title heading"
+          },
+          "content": {
+            "type": "string",
+            "description": "Box details body paragraph text content"
+          },
+          "badgeBgColor": {
+            "type": "string",
+            "description": "Mini badge tag background color hex"
+          },
+          "badgeTextColor": {
+            "type": "string",
+            "description": "Mini badge tag text color hex"
+          },
+          "borderColor": {
+            "type": "string",
+            "description": "Box outline border color hex"
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Inner box background color hex"
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "badgeBgColor",
+          "badgeTextColor",
+          "borderColor",
+          "backgroundColor"
+        ]
+      },
+      "BrandGridSliderSettingsDto": {
+        "type": "object",
+        "properties": {
+          "autoplay": {
+            "type": "boolean",
+            "description": "Autoplay slider transitions flag",
+            "default": false
+          },
+          "showArrows": {
+            "type": "boolean",
+            "description": "Show navigation arrows controls flag",
+            "default": true
+          },
+          "showDots": {
+            "type": "boolean",
+            "description": "Show slider dots pagination flag",
+            "default": false
+          },
+          "interval": {
+            "type": "number",
+            "description": "Autoplay transition duration speed in ms",
+            "default": 3000
+          }
+        }
+      },
+      "BrandGridDataDto": {
+        "type": "object",
+        "properties": {
+          "brandIds": {
+            "description": "Selected Brand reference IDs list",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "showDivider": {
+            "type": "boolean",
+            "description": "Show card divide borders lines flag",
+            "default": true
+          },
+          "enableSlider": {
+            "type": "boolean",
+            "description": "Enable slider layout mode option flag",
+            "default": false
+          },
+          "sliderSettings": {
+            "description": "Slider specific configurations",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BrandGridSliderSettingsDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "brandIds"
+        ]
+      },
+      "ComponentSettings": {
+        "type": "object",
+        "properties": {
+          "container": {
+            "type": "string",
+            "description": "Layout container type",
+            "default": "boxed"
+          },
+          "fullWidth": {
+            "type": "boolean",
+            "description": "Full width visual stretch flag",
+            "default": false
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Background color override hex"
+          },
+          "paddingTop": {
+            "type": "string",
+            "description": "Top padding in CSS units"
+          },
+          "paddingBottom": {
+            "type": "string",
+            "description": "Bottom padding in CSS units"
+          }
+        },
+        "required": [
+          "container",
+          "fullWidth"
+        ]
+      },
       "CmsComponent": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Database primary key identifier string"
+          },
+          "pageId": {
+            "description": "Page reference ID mapping",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "componentType": {
+            "type": "string",
+            "enum": [
+              "HERO_SLIDER",
+              "SECTION_HEADER",
+              "FEATURE_ICONS",
+              "PRODUCT_SECTION",
+              "CATEGORY_GRID",
+              "PROMO_BANNER",
+              "CTA_BANNER",
+              "IMAGE_GRID",
+              "BLOG_GRID",
+              "VIDEO_SECTION",
+              "TESTIMONIALS",
+              "RICH_TEXT",
+              "CUSTOM_HTML",
+              "INFO_BOX",
+              "BRAND_GRID"
+            ],
+            "description": "Component display style type"
+          },
+          "order": {
+            "type": "number",
+            "description": "Display placement order index"
+          },
+          "isVisible": {
+            "type": "boolean",
+            "description": "Visual visibility display toggle status flag"
+          },
+          "settings": {
+            "description": "Visual display layout settings parameters",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ComponentSettings"
+              }
+            ]
+          },
+          "data": {
+            "description": "Dynamic component properties details configuration",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HeroSliderDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/FeatureIconsDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/ProductSectionDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CategoryGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/PromoBannerDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/ImageGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/BlogGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/VideoSectionDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/TestimonialsDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/RichTextDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CustomHtmlDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/SectionHeaderDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CtaBannerDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/InfoBoxDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/BrandGridDataDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Database entry creation timestamp string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Database entry update timestamp string"
+          }
+        },
+        "required": [
+          "_id",
+          "pageId",
+          "componentType",
+          "order",
+          "isVisible",
+          "settings",
+          "data",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "ComponentSettingsDto": {
         "type": "object",
@@ -11844,7 +12736,7 @@
               "HERO_SLIDER",
               "SECTION_HEADER",
               "FEATURE_ICONS",
-              "PRODUCT_GRID",
+              "PRODUCT_SECTION",
               "CATEGORY_GRID",
               "PROMO_BANNER",
               "CTA_BANNER",
@@ -11855,8 +12747,7 @@
               "RICH_TEXT",
               "CUSTOM_HTML",
               "INFO_BOX",
-              "PRODUCT_HALF_BORDER",
-              "PRODUCT_FULL_BORDER"
+              "BRAND_GRID"
             ],
             "description": "Component renderer type"
           },
@@ -11879,8 +12770,54 @@
             ]
           },
           "data": {
-            "type": "object",
-            "description": "Dynamic component properties mapping"
+            "description": "Dynamic component properties mapping",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HeroSliderDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/FeatureIconsDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/ProductSectionDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CategoryGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/PromoBannerDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/ImageGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/BlogGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/VideoSectionDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/TestimonialsDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/RichTextDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CustomHtmlDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/SectionHeaderDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CtaBannerDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/InfoBoxDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/BrandGridDataDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11930,7 +12867,7 @@
               "HERO_SLIDER",
               "SECTION_HEADER",
               "FEATURE_ICONS",
-              "PRODUCT_GRID",
+              "PRODUCT_SECTION",
               "CATEGORY_GRID",
               "PROMO_BANNER",
               "CTA_BANNER",
@@ -11941,8 +12878,7 @@
               "RICH_TEXT",
               "CUSTOM_HTML",
               "INFO_BOX",
-              "PRODUCT_HALF_BORDER",
-              "PRODUCT_FULL_BORDER"
+              "BRAND_GRID"
             ],
             "description": "Component renderer type"
           },
@@ -11965,8 +12901,54 @@
             ]
           },
           "data": {
-            "type": "object",
-            "description": "Dynamic component properties mapping"
+            "description": "Dynamic component properties mapping",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/HeroSliderDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/FeatureIconsDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/ProductSectionDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CategoryGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/PromoBannerDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/ImageGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/BlogGridDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/VideoSectionDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/TestimonialsDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/RichTextDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CustomHtmlDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/SectionHeaderDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/CtaBannerDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/InfoBoxDataDto"
+              },
+              {
+                "$ref": "#/components/schemas/BrandGridDataDto"
+              }
+            ]
           }
         }
       }

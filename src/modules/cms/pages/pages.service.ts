@@ -237,7 +237,7 @@ export class CmsPagesService {
       );
 
       // 4. Update the cloned page with component references
-      const componentIds = clonedComponents.map((c) => c._id as Types.ObjectId);
+      const componentIds = clonedComponents.map((c) => c._id as any);
       const updatedClonedPage = await this.pagesRepository.update(
         (clonedPage._id as any).toString(),
         { componentIds } as any,

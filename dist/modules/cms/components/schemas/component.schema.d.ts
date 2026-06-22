@@ -9,19 +9,22 @@ export declare class ComponentSettings {
     paddingBottom: string;
 }
 export declare class CmsComponent {
+    _id: string;
     pageId: Types.ObjectId;
     componentType: CmsComponentType;
     order: number;
     isVisible: boolean;
     settings: ComponentSettings;
     data: Record<string, any>;
+    createdAt: string;
+    updatedAt: string;
 }
-export declare const CmsComponentSchema: import("mongoose").Schema<CmsComponent, import("mongoose").Model<CmsComponent, any, any, any, Document<unknown, any, CmsComponent, any, {}> & CmsComponent & {
-    _id: Types.ObjectId;
-} & {
+export declare const CmsComponentSchema: import("mongoose").Schema<CmsComponent, import("mongoose").Model<CmsComponent, any, any, any, Document<unknown, any, CmsComponent, any, {}> & CmsComponent & Required<{
+    _id: string;
+}> & {
     __v: number;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, CmsComponent, Document<unknown, {}, import("mongoose").FlatRecord<CmsComponent>, {}, import("mongoose").ResolveSchemaOptions<import("mongoose").DefaultSchemaOptions>> & import("mongoose").FlatRecord<CmsComponent> & {
-    _id: Types.ObjectId;
-} & {
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, CmsComponent, Document<unknown, {}, import("mongoose").FlatRecord<CmsComponent>, {}, import("mongoose").ResolveSchemaOptions<import("mongoose").DefaultSchemaOptions>> & import("mongoose").FlatRecord<CmsComponent> & Required<{
+    _id: string;
+}> & {
     __v: number;
 }>;
