@@ -3396,6 +3396,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Create a new brand",
         "tags": [
           "Brands"
@@ -3496,6 +3501,64 @@
           }
         },
         "summary": "Retrieve all brands with pagination and filtering",
+        "tags": [
+          "Brands"
+        ]
+      }
+    },
+    "/brands/by-ids": {
+      "get": {
+        "operationId": "BrandController_findByIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of categories matching the IDs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BrandResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get categories by a list of IDs",
         "tags": [
           "Brands"
         ]
@@ -3613,6 +3676,11 @@
             }
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Update a brand by ID",
         "tags": [
           "Brands"

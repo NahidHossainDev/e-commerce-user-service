@@ -88,6 +88,32 @@ export class BrandService {
     return brand;
   }
 
+  async findByIds(ids: string[]): Promise<BrandDocument[]> {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+    const objectIds = ids
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    const brands = await this.brandModel
+      .find({ _id: { $in: objectIds }, isActive: true })
+      .exec();
+
+    // Return the brands in the order of the requested ids
+    const brandMap = new Map(
+      brands.map((brand) => [(brand._id as Types.ObjectId).toString(), brand]),
+    );
+    const result: BrandDocument[] = [];
+    for (const id of ids) {
+      const found = brandMap.get(id);
+      if (found) {
+        result.push(found);
+      }
+    }
+    return result;
+  }
+
   async update(
     id: string,
     updateBrandDto: UpdateBrandDto,

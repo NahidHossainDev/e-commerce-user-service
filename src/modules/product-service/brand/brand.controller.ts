@@ -7,15 +7,20 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UserRole } from 'src/common/interface';
 import { ApiWrappedResponse } from 'src/utils/response/swagger.helper';
 import { BrandService } from './brand.service';
+import { BrandQueryOptionsDto } from './dto/brand-query-options.dto';
 import {
   BrandResponseDto,
   PaginatedBrandsResponseDto,
 } from './dto/brand-response.dto';
-import { BrandQueryOptionsDto } from './dto/brand-query-options.dto';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 
@@ -25,6 +30,9 @@ export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Create a new brand' })
   @ApiWrappedResponse({
     status: 201,
@@ -54,6 +62,22 @@ export class BrandController {
     )) as unknown as PaginatedBrandsResponseDto;
   }
 
+  @Get('by-ids')
+  @ApiOperation({ summary: 'Get categories by a list of IDs' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'List of categories matching the IDs.',
+    type: BrandResponseDto,
+    isArray: true,
+  })
+  async findByIds(
+    @Query('ids') ids: string,
+  ): Promise<BrandResponseDto[]> {
+    const idList = ids ? ids.split(',') : [];
+    const brands = await this.brandService.findByIds(idList);
+    return brands as unknown as BrandResponseDto[];
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve a brand by ID' })
   @ApiWrappedResponse({
@@ -66,6 +90,9 @@ export class BrandController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update a brand by ID' })
   @ApiWrappedResponse({
     status: 200,
