@@ -1494,6 +1494,64 @@
         ]
       }
     },
+    "/products/by-ids": {
+      "get": {
+        "operationId": "ProductController_findByIds",
+        "parameters": [
+          {
+            "name": "ids",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products matching the IDs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductResponseDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get products by a list of IDs",
+        "tags": [
+          "Products"
+        ]
+      }
+    },
     "/products/{idOrSlug}": {
       "get": {
         "operationId": "ProductController_findOne",

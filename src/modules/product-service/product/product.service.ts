@@ -379,6 +379,39 @@ export class ProductService {
     });
   }
 
+  async findByIds(ids: string[]): Promise<ProductDocument[]> {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+    const objectIds = ids
+      .filter((id) => Types.ObjectId.isValid(id))
+      .map((id) => new Types.ObjectId(id));
+
+    const products = await this.productModel
+      .find({
+        _id: { $in: objectIds },
+        isDeleted: false,
+      })
+      .select('-vendorId -isDeleted -deletedAt -lastStockSyncAt -__v')
+      .populate(['categoryId', 'brandId', 'subCategoryIds'])
+      .exec();
+
+    const productMap = new Map(
+      products.map((product) => [
+        (product._id as Types.ObjectId).toString(),
+        product,
+      ]),
+    );
+    const result: ProductDocument[] = [];
+    for (const id of ids) {
+      const found = productMap.get(id);
+      if (found) {
+        result.push(found);
+      }
+    }
+    return result;
+  }
+
   // --- Private Helpers ---
 
   private applySearchFilters(filterQuery: any, searchTerm?: string) {
@@ -389,9 +422,9 @@ export class ProductService {
       return;
     }
 
-    filterQuery['$or'] = PRODUCT_SEARCH_FIELDS
-      .filter((field) => field !== '_id')
-      .map((field) => ({ [field]: { $regex: searchTerm, $options: 'i' } }));
+    filterQuery['$or'] = PRODUCT_SEARCH_FIELDS.filter(
+      (field) => field !== '_id',
+    ).map((field) => ({ [field]: { $regex: searchTerm, $options: 'i' } }));
   }
 
   private applyIdFilters(

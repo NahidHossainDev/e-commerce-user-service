@@ -30,6 +30,22 @@ export class ProductController {
     )) as unknown as PaginatedProductsResponseDto;
   }
 
+  @Get('by-ids')
+  @ApiOperation({ summary: 'Get products by a list of IDs' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'List of products matching the IDs.',
+    type: ProductResponseDto,
+    isArray: true,
+  })
+  async findByIds(
+    @Query('ids') ids: string,
+  ): Promise<ProductResponseDto[]> {
+    const idList = ids ? ids.split(',') : [];
+    const products = await this.productService.findByIds(idList);
+    return products as unknown as ProductResponseDto[];
+  }
+
   @Get(':idOrSlug')
   @ApiOperation({ summary: 'Get a product by ID or slug' })
   @ApiWrappedResponse({
