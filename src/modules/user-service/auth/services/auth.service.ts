@@ -14,9 +14,9 @@ import { LoginDto } from '../dto/login.dto';
 import { RegisterDto } from '../dto/register.dto';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
-import { Model } from 'mongoose';
+import { ClientSession, Connection, Model } from 'mongoose';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { AccountStatus, UserDocument, UserRole } from '../../user/user.schema';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
@@ -42,6 +42,7 @@ export class AuthService {
     private eventEmitter: EventEmitter2,
     @InjectModel(VerificationToken.name)
     private verificationTokenModel: Model<VerificationTokenDocument>,
+    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async register(payload: RegisterDto) {
@@ -50,38 +51,75 @@ export class AuthService {
 
     const existingUser = await this.userService.findByEmail(email);
     if (existingUser) {
+      if (existingUser.accountStatus === AccountStatus.PENDING_VERIFICATION) {
+        const rawToken = await this.createVerificationToken(
+          existingUser._id,
+          VerificationTokenType.EMAIL_VERIFICATION,
+        );
+
+        this.eventEmitter.emit(
+          AUTH_EVENTS.USER_REGISTERED,
+          new UserRegisteredEvent(
+            existingUser._id.toString(),
+            email,
+            rawToken,
+            existingUser.profile?.fullName || fullName,
+          ),
+        );
+
+        return {
+          message: 'We sent you a verification email. Please verify to continue.',
+        };
+      }
+
       throw new ConflictException('Email already exists');
     }
 
-    const userPayload: Partial<CreateUserDto> = {
-      ...payload,
-      email,
-      password,
-      profile: { fullName },
-      accountStatus: AccountStatus.PENDING_VERIFICATION,
-      primaryRole: UserRole.CUSTOMER,
-    };
+    const session = await this.connection.startSession();
+    session.startTransaction();
 
-    const newUser = await this.userService.create(userPayload as CreateUserDto);
-
-    const rawToken = await this.createVerificationToken(
-      newUser._id,
-      VerificationTokenType.EMAIL_VERIFICATION,
-    );
-
-    this.eventEmitter.emit(
-      AUTH_EVENTS.USER_REGISTERED,
-      new UserRegisteredEvent(
-        newUser._id.toString(),
+    try {
+      const userPayload: Partial<CreateUserDto> = {
+        ...payload,
         email,
-        rawToken,
-        fullName,
-      ),
-    );
+        password,
+        profile: { fullName },
+        accountStatus: AccountStatus.PENDING_VERIFICATION,
+        primaryRole: UserRole.CUSTOMER,
+      };
 
-    return {
-      message: 'We sent you a verification email. Please verify to continue.',
-    };
+      const newUser = await this.userService.create(
+        userPayload as CreateUserDto,
+        session,
+      );
+
+      const rawToken = await this.createVerificationToken(
+        newUser._id,
+        VerificationTokenType.EMAIL_VERIFICATION,
+        session,
+      );
+
+      await session.commitTransaction();
+
+      this.eventEmitter.emit(
+        AUTH_EVENTS.USER_REGISTERED,
+        new UserRegisteredEvent(
+          newUser._id.toString(),
+          email,
+          rawToken,
+          fullName,
+        ),
+      );
+
+      return {
+        message: 'We sent you a verification email. Please verify to continue.',
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      await session.endSession();
+    }
   }
 
   async verifyEmail(payload: VerifyEmailDto) {
@@ -342,11 +380,12 @@ export class AuthService {
   private async createVerificationToken(
     userId: any,
     type: VerificationTokenType,
+    session?: ClientSession,
   ) {
     const rawToken = crypto.randomBytes(32).toString('hex');
     const tokenHash = generateHash(rawToken);
 
-    await this.verificationTokenModel.create({
+    const tokenDoc = new this.verificationTokenModel({
       userId,
       tokenHash,
       type,
@@ -355,6 +394,7 @@ export class AuthService {
           AUTH_CONSTANTS.EMAIL_VERIFICATION_EXPIRY_MINUTES * 60 * 1000,
       ),
     });
+    await tokenDoc.save({ session });
 
     return rawToken;
   }

@@ -102,13 +102,13 @@ export class ProductMedia {
   @Prop({ required: true })
   url: string;
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   altText: string;
 
-  @Prop({ required: true })
+  @Prop({ default: '' })
   format: string;
 
-  @Prop({ required: true, enum: ProductMediaType })
+  @Prop({ required: true, enum: ProductMediaType, default: ProductMediaType.IMAGE })
   type: ProductMediaType;
 }
 // --- Main Product Schema ---

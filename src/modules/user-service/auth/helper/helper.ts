@@ -1,11 +1,11 @@
-import crypto from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 
 export const generateRandomPassword = (): string => {
-  return crypto.randomBytes(16).toString('hex');
+  return randomBytes(16).toString('hex');
 };
 
 export const generateHash = (otpOrToken: string): string => {
-  return crypto.createHash('sha256').update(otpOrToken).digest('hex');
+  return createHash('sha256').update(otpOrToken).digest('hex');
 };
 
 export const generateOtp = (): string => {

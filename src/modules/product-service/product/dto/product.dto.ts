@@ -15,7 +15,34 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { AppCurrency } from '../../../../common/constants/currency.constants';
-import { ProductStatus } from '../schemas/product.schema';
+import { ProductMediaType, ProductStatus } from '../schemas/product.schema';
+
+export class ProductMediaDto {
+  @ApiProperty({ description: 'Media URL' })
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+
+  @ApiProperty({ description: 'Alt text', required: false })
+  @IsString()
+  @IsOptional()
+  altText?: string;
+
+  @ApiProperty({ description: 'Media format (e.g. image/jpeg)', required: false })
+  @IsString()
+  @IsOptional()
+  format?: string;
+
+  @ApiProperty({
+    description: 'Media type',
+    enum: ProductMediaType,
+    default: ProductMediaType.IMAGE,
+    required: false,
+  })
+  @IsEnum(ProductMediaType)
+  @IsOptional()
+  type?: ProductMediaType;
+}
 
 export class PriceDto {
   @ApiProperty({ description: 'Base price of the product' })
@@ -171,6 +198,13 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
   thumbnail: string;
+
+  @ApiProperty({ type: [ProductMediaDto], required: false })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductMediaDto)
+  @IsOptional()
+  media?: ProductMediaDto[];
 
   @ApiProperty({ description: 'Category ID' })
   @IsMongoId()

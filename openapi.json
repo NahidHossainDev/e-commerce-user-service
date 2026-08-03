@@ -7983,7 +7983,7 @@
           },
           "password": {
             "type": "string",
-            "example": "Password123"
+            "example": "123456"
           }
         },
         "required": [
@@ -9367,6 +9367,12 @@
             "type": "string",
             "description": "Thumbnail image URL"
           },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductMediaDto"
+            }
+          },
           "categoryId": {
             "type": "string",
             "description": "Category ID"
@@ -9504,6 +9510,12 @@
           "thumbnail": {
             "type": "string",
             "description": "Thumbnail image URL"
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductMediaDto"
+            }
           },
           "categoryId": {
             "type": "string",

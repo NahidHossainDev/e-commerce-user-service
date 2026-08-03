@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
 import {
   ImageAttachedEvent,
@@ -22,8 +22,12 @@ export class UserService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async create(payload: CreateUserDto): Promise<UserDocument> {
-    const savedUser = await this.userModel.create(payload);
+  async create(
+    payload: CreateUserDto,
+    session?: ClientSession,
+  ): Promise<UserDocument> {
+    const user = new this.userModel(payload);
+    const savedUser = await user.save({ session });
 
     if (savedUser.profile?.imageUrl) {
       const mediaId = extractMediaIdFromUrl(savedUser.profile.imageUrl);

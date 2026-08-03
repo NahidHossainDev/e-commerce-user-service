@@ -34,12 +34,9 @@ export class RegisterDto {
   @Matches(/^$/, { message: 'Bots not allowed' })
   bot_field?: string;
 
-  @ApiProperty({ example: 'Password123' })
+  @ApiProperty({ example: '123456' })
   @IsNotEmpty()
   @IsString()
-  @MinLength(8)
-  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'password is too weak',
-  })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
   password: string;
 }

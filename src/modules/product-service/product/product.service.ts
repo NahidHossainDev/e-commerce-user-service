@@ -79,8 +79,13 @@ export class ProductService {
           ? undefined
           : createProductDto.barcode.trim();
 
+      const cleanMedia = (createProductDto.media || []).filter(
+        (m) => m && typeof m.url === 'string' && m.url.trim() !== '',
+      );
+
       const product = new this.productModel({
         ...createProductDto,
+        media: cleanMedia,
         slug,
         sku,
         barcode,
@@ -253,6 +258,12 @@ export class ProductService {
       ...updateProductDto,
     };
 
+    if (updateProductDto.media) {
+      updateData.media = updateProductDto.media.filter(
+        (m) => m && typeof m.url === 'string' && m.url.trim() !== '',
+      );
+    }
+
     if (updateProductDto.title) {
       updateData.slug = generateSlug(updateProductDto.title);
     }
@@ -294,6 +305,39 @@ export class ProductService {
     ) {
       this.emitMediaEvents(oldProduct, 'detach', true);
       this.emitMediaEvents(product, 'attach', true);
+    }
+
+    if (updateProductDto.media) {
+      const oldMediaUrls = new Set((oldProduct.media || []).map((m) => m.url));
+      const newMediaUrls = new Set((product.media || []).map((m) => m.url));
+
+      (oldProduct.media || []).forEach((m) => {
+        if (!newMediaUrls.has(m.url)) {
+          const mediaId = extractMediaIdFromUrl(m.url);
+          if (mediaId) {
+            this.eventEmitter.emit(
+              MediaEvent.IMAGE_DETACHED,
+              new ImageDetachedEvent(mediaId),
+            );
+          }
+        }
+      });
+
+      (product.media || []).forEach((m) => {
+        if (!oldMediaUrls.has(m.url)) {
+          const mediaId = extractMediaIdFromUrl(m.url);
+          if (mediaId) {
+            this.eventEmitter.emit(
+              MediaEvent.IMAGE_ATTACHED,
+              new ImageAttachedEvent(
+                mediaId,
+                (product._id as Types.ObjectId).toString(),
+                'product',
+              ),
+            );
+          }
+        }
+      });
     }
 
     return product;
