@@ -6,13 +6,13 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { config, Config } from './config';
+import { CmsModule } from './modules/cms/cms.module';
 import { CommunicationServiceModule } from './modules/communication-service/communication-service.module';
 import { MediaModule } from './modules/media/media.module';
 import { OrderServiceModule } from './modules/order-service/order-service.module';
 import { PaymentServiceModule } from './modules/payment-service/payment-service.module';
 import { ProductServiceModule } from './modules/product-service/product-service.module';
 import { UserServiceModule } from './modules/user-service/user-service.module';
-import { CmsModule } from './modules/cms/cms.module';
 
 @Module({
   imports: [
@@ -35,7 +35,7 @@ import { CmsModule } from './modules/cms/cms.module';
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 10,
+        limit: 100,
       },
     ]),
 

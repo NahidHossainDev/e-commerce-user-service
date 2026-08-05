@@ -19,9 +19,11 @@ import * as crypto from 'crypto';
 import { ClientSession, Connection, Model } from 'mongoose';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { AccountStatus, UserDocument, UserRole } from '../../user/user.schema';
+import { ForgotPasswordDto, ResetPasswordDto } from '../dto/forgot-password.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import {
   AUTH_EVENTS,
+  PasswordResetRequestedEvent,
   UserRegisteredEvent,
   UserResendVerificationEvent,
 } from '../events/auth.events';
@@ -195,6 +197,83 @@ export class AuthService {
     );
 
     return { message: 'Verification email resent' };
+  }
+
+  async forgotPassword(payload: ForgotPasswordDto) {
+    const email = payload.email.trim().toLowerCase();
+    const user = await this.userService.findByEmail(email, true);
+
+    if (user && user.accountStatus !== AccountStatus.DELETED) {
+      const secret = config.jwtSecretKey + user.password;
+      const tokenPayload = {
+        sub: user._id.toString(),
+        email: user.email,
+        type: 'password_reset',
+      };
+
+      const resetToken = this.jwtService.sign(tokenPayload, {
+        secret,
+        expiresIn: '15m',
+      });
+
+      this.eventEmitter.emit(
+        AUTH_EVENTS.PASSWORD_RESET_REQUESTED,
+        new PasswordResetRequestedEvent(
+          user._id.toString(),
+          user.email!,
+          resetToken,
+          user.profile?.fullName || '',
+        ),
+      );
+    }
+
+    // Always return a generic success message to prevent user enumeration
+    return {
+      message:
+        'If an account with that email exists, a password reset link has been sent.',
+    };
+  }
+
+  async resetPassword(payload: ResetPasswordDto) {
+    const { token, newPassword } = payload;
+
+    let unverifiedPayload: { sub?: string; type?: string };
+    try {
+      unverifiedPayload = this.jwtService.decode(token);
+    } catch {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    if (
+      !unverifiedPayload ||
+      !unverifiedPayload.sub ||
+      unverifiedPayload.type !== 'password_reset'
+    ) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const user = await this.userService.findOne(unverifiedPayload.sub, true);
+    if (!user || user.isDeleted) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const secret = config.jwtSecretKey + user.password;
+    try {
+      this.jwtService.verify(token, { secret });
+    } catch {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    user.password = newPassword;
+    if (!user.security) {
+      user.security = {} as any;
+    }
+    user.security.refreshTokenHash = undefined;
+    user.security.passwordChangedAt = new Date();
+
+    await user.save();
+
+    return { message: 'Password has been reset successfully.' };
   }
 
   async login(loginDto: LoginDto): Promise<{

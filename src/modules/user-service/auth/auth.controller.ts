@@ -22,6 +22,10 @@ import {
   MessageResponseDto,
   SanitizedUserDto,
 } from './dto/auth-response.dto';
+import {
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import {
   PhoneResendDto,
@@ -168,6 +172,38 @@ export class AuthController {
     @Body('email') email: string,
   ): Promise<MessageResponseDto> {
     return await this.authService.resendVerification(email);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Password Reset
+  // ---------------------------------------------------------------------------
+
+  @Post('forgot-password')
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @ApiOperation({ summary: 'Request password reset token via email' })
+  @ApiWrappedResponse({
+    status: 200,
+    description:
+      'Generates reset token and sends link if account exists with email.',
+    type: MessageResponseDto,
+  })
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<MessageResponseDto> {
+    return await this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Reset password using valid reset token' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Password reset successfully.',
+    type: MessageResponseDto,
+  })
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<MessageResponseDto> {
+    return await this.authService.resetPassword(resetPasswordDto);
   }
 
   // ---------------------------------------------------------------------------
