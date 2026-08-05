@@ -234,9 +234,7 @@ export class AuthService {
     };
   }
 
-  async resetPassword(payload: ResetPasswordDto) {
-    const { token, newPassword } = payload;
-
+  async verifyResetToken(token: string) {
     let unverifiedPayload: { sub?: string; type?: string };
     try {
       unverifiedPayload = this.jwtService.decode(token);
@@ -263,6 +261,13 @@ export class AuthService {
     } catch {
       throw new BadRequestException('Invalid or expired reset token');
     }
+
+    return { valid: true, user };
+  }
+
+  async resetPassword(payload: ResetPasswordDto) {
+    const { token, newPassword } = payload;
+    const { user } = await this.verifyResetToken(token);
 
     user.password = newPassword;
     if (!user.security) {

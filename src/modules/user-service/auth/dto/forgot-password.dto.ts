@@ -30,3 +30,12 @@ export class ResetPasswordDto {
   @MinLength(6)
   newPassword: string;
 }
+
+export class VerifyResetTokenDto {
+  @ApiProperty({
+    description: 'Password reset JWT token received in email',
+  })
+  @IsNotEmpty()
+  @IsString()
+  token: string;
+}

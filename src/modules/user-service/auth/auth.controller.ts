@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Post,
   Query,
   Request,
@@ -25,6 +26,7 @@ import {
 import {
   ForgotPasswordDto,
   ResetPasswordDto,
+  VerifyResetTokenDto,
 } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import {
@@ -191,6 +193,21 @@ export class AuthController {
     @Body() forgotPasswordDto: ForgotPasswordDto,
   ): Promise<MessageResponseDto> {
     return await this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('verify-reset-token')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Verify if a password reset token is valid' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Returns valid true if token is valid and active.',
+    type: MessageResponseDto,
+  })
+  async verifyResetToken(
+    @Body() verifyResetTokenDto: VerifyResetTokenDto,
+  ): Promise<MessageResponseDto> {
+    await this.authService.verifyResetToken(verifyResetTokenDto.token);
+    return { message: 'Reset token is valid.' };
   }
 
   @Post('reset-password')

@@ -433,6 +433,62 @@
         ]
       }
     },
+    "/auth/verify-reset-token": {
+      "post": {
+        "operationId": "AuthController_verifyResetToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyResetTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns valid true if token is valid and active.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Verify if a password reset token is valid",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/auth/reset-password": {
       "post": {
         "operationId": "AuthController_resetPassword",
@@ -8266,6 +8322,18 @@
         },
         "required": [
           "email"
+        ]
+      },
+      "VerifyResetTokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Password reset JWT token received in email"
+          }
+        },
+        "required": [
+          "token"
         ]
       },
       "ResetPasswordDto": {
