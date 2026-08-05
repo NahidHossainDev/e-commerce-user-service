@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   AUTH_EVENTS,
+  PasswordResetRequestedEvent,
   UserRegisteredEvent,
   UserResendVerificationEvent,
 } from '../../user-service/auth/events/auth.events';
@@ -44,6 +45,23 @@ export class NotificationListener {
     } catch (error) {
       this.logger.error(
         `Failed to resend verification email to ${event.email}`,
+        error,
+      );
+    }
+  }
+
+  @OnEvent(AUTH_EVENTS.PASSWORD_RESET_REQUESTED)
+  async handlePasswordResetRequestedEvent(event: PasswordResetRequestedEvent) {
+    this.logger.log(`Handling password reset requested event for: ${event.email}`);
+    try {
+      await this.notificationService.sendPasswordReset(
+        event.email,
+        event.token,
+        event.fullName,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to send password reset email to ${event.email}`,
         error,
       );
     }

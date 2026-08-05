@@ -3,6 +3,7 @@ import {
   EMAIL_PROVIDER,
   EmailProvider,
 } from './interfaces/email-provider.interface';
+import { resetPasswordTemplate } from './templates/reset-password.template';
 import { verifyEmailTemplate } from './templates/verify-email.template';
 
 @Injectable()
@@ -15,10 +16,12 @@ export class NotificationService {
 
   async sendEmailVerification(email: string, token: string, name: string) {
     try {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+      const verificationUrl = `${frontendUrl}/verify-email?token=${token}`;
       const template = verifyEmailTemplate({
         name,
         token,
-        url: `https://example.com/verify?token=${token}`, // In production, get from config/frontend URL
+        url: verificationUrl,
       });
 
       await this.emailProvider.send({
@@ -31,6 +34,33 @@ export class NotificationService {
       return true;
     } catch (error) {
       this.logger.error(`Failed to send email verification to ${email}`, error);
+      throw error;
+    }
+  }
+
+  async sendPasswordReset(email: string, token: string, name: string) {
+    try {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+      const resetUrl = `${frontendUrl}/reset-password?token=${token}`;
+
+      const template = resetPasswordTemplate({
+        name,
+        url: resetUrl,
+      });
+
+      await this.emailProvider.send({
+        to: email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+      });
+
+      return true;
+    } catch (error) {
+      this.logger.error(
+        `Failed to send password reset email to ${email}`,
+        error,
+      );
       throw error;
     }
   }
