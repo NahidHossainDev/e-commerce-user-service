@@ -214,9 +214,12 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.pre('save', async function (this: UserDocument) {
-  this.password = await bcrypt?.hash(this.password, Number(config.saltRound));
-  if (this.security.passwordChangedAt)
-    this.security.passwordChangedAt = new Date();
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, Number(config.saltRound));
+    if (this.security) {
+      this.security.passwordChangedAt = new Date();
+    }
+  }
 });
 
 // UserSchema.index({ email: 1 }, { unique: true });

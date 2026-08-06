@@ -545,6 +545,67 @@
         ]
       }
     },
+    "/auth/change-password": {
+      "post": {
+        "operationId": "AuthController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MessageResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Change logged-in user password",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/auth/phone/start": {
       "post": {
         "operationId": "AuthController_phoneStart",
@@ -8354,6 +8415,25 @@
           "newPassword"
         ]
       },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "example": "current-password",
+            "description": "Current user password"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "new-secure-password",
+            "description": "New password (minimum 6 characters)"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
       "PhoneStartDto": {
         "type": "object",
         "properties": {
@@ -8776,10 +8856,6 @@
           "phoneNumber": {
             "type": "string",
             "example": "+880123456789"
-          },
-          "password": {
-            "type": "string",
-            "example": "secrete-password"
           },
           "provider": {
             "type": "string",

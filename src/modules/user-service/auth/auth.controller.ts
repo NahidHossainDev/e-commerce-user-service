@@ -23,6 +23,7 @@ import {
   MessageResponseDto,
   SanitizedUserDto,
 } from './dto/auth-response.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import {
   ForgotPasswordDto,
   ResetPasswordDto,
@@ -221,6 +222,25 @@ export class AuthController {
     @Body() resetPasswordDto: ResetPasswordDto,
   ): Promise<MessageResponseDto> {
     return await this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('change-password')
+  @ApiOperation({ summary: 'Change logged-in user password' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Password changed successfully.',
+    type: MessageResponseDto,
+  })
+  async changePassword(
+    @CurrentUser() user: UserDocument,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ): Promise<MessageResponseDto> {
+    return await this.authService.changePassword(
+      user._id.toString(),
+      changePasswordDto,
+    );
   }
 
   // ---------------------------------------------------------------------------

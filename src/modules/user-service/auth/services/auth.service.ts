@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -10,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { config } from 'src/config';
 import { UserService } from 'src/modules/user-service/user/user.service';
 import { AUTH_CONSTANTS } from '../constants/auth.constants';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import { LoginDto } from '../dto/login.dto';
 import { RegisterDto } from '../dto/register.dto';
 
@@ -19,7 +21,10 @@ import * as crypto from 'crypto';
 import { ClientSession, Connection, Model } from 'mongoose';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { AccountStatus, UserDocument, UserRole } from '../../user/user.schema';
-import { ForgotPasswordDto, ResetPasswordDto } from '../dto/forgot-password.dto';
+import {
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from '../dto/forgot-password.dto';
 import { VerifyEmailDto } from '../dto/verify-email.dto';
 import {
   AUTH_EVENTS,
@@ -70,7 +75,8 @@ export class AuthService {
         );
 
         return {
-          message: 'We sent you a verification email. Please verify to continue.',
+          message:
+            'We sent you a verification email. Please verify to continue.',
         };
       }
 
@@ -456,9 +462,44 @@ export class AuthService {
     };
   }
 
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const { currentPassword, newPassword } = changePasswordDto;
+
+    if (currentPassword === newPassword) {
+      throw new BadRequestException(
+        'New password cannot be the same as current password',
+      );
+    }
+
+    const user = await this.userService.findOne(userId, true);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid current password');
+    }
+
+    user.password = newPassword;
+    if (!user.security) {
+      user.security = {} as any;
+    }
+    user.security.refreshTokenHash = undefined;
+    user.security.passwordChangedAt = new Date();
+
+    await user.save();
+
+    return { message: 'Password changed successfully.' };
+  }
+
   async getMe(userId: string) {
     const user = await this.userService.findOne(userId);
-    return this.sanitizeUser(user);
+    return user;
+    // return this.sanitizeUser(user);
   }
 
   private async createVerificationToken(

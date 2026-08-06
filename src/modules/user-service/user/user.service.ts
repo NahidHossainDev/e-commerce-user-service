@@ -73,7 +73,9 @@ export class UserService {
     const oldUser = await this.userModel.findById(id);
     if (!oldUser) throw new NotFoundException('User not found');
 
-    const updated = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
+    const { password, ...updatePayload } = updateUserDto as any;
+
+    const updated = await this.userModel.findByIdAndUpdate(id, updatePayload, {
       new: true,
     });
 
