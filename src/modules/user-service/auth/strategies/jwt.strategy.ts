@@ -8,7 +8,10 @@ import { UserService } from 'src/modules/user-service/user/user.service';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private userService: UserService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        (req: any) => req?.cookies?.accessToken || req?.cookies?.COOKIE_ACCESS_TOKEN,
+      ]),
       ignoreExpiration: false,
       secretOrKey: config.jwtSecretKey,
     });
