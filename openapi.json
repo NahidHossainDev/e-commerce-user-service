@@ -1544,6 +1544,7 @@
             "in": "query",
             "description": "Page number",
             "schema": {
+              "default": 1,
               "type": "number"
             }
           },
@@ -1551,8 +1552,11 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Items per page",
+            "description": "Items per page (maximum 30 for public listing)",
             "schema": {
+              "minimum": 1,
+              "maximum": 30,
+              "default": 12,
               "type": "number"
             }
           },
@@ -1560,8 +1564,9 @@
             "name": "sortBy",
             "required": false,
             "in": "query",
-            "description": "Sort field",
+            "description": "Field to sort by",
             "schema": {
+              "default": "createdAt",
               "type": "string"
             }
           },
@@ -1571,13 +1576,19 @@
             "in": "query",
             "description": "Sort order",
             "schema": {
-              "type": "string"
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
             }
           },
           {
             "name": "searchTerm",
             "required": false,
             "in": "query",
+            "description": "Search across title, description, tags, keywords, sku",
             "schema": {
               "type": "string"
             }
@@ -1586,22 +1597,43 @@
             "name": "categoryId",
             "required": false,
             "in": "query",
+            "description": "Category ID, comma-separated IDs, or array of IDs",
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Category ID, name, comma-separated values, or array of values",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
             }
           },
           {
             "name": "brandId",
             "required": false,
             "in": "query",
+            "description": "Brand ID, comma-separated IDs, or array of IDs",
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "brand",
+            "required": false,
+            "in": "query",
+            "description": "Brand ID, name, comma-separated values, or array of values",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
             }
           },
           {
             "name": "minPrice",
             "required": false,
             "in": "query",
+            "description": "Minimum price",
             "schema": {
               "type": "number"
             }
@@ -1610,6 +1642,7 @@
             "name": "maxPrice",
             "required": false,
             "in": "query",
+            "description": "Maximum price",
             "schema": {
               "type": "number"
             }
@@ -1618,7 +1651,9 @@
             "name": "status",
             "required": false,
             "in": "query",
+            "description": "Product status",
             "schema": {
+              "default": "ACTIVE",
               "type": "string",
               "enum": [
                 "DRAFT",
@@ -1636,6 +1671,7 @@
             "name": "vendorId",
             "required": false,
             "in": "query",
+            "description": "Vendor ID",
             "schema": {
               "type": "string"
             }
@@ -1644,6 +1680,7 @@
             "name": "isFeatured",
             "required": false,
             "in": "query",
+            "description": "Filter featured products",
             "schema": {
               "type": "boolean"
             }
@@ -1652,6 +1689,7 @@
             "name": "isOnOffer",
             "required": false,
             "in": "query",
+            "description": "Filter products on offer",
             "schema": {
               "type": "boolean"
             }
@@ -1660,6 +1698,7 @@
             "name": "isBestSeller",
             "required": false,
             "in": "query",
+            "description": "Filter best seller products",
             "schema": {
               "type": "boolean"
             }
@@ -1668,6 +1707,7 @@
             "name": "isNew",
             "required": false,
             "in": "query",
+            "description": "Filter new products",
             "schema": {
               "type": "boolean"
             }
@@ -1676,6 +1716,7 @@
             "name": "isPerishable",
             "required": false,
             "in": "query",
+            "description": "Filter perishable products",
             "schema": {
               "type": "boolean"
             }
@@ -1905,6 +1946,7 @@
             "in": "query",
             "description": "Page number",
             "schema": {
+              "default": 1,
               "type": "number"
             }
           },
@@ -1912,8 +1954,11 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Items per page",
+            "description": "Items per page (maximum 30 for public listing)",
             "schema": {
+              "minimum": 1,
+              "maximum": 30,
+              "default": 12,
               "type": "number"
             }
           },
@@ -1921,8 +1966,9 @@
             "name": "sortBy",
             "required": false,
             "in": "query",
-            "description": "Sort field",
+            "description": "Field to sort by",
             "schema": {
+              "default": "createdAt",
               "type": "string"
             }
           },
@@ -1932,13 +1978,19 @@
             "in": "query",
             "description": "Sort order",
             "schema": {
-              "type": "string"
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
             }
           },
           {
             "name": "searchTerm",
             "required": false,
             "in": "query",
+            "description": "Search across title, description, tags, keywords, sku",
             "schema": {
               "type": "string"
             }
@@ -1947,22 +1999,43 @@
             "name": "categoryId",
             "required": false,
             "in": "query",
+            "description": "Category ID, comma-separated IDs, or array of IDs",
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Category ID, name, comma-separated values, or array of values",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
             }
           },
           {
             "name": "brandId",
             "required": false,
             "in": "query",
+            "description": "Brand ID, comma-separated IDs, or array of IDs",
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "brand",
+            "required": false,
+            "in": "query",
+            "description": "Brand ID, name, comma-separated values, or array of values",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
             }
           },
           {
             "name": "minPrice",
             "required": false,
             "in": "query",
+            "description": "Minimum price",
             "schema": {
               "type": "number"
             }
@@ -1971,6 +2044,7 @@
             "name": "maxPrice",
             "required": false,
             "in": "query",
+            "description": "Maximum price",
             "schema": {
               "type": "number"
             }
@@ -1979,7 +2053,9 @@
             "name": "status",
             "required": false,
             "in": "query",
+            "description": "Product status",
             "schema": {
+              "default": "ACTIVE",
               "type": "string",
               "enum": [
                 "DRAFT",
@@ -1997,6 +2073,7 @@
             "name": "vendorId",
             "required": false,
             "in": "query",
+            "description": "Vendor ID",
             "schema": {
               "type": "string"
             }
@@ -2005,6 +2082,7 @@
             "name": "isFeatured",
             "required": false,
             "in": "query",
+            "description": "Filter featured products",
             "schema": {
               "type": "boolean"
             }
@@ -2013,6 +2091,7 @@
             "name": "isOnOffer",
             "required": false,
             "in": "query",
+            "description": "Filter products on offer",
             "schema": {
               "type": "boolean"
             }
@@ -2021,6 +2100,7 @@
             "name": "isBestSeller",
             "required": false,
             "in": "query",
+            "description": "Filter best seller products",
             "schema": {
               "type": "boolean"
             }
@@ -2029,6 +2109,7 @@
             "name": "isNew",
             "required": false,
             "in": "query",
+            "description": "Filter new products",
             "schema": {
               "type": "boolean"
             }
@@ -2037,6 +2118,7 @@
             "name": "isPerishable",
             "required": false,
             "in": "query",
+            "description": "Filter perishable products",
             "schema": {
               "type": "boolean"
             }
@@ -9592,6 +9674,10 @@
           "data",
           "meta"
         ]
+      },
+      "Object": {
+        "type": "object",
+        "properties": {}
       },
       "PriceDto": {
         "type": "object",

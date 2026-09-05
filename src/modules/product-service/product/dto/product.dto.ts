@@ -345,3 +345,5 @@ export class CreateProductDto {
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
+
+export * from './product-query-options.dto';

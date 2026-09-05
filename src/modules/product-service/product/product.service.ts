@@ -129,30 +129,16 @@ export class ProductService {
       queryDto,
       paginateOptions as unknown as (keyof ProductQueryDto)[],
     );
-    const filters = pick(queryDto, PRODUCT_FILTER_FIELDS);
-
-    const {
-      searchTerm,
-      categoryId,
-      brandId,
-      minPrice,
-      maxPrice,
-      ...remainingFilters
-    } = filters;
-
-    const filterQuery: FilterQuery<ProductDocument> = {
-      isDeleted: false,
-      status: ProductStatus.ACTIVE,
-      ...remainingFilters,
-    };
-
-    this.applySearchFilters(filterQuery, searchTerm);
-    this.applyIdFilters(filterQuery, categoryId, brandId);
-    this.applyPriceFilters(filterQuery, minPrice, maxPrice);
+    const filterQuery = this.buildProductFilter(queryDto, true);
 
     const pagination = paginationHelpers.calculatePagination(
-      paginateQueries as any, // Cast to avoid strict type error vs helper signature
+      paginateQueries as any,
     );
+    // Public safety cap: Maximum 30 products per page
+    if (pagination.limit > 30) {
+      pagination.limit = 30;
+      pagination.skip = (pagination.page - 1) * pagination.limit;
+    }
     this.applySorting(pagination);
 
     const result = await getPaginatedData<ProductDocument>({
@@ -162,12 +148,22 @@ export class ProductService {
       populate: ['categoryId', 'brandId', 'subCategoryIds'],
     });
 
-    result.data = result.data.map((item) => {
-      const obj = item.toObject ? item.toObject() : item;
+    result.data = result.data.map((item: any) => {
+      const obj = item.toObject ? item.toObject() : { ...item };
       delete obj.vendorId;
       delete obj.isDeleted;
       delete obj.deletedAt;
       delete obj.lastStockSyncAt;
+
+      if (obj.categoryId && !obj.category) {
+        obj.category = obj.categoryId;
+      }
+      if (obj.brandId && !obj.brand) {
+        obj.brand = obj.brandId;
+      }
+      if (obj.subCategoryIds && !obj.subCategories) {
+        obj.subCategories = obj.subCategoryIds;
+      }
       return obj;
     });
 
@@ -179,27 +175,7 @@ export class ProductService {
       queryDto,
       paginateOptions as unknown as (keyof ProductQueryDto)[],
     );
-    const filters = pick(queryDto, PRODUCT_FILTER_FIELDS);
-
-    const {
-      searchTerm,
-      categoryId,
-      brandId,
-      vendorId,
-      minPrice,
-      maxPrice,
-      ...remainingFilters
-    } = filters;
-
-    const filterQuery: FilterQuery<ProductDocument> = {
-      ...remainingFilters,
-    };
-
-    if (vendorId) filterQuery.vendorId = new Types.ObjectId(vendorId);
-
-    this.applySearchFilters(filterQuery, searchTerm);
-    this.applyIdFilters(filterQuery, categoryId, brandId);
-    this.applyPriceFilters(filterQuery, minPrice, maxPrice);
+    const filterQuery = this.buildProductFilter(queryDto, false);
 
     const pagination = paginationHelpers.calculatePagination(
       paginateQueries as any,
@@ -213,6 +189,7 @@ export class ProductService {
       populate: [
         { path: 'categoryId', select: 'name' },
         { path: 'brandId', select: 'name logo' },
+        { path: 'subCategoryIds', select: 'name' },
       ],
     });
   }
@@ -427,7 +404,9 @@ export class ProductService {
     if (!ids || ids.length === 0) {
       return [];
     }
-    const objectIds = ids
+    // Safety cap: Maximum 30 IDs per request for public lookup
+    const safeIds = ids.slice(0, 30);
+    const objectIds = safeIds
       .filter((id) => Types.ObjectId.isValid(id))
       .map((id) => new Types.ObjectId(id));
 
@@ -447,7 +426,7 @@ export class ProductService {
       ]),
     );
     const result: ProductDocument[] = [];
-    for (const id of ids) {
+    for (const id of safeIds) {
       const found = productMap.get(id);
       if (found) {
         result.push(found);
@@ -458,39 +437,133 @@ export class ProductService {
 
   // --- Private Helpers ---
 
-  private applySearchFilters(filterQuery: any, searchTerm?: string) {
-    if (!searchTerm) return;
+  private buildProductFilter(
+    query: ProductQueryDto,
+    isPublic = true,
+  ): FilterQuery<ProductDocument> {
+    const filter: FilterQuery<ProductDocument> = {};
 
-    if (Types.ObjectId.isValid(searchTerm)) {
-      filterQuery._id = new Types.ObjectId(searchTerm);
-      return;
+    if (isPublic) {
+      filter.isDeleted = false;
+      filter.status = query.status
+        ? (query.status as ProductStatus)
+        : ProductStatus.ACTIVE;
+    } else {
+      if (query.status) {
+        filter.status = query.status as ProductStatus;
+      }
     }
 
-    filterQuery['$or'] = PRODUCT_SEARCH_FIELDS.filter(
-      (field) => field !== '_id',
-    ).map((field) => ({ [field]: { $regex: searchTerm, $options: 'i' } }));
-  }
-
-  private applyIdFilters(
-    filterQuery: any,
-    categoryId?: string,
-    brandId?: string,
-  ) {
-    if (categoryId) filterQuery.categoryId = new Types.ObjectId(categoryId);
-    if (brandId) filterQuery.brandId = new Types.ObjectId(brandId);
-  }
-
-  private applyPriceFilters(
-    filterQuery: any,
-    minPrice?: number,
-    maxPrice?: number,
-  ) {
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      filterQuery['price.basePrice'] = {
-        ...(minPrice !== undefined && { $gte: minPrice }),
-        ...(maxPrice !== undefined && { $lte: maxPrice }),
-      };
+    if (query.vendorId && Types.ObjectId.isValid(query.vendorId)) {
+      filter.vendorId = new Types.ObjectId(query.vendorId);
     }
+
+    const normalizeToArray = (val: any): string[] => {
+      if (!val) return [];
+      if (Array.isArray(val)) {
+        return val
+          .flatMap((v) => (typeof v === 'string' ? v.split(',') : [v]))
+          .map((s) => String(s).trim())
+          .filter(Boolean);
+      }
+      if (typeof val === 'string') {
+        return val
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+      return [String(val)];
+    };
+
+    // 1. Brand Filter (brandId / brand) - supports single, comma-separated, or array of IDs
+    const brandRaw = query.brandId || query.brand;
+    const brandVals = normalizeToArray(brandRaw);
+    if (brandVals.length > 0) {
+      const objectIds = brandVals
+        .filter((id) => Types.ObjectId.isValid(id))
+        .map((id) => new Types.ObjectId(id));
+      const matchValues = [...brandVals, ...objectIds];
+
+      filter.$and = filter.$and || [];
+      filter.$and.push({
+        $or: [
+          { 'brand.id': { $in: matchValues } },
+          { 'brand._id': { $in: matchValues } },
+          { brand: { $in: matchValues } },
+          { brandId: { $in: matchValues } },
+        ],
+      });
+    }
+
+    // 2. Category Filter (categoryId / category) - supports single, comma-separated, or array of IDs
+    const catRaw = query.categoryId || query.category;
+    const catVals = normalizeToArray(catRaw);
+    if (catVals.length > 0) {
+      const objectIds = catVals
+        .filter((id) => Types.ObjectId.isValid(id))
+        .map((id) => new Types.ObjectId(id));
+      const matchValues = [...catVals, ...objectIds];
+
+      filter.$and = filter.$and || [];
+      filter.$and.push({
+        $or: [
+          { 'category.id': { $in: matchValues } },
+          { 'category._id': { $in: matchValues } },
+          { category: { $in: matchValues } },
+          { categoryId: { $in: matchValues } },
+          { 'subCategories.id': { $in: matchValues } },
+          { 'subCategories._id': { $in: matchValues } },
+          { subCategoryIds: { $in: matchValues } },
+        ],
+      });
+    }
+
+    // 3. Search Filter (searchTerm)
+    if (query.searchTerm && query.searchTerm.trim()) {
+      const term = query.searchTerm.trim();
+      const regex = new RegExp(term, 'i');
+      const searchConditions: any[] = [
+        { title: { $regex: regex } },
+        { description: { $regex: regex } },
+        { tags: { $in: [regex] } },
+        { keywords: { $in: [regex] } },
+      ];
+      if (Types.ObjectId.isValid(term)) {
+        searchConditions.push({ _id: new Types.ObjectId(term) });
+      }
+      filter.$and = filter.$and || [];
+      filter.$and.push({ $or: searchConditions });
+    }
+
+    // 4. Price Range Filter (minPrice, maxPrice)
+    if (query.minPrice !== undefined || query.maxPrice !== undefined) {
+      const priceCond: Record<string, number> = {};
+      if (query.minPrice !== undefined && !isNaN(Number(query.minPrice))) {
+        priceCond.$gte = Number(query.minPrice);
+      }
+      if (query.maxPrice !== undefined && !isNaN(Number(query.maxPrice))) {
+        priceCond.$lte = Number(query.maxPrice);
+      }
+
+      if (Object.keys(priceCond).length > 0) {
+        filter.$and = filter.$and || [];
+        filter.$and.push({
+          $or: [
+            { 'price.discountPrice': priceCond },
+            { 'price.basePrice': priceCond },
+          ],
+        });
+      }
+    }
+
+    // 5. Boolean Flags
+    if (typeof query.isOnOffer === 'boolean') filter.isOnOffer = query.isOnOffer;
+    if (typeof query.isBestSeller === 'boolean') filter.isBestSeller = query.isBestSeller;
+    if (typeof query.isFeatured === 'boolean') filter.isFeatured = query.isFeatured;
+    if (typeof query.isNew === 'boolean') filter.isNew = query.isNew;
+    if (typeof query.isPerishable === 'boolean') filter.isPerishable = query.isPerishable;
+
+    return filter;
   }
 
   private applySorting(pagination: any) {
@@ -499,6 +572,8 @@ export class ProductService {
       const field = Object.keys(sortOption)[0];
       pagination.sortBy = field;
       pagination.sortOrder = sortOption[field];
+    } else if (pagination.sortBy === 'price') {
+      pagination.sortBy = 'price.discountPrice';
     }
   }
 

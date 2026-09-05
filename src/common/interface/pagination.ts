@@ -14,10 +14,12 @@ export interface IPaginateCalculateResult
 export interface IPaginatedResponse<T> {
   data: T[];
   meta: {
+    total?: number;
     totalCount: number;
     totalPages: number;
     limit: number;
     page: number;
     nextPage: number | null;
+    prevPage?: number | null;
   };
 }

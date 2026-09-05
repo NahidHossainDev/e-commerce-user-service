@@ -218,6 +218,9 @@ export class ProductResponseDto {
 }
 
 export class PaginationMetaDto {
+  @ApiProperty({ example: 100, required: false })
+  total?: number;
+
   @ApiProperty({ example: 100 })
   totalCount: number;
 
@@ -232,6 +235,9 @@ export class PaginationMetaDto {
 
   @ApiProperty({ example: 2, nullable: true })
   nextPage: number | null;
+
+  @ApiProperty({ example: 1, nullable: true, required: false })
+  prevPage?: number | null;
 }
 
 export class PaginatedProductsResponseDto {

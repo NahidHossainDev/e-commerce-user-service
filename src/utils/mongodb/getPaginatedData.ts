@@ -60,14 +60,17 @@ export async function getPaginatedData<T extends Document>({
 
   const totalPages = totalCount > 0 ? Math.ceil(totalCount / limit) : 0;
   const nextPage = page < totalPages ? page + 1 : null;
+  const prevPage = page > 1 ? page - 1 : null;
 
   return {
     meta: {
+      total: totalCount,
       totalCount,
       page,
-      nextPage,
       limit,
       totalPages: totalPages,
+      nextPage,
+      prevPage,
     },
     data: data as T[],
   };
