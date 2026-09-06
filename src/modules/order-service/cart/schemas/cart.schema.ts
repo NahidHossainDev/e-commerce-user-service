@@ -15,6 +15,9 @@ export class CartItem {
   @Prop({ required: true })
   productThumbnail: string;
 
+  @Prop({ type: String, default: '' })
+  slug?: string;
+
   @Prop({ type: String })
   variantSku?: string;
 
@@ -26,6 +29,9 @@ export class CartItem {
 
   @Prop({ default: Date.now })
   addedAt: Date;
+
+  @Prop({ default: Date.now })
+  updatedAt: Date;
 
   @Prop({ default: false })
   isOutOfStock: boolean;

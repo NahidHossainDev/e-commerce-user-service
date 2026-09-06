@@ -63,7 +63,7 @@ export class OrderService {
   ) {}
 
   async checkout(userId: string, payload: CheckoutDto): Promise<OrderDocument> {
-    const cart = await this.cartService.getCart(userId);
+    const cart = await this.cartService.getCartDocument(userId);
 
     if (!cart || cart.items.length === 0) {
       throw new BadRequestException('Cart is empty');
@@ -444,7 +444,7 @@ export class OrderService {
   }
 
   async applyCoupon(userId: string, dto: ApplyCouponDto): Promise<BillingInfo> {
-    const cart = await this.cartService.getCart(userId);
+    const cart = await this.cartService.getCartDocument(userId);
 
     // Validate coupon
     const coupon = await this.couponService.validateCoupon({
@@ -457,7 +457,7 @@ export class OrderService {
   }
 
   async removeCoupon(userId: string): Promise<BillingInfo> {
-    const cart = await this.cartService.getCart(userId);
+    const cart = await this.cartService.getCartDocument(userId);
     return this.calculateBilling(cart);
   }
 

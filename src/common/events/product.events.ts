@@ -24,6 +24,7 @@ export interface IProductAvailabilityResult {
   price: Price;
   title: string;
   thumbnail: string;
+  slug?: string;
   availableStock: number;
   error?: string;
   variantSku?: string;
@@ -35,6 +36,7 @@ export class ProductAvailabilityResult {
   public readonly price: Price;
   public readonly title: string;
   public readonly thumbnail: string;
+  public readonly slug?: string;
   public readonly availableStock: number;
   public readonly error?: string;
   public readonly variantSku?: string;
@@ -45,6 +47,7 @@ export class ProductAvailabilityResult {
     this.price = params.price;
     this.title = params.title;
     this.thumbnail = params.thumbnail;
+    this.slug = params.slug;
     this.availableStock = params.availableStock;
     this.error = params.error;
     this.variantSku = params.variantSku;

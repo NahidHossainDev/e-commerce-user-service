@@ -14,9 +14,40 @@ import {
 import {
   AddToCartDto,
   CheckoutPreviewDto,
+  MergeCartItemDto,
   UpdateCartItemDto,
 } from './dto/cart.dto';
 import { Cart, CartDocument, CartItem } from './schemas/cart.schema';
+
+export interface FormattedCartItem {
+  id: string;
+  productId: string;
+  title: string;
+  thumbnail: string;
+  slug: string;
+  variantSku?: string;
+  price: number;
+  discountPrice: number;
+  quantity: number;
+  stock: number;
+  isOutOfStock: boolean;
+  selected: boolean;
+  updatedAt: number;
+}
+
+export interface FormattedCartSummary {
+  totalAmount: number;
+  totalDiscount: number;
+  payableAmount: number;
+  totalItems: number;
+}
+
+export interface FormattedCartResponse {
+  _id: string;
+  userId: string;
+  items: FormattedCartItem[];
+  cartSummary: FormattedCartSummary;
+}
 
 @Injectable()
 export class CartService {
@@ -25,22 +56,29 @@ export class CartService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async getCart(userId: string): Promise<CartDocument> {
-    const cart = await this.cartModel.findOne({
+  async getCart(userId: string): Promise<FormattedCartResponse> {
+    let cart = await this.cartModel.findOne({
       userId: new Types.ObjectId(userId),
     });
-    if (!cart) throw new NotFoundException('Cart not found');
 
-    // Real-time stock validation
-    await this.syncCartWithProductStock(cart);
+    if (!cart) {
+      cart = new this.cartModel({
+        userId: new Types.ObjectId(userId),
+        items: [],
+      });
+      await cart.save();
+    } else {
+      // Real-time stock validation
+      await this.syncCartWithProductStock(cart);
+    }
 
-    return cart;
+    return this.formatCartResponse(cart);
   }
 
   async addToCart(
     userId: string,
     payload: AddToCartDto,
-  ): Promise<CartDocument> {
+  ): Promise<FormattedCartResponse> {
     // Emit Event to check Product Availability
     const [result] = (await this.eventEmitter.emitAsync(
       ProductEvents.CHECK_AVAILABILITY,
@@ -80,16 +118,19 @@ export class CartService {
     if (existingItem) {
       existingItem.quantity += payload.quantity;
       existingItem.availableStock = result.availableStock;
+      existingItem.updatedAt = new Date();
     } else {
       const item: CartItem = {
         productId: new Types.ObjectId(payload.productId),
         productName: result.title,
         productThumbnail: result.thumbnail,
+        slug: result.slug || '',
         price: result.price,
         availableStock: result.availableStock,
         variantSku: payload.variantSku,
         quantity: payload.quantity,
         addedAt: new Date(),
+        updatedAt: new Date(),
         isOutOfStock: false,
         isSelected: true,
       };
@@ -97,23 +138,32 @@ export class CartService {
     }
 
     this.calculateTotals(cart);
-    return cart.save();
+    await cart.save();
+    return this.formatCartResponse(cart);
   }
 
   async updateItemQuantity(
     userId: string,
-    productId: string,
+    itemId: string,
     dto: UpdateCartItemDto,
-  ): Promise<CartDocument> {
-    const cart = await this.getCart(userId);
+  ): Promise<FormattedCartResponse> {
+    const cart = await this.getCartDocument(userId);
+
+    let targetProductId = itemId;
+    let targetVariantSku = dto.variantSku;
+    if (itemId && itemId.includes('::')) {
+      const parts = itemId.split('::');
+      targetProductId = parts[0];
+      targetVariantSku = targetVariantSku || parts[1];
+    }
 
     // Check product availability with new quantity
     const [result] = (await this.eventEmitter.emitAsync(
       ProductEvents.CHECK_AVAILABILITY,
       new ProductCheckAvailabilityEvent({
-        productId,
+        productId: targetProductId,
         quantity: dto.quantity,
-        variantSku: dto.variantSku,
+        variantSku: targetVariantSku,
       }),
     )) as ProductAvailabilityResult[];
 
@@ -125,8 +175,8 @@ export class CartService {
 
     const item = cart.items.find(
       (item) =>
-        item.productId.toString() === productId &&
-        (!dto.variantSku || item.variantSku === dto.variantSku),
+        item.productId.toString() === targetProductId &&
+        (!targetVariantSku || item.variantSku === targetVariantSku),
     );
 
     if (!item) {
@@ -134,34 +184,47 @@ export class CartService {
     }
 
     item.quantity = dto.quantity;
+    item.availableStock = result.availableStock;
     item.isOutOfStock = false;
+    item.updatedAt = new Date();
 
     this.calculateTotals(cart);
-    return cart.save();
+    await cart.save();
+    return this.formatCartResponse(cart);
   }
 
   async removeItem(
     userId: string,
-    productId: string,
+    itemId: string,
     variantSku?: string,
-  ): Promise<CartDocument> {
-    const cart = await this.getCart(userId);
+  ): Promise<FormattedCartResponse> {
+    const cart = await this.getCartDocument(userId);
+
+    let targetProductId = itemId;
+    let targetVariantSku = variantSku;
+    if (itemId && itemId.includes('::')) {
+      const parts = itemId.split('::');
+      targetProductId = parts[0];
+      targetVariantSku = targetVariantSku || parts[1];
+    }
+
     cart.items = cart.items.filter(
       (item) =>
         !(
-          item.productId.toString() === productId &&
-          (!variantSku || item.variantSku === variantSku)
+          item.productId.toString() === targetProductId &&
+          (!targetVariantSku || item.variantSku === targetVariantSku)
         ),
     );
     this.calculateTotals(cart);
-    return cart.save();
+    await cart.save();
+    return this.formatCartResponse(cart);
   }
 
   async checkoutPreview(
     userId: string,
     _dto: CheckoutPreviewDto,
-  ): Promise<CartDocument> {
-    const cart = await this.getCart(userId);
+  ): Promise<FormattedCartResponse> {
+    const cart = await this.getCartDocument(userId);
 
     // Check if any items are out of stock
     const outOfStockItems = cart.items.filter((item) => item.isOutOfStock);
@@ -191,8 +254,9 @@ export class CartService {
 
     // Recalculate totals to ensure accuracy
     this.calculateTotals(cart);
+    await cart.save();
 
-    return cart;
+    return this.formatCartResponse(cart);
   }
 
   async clearCart(userId: string, session?: any): Promise<void> {
@@ -211,6 +275,91 @@ export class CartService {
       .session(session || null);
   }
 
+  async mergeCart(
+    userId: string,
+    guestItems: MergeCartItemDto[],
+  ): Promise<FormattedCartResponse> {
+    const userObjectId = new Types.ObjectId(userId);
+    let cart = await this.cartModel.findOne({ userId: userObjectId });
+
+    if (!cart) {
+      cart = new this.cartModel({ userId: userObjectId, items: [] });
+    }
+
+    if (guestItems && guestItems.length > 0) {
+      // Map existing server items by composite key `${productId}::${variantSku || ''}`
+      const itemMap = new Map<string, CartItem>();
+      for (const sItem of cart.items) {
+        const key = `${sItem.productId.toString()}::${sItem.variantSku || ''}`;
+        itemMap.set(key, sItem);
+      }
+
+      for (const gItem of guestItems) {
+        const key = `${gItem.productId}::${gItem.variantSku || ''}`;
+        const existing = itemMap.get(key);
+
+        if (existing) {
+          const guestTime = gItem.updatedAt
+            ? new Date(gItem.updatedAt).getTime()
+            : Date.now();
+          const serverTime = existing.updatedAt
+            ? new Date(existing.updatedAt).getTime()
+            : 0;
+
+          if (guestTime >= serverTime) {
+            existing.quantity = gItem.quantity;
+            existing.updatedAt = new Date(guestTime);
+          }
+        } else {
+          // Fetch product snapshot & availability
+          const [result] = (await this.eventEmitter.emitAsync(
+            ProductEvents.CHECK_AVAILABILITY,
+            new ProductCheckAvailabilityEvent({
+              productId: gItem.productId,
+              quantity: gItem.quantity,
+              variantSku: gItem.variantSku,
+            }),
+          )) as ProductAvailabilityResult[];
+
+          if (result) {
+            const newItem: CartItem = {
+              productId: new Types.ObjectId(gItem.productId),
+              productName: result.title || 'Product',
+              productThumbnail: result.thumbnail || '',
+              slug: result.slug || '',
+              price: result.price,
+              availableStock: result.availableStock ?? 0,
+              variantSku: gItem.variantSku,
+              quantity: gItem.quantity,
+              addedAt: gItem.updatedAt ? new Date(gItem.updatedAt) : new Date(),
+              updatedAt: gItem.updatedAt
+                ? new Date(gItem.updatedAt)
+                : new Date(),
+              isOutOfStock: !result.isAvailable,
+              isSelected: true,
+            };
+            cart.items.push(newItem);
+            itemMap.set(key, newItem);
+          }
+        }
+      }
+    }
+
+    // Real-time stock validation, pricing sync, totals calculation, and save
+    await this.syncCartWithProductStock(cart);
+
+    return this.formatCartResponse(cart);
+  }
+
+  async getCartDocument(userId: string): Promise<CartDocument> {
+    const cart = await this.cartModel.findOne({
+      userId: new Types.ObjectId(userId),
+    });
+    if (!cart) throw new NotFoundException('Cart not found');
+    await this.syncCartWithProductStock(cart);
+    return cart;
+  }
+
   private async syncCartWithProductStock(cart: CartDocument): Promise<void> {
     for (const item of cart.items) {
       const [result] = (await this.eventEmitter.emitAsync(
@@ -222,13 +371,14 @@ export class CartService {
         }),
       )) as ProductAvailabilityResult[];
 
-      if (!result || !result.isAvailable) {
-        item.isOutOfStock = true;
-        item.availableStock = result.availableStock;
-      } else {
-        item.isOutOfStock = false;
-        item.availableStock = result.availableStock;
-        item.price = result.price;
+      item.isOutOfStock = !result?.isAvailable;
+      item.availableStock = result?.availableStock ?? 0;
+
+      if (result) {
+        item.price = result.price || item.price;
+        item.slug = result.slug || item.slug;
+        item.productName = result.title || item.productName;
+        item.productThumbnail = result.thumbnail || item.productThumbnail;
       }
     }
 
@@ -239,7 +389,7 @@ export class CartService {
   private calculateTotals(cart: CartDocument): void {
     // Calculate subtotal from items
     cart.totalAmount = cart.items.reduce((acc, item) => {
-      if (item.isOutOfStock || !item.isSelected) return acc; // Don't include out of stock or unselected items
+      if (item.isOutOfStock || !item.isSelected) return acc;
       return acc + (item.price.basePrice || 0) * item.quantity;
     }, 0);
 
@@ -260,5 +410,56 @@ export class CartService {
 
     cart.totalDiscount = itemLevelDiscount;
     cart.payableAmount = Math.max(0, discountedTotal);
+  }
+
+  private formatCartResponse(cart: CartDocument): FormattedCartResponse {
+    const items: FormattedCartItem[] = (cart.items || []).map((item) => {
+      const pId = item.productId ? item.productId.toString() : '';
+      const compositeId = item.variantSku ? `${pId}::${item.variantSku}` : pId;
+      const basePrice = item.price?.basePrice ?? 0;
+      const discountPrice =
+        item.price?.discountPrice && item.price.discountPrice > 0
+          ? item.price.discountPrice
+          : 0;
+
+      const updatedAtTime = item.updatedAt
+        ? new Date(item.updatedAt).getTime()
+        : item.addedAt
+          ? new Date(item.addedAt).getTime()
+          : Date.now();
+
+      return {
+        id: compositeId,
+        productId: pId,
+        title: item.productName || '',
+        thumbnail: item.productThumbnail || '',
+        slug: item.slug || '',
+        variantSku: item.variantSku || undefined,
+        price: basePrice,
+        discountPrice: discountPrice,
+        quantity: item.quantity,
+        stock: item.availableStock ?? 0,
+        isOutOfStock: Boolean(item.isOutOfStock),
+        selected: item.isSelected !== undefined ? item.isSelected : true,
+        updatedAt: updatedAtTime,
+      };
+    });
+
+    const totalItems = (cart.items || []).reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0,
+    );
+
+    return {
+      _id: String(cart._id),
+      userId: cart.userId ? cart.userId.toString() : '',
+      items,
+      cartSummary: {
+        totalAmount: cart.totalAmount ?? 0,
+        totalDiscount: cart.totalDiscount ?? 0,
+        payableAmount: cart.payableAmount ?? 0,
+        totalItems,
+      },
+    };
   }
 }

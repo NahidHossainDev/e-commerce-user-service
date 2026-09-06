@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -17,6 +18,7 @@ import { CartService } from '../cart.service';
 import {
   AddToCartDto,
   CheckoutPreviewDto,
+  MergeCartRequestDto,
   UpdateCartItemDto,
 } from '../dto/cart.dto';
 
@@ -30,13 +32,28 @@ export class CartController {
   @Get()
   @ApiOperation({ summary: 'Get current user cart' })
   getCart(@CurrentUser() user: IAuthUser) {
+    if (!user?.id) {
+      throw new UnauthorizedException('Authentication required');
+    }
     return this.cartService.getCart(user.id);
   }
 
   @Post('add')
   @ApiOperation({ summary: 'Add item to cart' })
   addToCart(@CurrentUser() user: IAuthUser, @Body() dto: AddToCartDto) {
+    if (!user?.id) {
+      throw new UnauthorizedException('Authentication required');
+    }
     return this.cartService.addToCart(user.id, dto);
+  }
+
+  @Post('merge')
+  @ApiOperation({ summary: 'Merge guest cart with user cart' })
+  mergeCart(@CurrentUser() user: IAuthUser, @Body() dto: MergeCartRequestDto) {
+    if (!user?.id) {
+      throw new UnauthorizedException('Authentication required to merge cart');
+    }
+    return this.cartService.mergeCart(user.id, dto.items || []);
   }
 
   @Patch('update/:itemId')
@@ -46,6 +63,9 @@ export class CartController {
     @Param('itemId') itemId: string,
     @Body() dto: UpdateCartItemDto,
   ) {
+    if (!user?.id) {
+      throw new UnauthorizedException('Authentication required');
+    }
     return this.cartService.updateItemQuantity(user.id, itemId, dto);
   }
 
@@ -56,6 +76,9 @@ export class CartController {
     @Param('itemId') itemId: string,
     @Query('variantSku') variantSku?: string,
   ) {
+    if (!user?.id) {
+      throw new UnauthorizedException('Authentication required');
+    }
     return this.cartService.removeItem(user.id, itemId, variantSku);
   }
 
@@ -65,6 +88,9 @@ export class CartController {
     @CurrentUser() user: IAuthUser,
     @Body() dto: CheckoutPreviewDto,
   ) {
+    if (!user?.id) {
+      throw new UnauthorizedException('Authentication required');
+    }
     return this.cartService.checkoutPreview(user.id, dto);
   }
 }

@@ -17,11 +17,12 @@ export class ProductEventsController {
   async handleCheckAvailability(
     payload: ProductCheckAvailabilityEvent,
   ): Promise<ProductAvailabilityResult> {
-    const product = await this.productService.findOneAdmin(payload.productId);
+    const { productId, quantity, variantSku } = payload;
+    const product = await this.productService.findOneAdmin(productId);
 
     if (!product || product.status !== ProductStatus.ACTIVE) {
       return new ProductAvailabilityResult({
-        productId: payload.productId,
+        productId,
         isAvailable: false,
         price: {
           basePrice: 0,
@@ -36,14 +37,14 @@ export class ProductEventsController {
       });
     }
 
-    // Check specific variant if requested
-    if (payload.variantSku) {
-      const variant = product.variants.find(
-        (v) => v.sku === payload.variantSku,
-      );
+    let price = { ...product.price };
+    let availableStock = product.stock;
+
+    if (variantSku) {
+      const variant = product.variants?.find((v) => v.sku === variantSku);
       if (!variant) {
         return new ProductAvailabilityResult({
-          productId: payload.productId,
+          productId,
           isAvailable: false,
           price: {
             basePrice: 0,
@@ -53,65 +54,36 @@ export class ProductEventsController {
           },
           title: product.title,
           thumbnail: product.thumbnail,
+          slug: product.slug,
           availableStock: 0,
           error: 'Variant not found',
+          variantSku,
         });
       }
 
-      if (variant.stock < payload.quantity) {
-        return new ProductAvailabilityResult({
-          productId: payload.productId,
-          isAvailable: false,
-          price: {
-            ...product.price,
-            basePrice: variant.additionalPrice
-              ? product.price.basePrice + variant.additionalPrice
-              : product.price.basePrice,
-          },
-          title: product.title,
-          thumbnail: product.thumbnail,
-          availableStock: variant.stock,
-          error: 'Not enough stock for variant',
-          variantSku: payload.variantSku,
-        });
+      availableStock = variant.stock;
+      if (variant.additionalPrice) {
+        price = {
+          ...price,
+          basePrice: price.basePrice + variant.additionalPrice,
+        };
       }
-
-      return new ProductAvailabilityResult({
-        productId: payload.productId,
-        isAvailable: true,
-        price: {
-          ...product.price,
-          basePrice: variant.additionalPrice
-            ? product.price.basePrice + variant.additionalPrice
-            : product.price.basePrice,
-        },
-        title: product.title,
-        thumbnail: product.thumbnail,
-        availableStock: variant.stock,
-        variantSku: payload.variantSku,
-      });
     }
 
-    // Check main product stock
-    if (product.stock < payload.quantity) {
-      return new ProductAvailabilityResult({
-        productId: payload.productId,
-        isAvailable: false,
-        price: product.price,
-        title: product.title,
-        thumbnail: product.thumbnail,
-        availableStock: product.stock,
-        error: 'Not enough stock',
-      });
-    }
+    const hasStock = availableStock >= quantity;
 
     return new ProductAvailabilityResult({
-      productId: payload.productId,
-      isAvailable: true,
-      price: product.price,
+      productId,
+      isAvailable: hasStock,
+      price,
       title: product.title,
       thumbnail: product.thumbnail,
-      availableStock: product.stock,
+      slug: product.slug,
+      availableStock,
+      variantSku,
+      ...(hasStock
+        ? {}
+        : { error: variantSku ? 'Not enough stock for variant' : 'Not enough stock' }),
     });
   }
 }

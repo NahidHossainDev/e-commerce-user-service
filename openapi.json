@@ -5460,6 +5460,36 @@
         ]
       }
     },
+    "/cart/merge": {
+      "post": {
+        "operationId": "CartController_mergeCart",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergeCartRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Merge guest cart with user cart",
+        "tags": [
+          "Cart"
+        ]
+      }
+    },
     "/cart/update/{itemId}": {
       "patch": {
         "operationId": "CartController_updateItem",
@@ -11313,6 +11343,41 @@
         "required": [
           "productId",
           "quantity"
+        ]
+      },
+      "MergeCartItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "variantSku": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "productId",
+          "quantity"
+        ]
+      },
+      "MergeCartRequestDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MergeCartItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "UpdateCartItemDto": {
