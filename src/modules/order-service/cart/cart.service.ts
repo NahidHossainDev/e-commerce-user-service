@@ -31,6 +31,7 @@ export interface FormattedCartItem {
   quantity: number;
   stock: number;
   isOutOfStock: boolean;
+  isInsufficientStock: boolean;
   selected: boolean;
   updatedAt: number;
 }
@@ -322,20 +323,21 @@ export class CartService {
           )) as ProductAvailabilityResult[];
 
           if (result) {
+            const stock = result.availableStock ?? 0;
             const newItem: CartItem = {
               productId: new Types.ObjectId(gItem.productId),
               productName: result.title || 'Product',
               productThumbnail: result.thumbnail || '',
               slug: result.slug || '',
               price: result.price,
-              availableStock: result.availableStock ?? 0,
+              availableStock: stock,
               variantSku: gItem.variantSku,
               quantity: gItem.quantity,
               addedAt: gItem.updatedAt ? new Date(gItem.updatedAt) : new Date(),
               updatedAt: gItem.updatedAt
                 ? new Date(gItem.updatedAt)
                 : new Date(),
-              isOutOfStock: !result.isAvailable,
+              isOutOfStock: stock <= 0,
               isSelected: true,
             };
             cart.items.push(newItem);
@@ -371,8 +373,9 @@ export class CartService {
         }),
       )) as ProductAvailabilityResult[];
 
-      item.isOutOfStock = !result?.isAvailable;
-      item.availableStock = result?.availableStock ?? 0;
+      const stock = result?.availableStock ?? 0;
+      item.isOutOfStock = stock <= 0;
+      item.availableStock = stock;
 
       if (result) {
         item.price = result.price || item.price;
@@ -428,6 +431,10 @@ export class CartService {
           ? new Date(item.addedAt).getTime()
           : Date.now();
 
+      const stock = item.availableStock ?? 0;
+      const isOutOfStock = Boolean(item.isOutOfStock) || stock <= 0;
+      const isInsufficientStock = !isOutOfStock && item.quantity > stock;
+
       return {
         id: compositeId,
         productId: pId,
@@ -438,8 +445,9 @@ export class CartService {
         price: basePrice,
         discountPrice: discountPrice,
         quantity: item.quantity,
-        stock: item.availableStock ?? 0,
-        isOutOfStock: Boolean(item.isOutOfStock),
+        stock,
+        isOutOfStock,
+        isInsufficientStock,
         selected: item.isSelected !== undefined ? item.isSelected : true,
         updatedAt: updatedAtTime,
       };
