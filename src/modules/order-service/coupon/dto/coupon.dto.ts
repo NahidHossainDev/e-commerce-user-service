@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsBoolean,
   IsDate,
   IsEnum,
@@ -31,6 +32,21 @@ export class CreateCouponDto {
   @ApiProperty({ enum: [true, false] })
   @IsBoolean()
   isActive: boolean;
+
+  @ApiPropertyOptional({ default: false, description: 'Whether coupon is publicly visible/applicable to guest users' })
+  @IsBoolean()
+  @IsOptional()
+  isPublic?: boolean;
+
+  @ApiPropertyOptional({ default: false, description: 'Whether coupon is applicable only on user first order' })
+  @IsBoolean()
+  @IsOptional()
+  isFirstOrderOnly?: boolean;
+
+  @ApiPropertyOptional({ type: [String], description: 'List of specific eligible user IDs' })
+  @IsArray()
+  @IsOptional()
+  eligibleUserIds?: string[];
 
   @ApiProperty({ enum: DiscountType })
   @IsEnum(DiscountType)
@@ -99,3 +115,15 @@ export class CouponValidationDto {
   @IsOptional()
   orderAmount?: number;
 }
+
+export class GetAvailableCouponsQueryDto {
+  @ApiPropertyOptional({
+    description: 'Current cart / order subtotal amount to check coupon eligibility and min order requirements',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  orderAmount?: number;
+}
+

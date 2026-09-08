@@ -5800,6 +5800,24 @@
             }
           },
           {
+            "name": "isPublic",
+            "required": false,
+            "in": "query",
+            "description": "Filter by public visibility",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isFirstOrderOnly",
+            "required": false,
+            "in": "query",
+            "description": "Filter by first order only",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "usageCount",
             "required": false,
             "in": "query",
@@ -6054,6 +6072,31 @@
         ]
       }
     },
+    "/coupons": {
+      "get": {
+        "operationId": "CouponController_getAvailableCoupons",
+        "parameters": [
+          {
+            "name": "orderAmount",
+            "required": false,
+            "in": "query",
+            "description": "Current cart / order subtotal amount to check coupon eligibility and min order requirements",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get applicable and available coupons for guest or logged-in users",
+        "tags": [
+          "Coupons"
+        ]
+      }
+    },
     "/coupons/validate": {
       "post": {
         "operationId": "CouponController_validateCoupon",
@@ -6073,8 +6116,9 @@
             "description": ""
           }
         },
+        "summary": "Validate a coupon code against user and cart amount",
         "tags": [
-          "Private / Coupons"
+          "Coupons"
         ]
       }
     },
@@ -11423,6 +11467,23 @@
               true,
               false
             ]
+          },
+          "isPublic": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether coupon is publicly visible/applicable to guest users"
+          },
+          "isFirstOrderOnly": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether coupon is applicable only on user first order"
+          },
+          "eligibleUserIds": {
+            "description": "List of specific eligible user IDs",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "discountType": {
             "type": "string",

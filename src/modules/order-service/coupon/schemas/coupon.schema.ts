@@ -52,8 +52,18 @@ export class Coupon {
   @Prop({ default: true })
   isActive: boolean;
 
+  @Prop({ default: false, index: true })
+  isPublic: boolean;
+
+  @Prop({ default: false })
+  isFirstOrderOnly: boolean;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  eligibleUserIds: Types.ObjectId[];
+
   @Prop({ type: Object })
   rules: Record<string, any>;
 }
 
 export const CouponSchema = SchemaFactory.createForClass(Coupon);
+CouponSchema.index({ isPublic: 1, isActive: 1, validTo: 1 });

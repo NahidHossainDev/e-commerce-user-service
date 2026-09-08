@@ -22,6 +22,14 @@ export class CouponQueryOptions extends QueryOptions {
   @IsOptional()
   isActive?: 'true' | 'false';
 
+  @ApiPropertyOptional({ description: 'Filter by public visibility' })
+  @IsOptional()
+  isPublic?: 'true' | 'false';
+
+  @ApiPropertyOptional({ description: 'Filter by first order only' })
+  @IsOptional()
+  isFirstOrderOnly?: 'true' | 'false';
+
   @ApiPropertyOptional({ description: 'Sort by usage count' })
   @IsOptional()
   @IsNumber()
