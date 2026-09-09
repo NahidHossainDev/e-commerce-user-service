@@ -1348,6 +1348,66 @@
         ]
       }
     },
+    "/address/{id}/default": {
+      "patch": {
+        "operationId": "AddressController_setDefault",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address set as default successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AddressResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Set an address as default",
+        "tags": [
+          "Address"
+        ]
+      }
+    },
     "/address/{id}": {
       "get": {
         "operationId": "AddressController_findOne",
@@ -9219,7 +9279,6 @@
           }
         },
         "required": [
-          "userId",
           "fullName",
           "phoneNumber",
           "type",

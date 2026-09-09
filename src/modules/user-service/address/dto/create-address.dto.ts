@@ -14,10 +14,11 @@ export class CreateAddressDto {
     type: String,
     example: '6741fcb913bdffb52f8f945e',
     description: 'ID of the user who owns this address',
+    required: false,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  userId: string; // Accept string; convert to ObjectId in service if needed
+  userId?: string; // Accept string; convert to ObjectId in service if needed
 
   @ApiProperty({
     example: 'John Doe',

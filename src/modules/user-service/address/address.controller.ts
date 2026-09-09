@@ -7,11 +7,14 @@ import {
   Patch,
   Post,
   Query,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from 'src/common/decorators';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { IAuthUser } from 'src/common/interface';
 import { ApiWrappedResponse } from 'src/utils/response/swagger.helper';
 import { AddressService } from './address.service';
 import {
@@ -36,11 +39,17 @@ export class AddressController {
     type: AddressResponseDto,
   })
   async create(
+    @CurrentUser() user: IAuthUser,
     @Body() createAddressDto: CreateAddressDto,
   ): Promise<AddressResponseDto> {
-    return (await this.addressService.create(
-      createAddressDto,
-    )) as unknown as AddressResponseDto;
+    const userId = createAddressDto.userId || user?.id;
+    if (!userId) {
+      throw new UnauthorizedException('User ID not provided');
+    }
+    return (await this.addressService.create({
+      ...createAddressDto,
+      userId,
+    })) as unknown as AddressResponseDto;
   }
 
   @Get()
@@ -52,11 +61,36 @@ export class AddressController {
     isArray: true,
   })
   async findAll(
-    @Query('userId') userId: string,
+    @CurrentUser() user: IAuthUser,
+    @Query('userId') userId?: string,
   ): Promise<AddressResponseDto[]> {
+    const targetUserId = userId || user?.id;
+    if (!targetUserId) {
+      throw new UnauthorizedException('User ID not provided');
+    }
     return (await this.addressService.findAllByUser(
-      userId,
+      targetUserId,
     )) as unknown as AddressResponseDto[];
+  }
+
+  @Patch(':id/default')
+  @ApiOperation({ summary: 'Set an address as default' })
+  @ApiWrappedResponse({
+    status: 200,
+    description: 'Address set as default successfully.',
+    type: AddressResponseDto,
+  })
+  async setDefault(
+    @CurrentUser() user: IAuthUser,
+    @Param('id') id: string,
+  ): Promise<AddressResponseDto> {
+    if (!user?.id) {
+      throw new UnauthorizedException('User ID not provided');
+    }
+    return (await this.addressService.setDefaultAddress(
+      user.id,
+      id,
+    )) as unknown as AddressResponseDto;
   }
 
   @Get(':id')
@@ -66,7 +100,10 @@ export class AddressController {
     description: 'Address found.',
     type: AddressResponseDto,
   })
-  async findOne(@Param('id') id: string): Promise<AddressResponseDto> {
+  async findOne(
+    @CurrentUser() user: IAuthUser,
+    @Param('id') id: string,
+  ): Promise<AddressResponseDto> {
     return (await this.addressService.findOne(
       id,
     )) as unknown as AddressResponseDto;
@@ -80,6 +117,7 @@ export class AddressController {
     type: AddressResponseDto,
   })
   async update(
+    @CurrentUser() user: IAuthUser,
     @Param('id') id: string,
     @Body() updateAddressDto: UpdateAddressDto,
   ): Promise<AddressResponseDto> {
@@ -96,7 +134,10 @@ export class AddressController {
     description: 'Address deleted successfully.',
     type: AddressMessageResponseDto,
   })
-  async remove(@Param('id') id: string): Promise<AddressMessageResponseDto> {
+  async remove(
+    @CurrentUser() user: IAuthUser,
+    @Param('id') id: string,
+  ): Promise<AddressMessageResponseDto> {
     return (await this.addressService.remove(
       id,
     )) as unknown as AddressMessageResponseDto;
