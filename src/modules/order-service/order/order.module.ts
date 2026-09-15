@@ -2,13 +2,17 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CartModule } from 'src/modules/order-service/cart/cart.module';
 import { CouponModule } from 'src/modules/order-service/coupon/coupon.module';
+import { Address, AddressSchema } from 'src/modules/user-service/address/address.schema';
 import { AdminOrderController, OrderController } from './controller';
 import { OrderService } from './order.service';
 import { Order, OrderSchema } from './schemas/order.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
+    MongooseModule.forFeature([
+      { name: Order.name, schema: OrderSchema },
+      { name: Address.name, schema: AddressSchema },
+    ]),
     CartModule,
     CouponModule,
   ],
@@ -17,3 +21,5 @@ import { Order, OrderSchema } from './schemas/order.schema';
   exports: [OrderService],
 })
 export class OrderModule {}
+
+

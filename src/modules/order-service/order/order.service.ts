@@ -56,7 +56,6 @@ import {
   OrderStatus,
   PaymentStatus,
 } from './schemas/order.schema';
-import { generateOrderId } from './utils/order.utils';
 
 @Injectable()
 export class OrderService {
@@ -67,6 +66,7 @@ export class OrderService {
     private readonly eventEmitter: EventEmitter2,
     @InjectConnection() private readonly connection: Connection,
   ) {}
+
 
   async checkout(userId: string, payload: CheckoutDto): Promise<OrderDocument> {
     const cart = await this.cartService.getCartDocument(userId);
@@ -107,13 +107,14 @@ export class OrderService {
     session.startTransaction();
 
     try {
-      const orderId = generateOrderId();
+      const orderId = await this.generateNextOrderId(session);
 
       const orderItems = eligibleItems.map((item) => {
         const unitPrice =
           item.price.discountPrice > 0
             ? item.price.discountPrice
             : item.price.basePrice;
+
         return {
           productId: item.productId,
           name: item.productName,
@@ -334,10 +335,12 @@ export class OrderService {
     userId: string,
     orderId: string,
   ): Promise<OrderDocument> {
-    const order = await this.orderModel.findOne({
-      orderId,
-      userId: new Types.ObjectId(userId),
-    });
+    const order = await this.orderModel
+      .findOne({
+        orderId,
+        userId: new Types.ObjectId(userId),
+      })
+      .populate('addressId');
     if (!order) throw new NotFoundException('Order not found');
     return order;
   }
@@ -544,5 +547,29 @@ export class OrderService {
     order.billingInfo.paymentFailureReason = event.reason;
     await order.save();
   }
+
+  private async generateNextOrderId(session?: any): Promise<string> {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2);
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const dateStr = `${year}${month}${day}`;
+
+    // Atomic increment directly on MongoDB counters collection (no extra Mongoose schema needed)
+    const result = await this.connection
+      .collection('counters')
+      .findOneAndUpdate(
+        { _id: `order_${dateStr}` as any },
+        { $inc: { seq: 1 } },
+        { upsert: true, returnDocument: 'after', session: session || undefined },
+      );
+
+    const seq = (result as any)?.seq ?? (result as any)?.value?.seq ?? 1;
+    const sequence = seq.toString().padStart(4, '0');
+    return `ORD-${dateStr}-${sequence}`; // e.g. ORD-260915-0001
+  }
 }
+
+
+
 
