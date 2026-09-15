@@ -3,10 +3,16 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model, Types } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
+import {
+  PaymentCompletedEvent,
+  PaymentEvents,
+  PaymentFailedEvent,
+} from 'src/modules/payment-service/payment/payment.events';
+
 import {
   InventoryAdjustEvent,
   InventoryEvents,
@@ -65,8 +71,12 @@ export class OrderService {
   async checkout(userId: string, payload: CheckoutDto): Promise<OrderDocument> {
     const cart = await this.cartService.getCartDocument(userId);
 
-    if (!cart || cart.items.length === 0) {
-      throw new BadRequestException('Cart is empty');
+    const eligibleItems = (cart?.items || []).filter(
+      (item) => item.isSelected !== false && !item.isOutOfStock,
+    );
+
+    if (eligibleItems.length === 0) {
+      throw new BadRequestException('No items selected or available for checkout');
     }
 
     // Validate Coupon if provided
@@ -99,7 +109,7 @@ export class OrderService {
     try {
       const orderId = generateOrderId();
 
-      const orderItems = cart.items.map((item) => {
+      const orderItems = eligibleItems.map((item) => {
         const unitPrice =
           item.price.discountPrice > 0
             ? item.price.discountPrice
@@ -153,9 +163,9 @@ export class OrderService {
       const [paymentResult] = (await this.eventEmitter.emitAsync(
         OrderEvents.REQUEST_PAYMENT,
         new OrderPaymentRequestEvent({
-          orderId: savedOrder.orderId,
+          orderId: (savedOrder as any)._id.toString(),
           userId,
-          totalAmount: billingInfo.totalAmount,
+          totalAmount: billingInfo.payableAmount,
           paymentIntent: payload.paymentIntent,
           session: session as any,
         }),
@@ -503,4 +513,36 @@ export class OrderService {
       paymentAttempt: 0,
     };
   }
+
+  @OnEvent(PaymentEvents.PAYMENT_COMPLETED)
+  async handlePaymentCompleted(event: PaymentCompletedEvent) {
+    const order = Types.ObjectId.isValid(event.orderId)
+      ? await this.orderModel.findById(event.orderId)
+      : await this.orderModel.findOne({ orderId: event.orderId });
+
+    if (!order) return;
+
+    order.billingInfo.paymentStatus = PaymentStatus.PAID;
+    order.billingInfo.paymentTransactionId = event.transactionId;
+    if (order.status === OrderStatus.PENDING) {
+      order.status = OrderStatus.CONFIRMED;
+      order.confirmedAt = event.paidAt || new Date();
+    }
+    await order.save();
+  }
+
+  @OnEvent(PaymentEvents.PAYMENT_FAILED)
+  async handlePaymentFailed(event: PaymentFailedEvent) {
+    const order = Types.ObjectId.isValid(event.orderId)
+      ? await this.orderModel.findById(event.orderId)
+      : await this.orderModel.findOne({ orderId: event.orderId });
+
+    if (!order) return;
+
+    order.billingInfo.paymentStatus = PaymentStatus.FAILED;
+    order.billingInfo.paymentTransactionId = event.transactionId;
+    order.billingInfo.paymentFailureReason = event.reason;
+    await order.save();
+  }
 }
+

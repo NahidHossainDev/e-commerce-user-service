@@ -56,13 +56,15 @@ export class PaymentService {
 
     const payment = new this.paymentModel({
       userId: new Types.ObjectId(userId),
-      orderId: new Types.ObjectId(orderId),
+      orderId: Types.ObjectId.isValid(orderId)
+        ? new Types.ObjectId(orderId)
+        : new Types.ObjectId(),
       transactionId,
       amount,
       currency: currency || AppCurrency.BDT,
       paymentMethod,
       status: PaymentStatus.PENDING,
-      metadata,
+      metadata: { ...metadata, orderId },
     });
 
     try {

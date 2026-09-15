@@ -10,8 +10,10 @@ import { PaymentService } from '../payment.service';
 export class PaymentListener {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @OnEvent(OrderEvents.REQUEST_PAYMENT, { async: true })
+  @OnEvent(OrderEvents.REQUEST_PAYMENT)
   async handlePaymentRequest(event: OrderPaymentRequestEvent) {
-    await this.paymentService.paymentRequest(event);
+    return await this.paymentService.paymentRequest(event);
   }
 }
+
+

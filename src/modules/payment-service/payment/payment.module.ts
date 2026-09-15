@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { WalletModule } from '../wallet/wallet.module';
 import { PaymentController } from './controller';
+import { PaymentListener } from './listeners/payment.listener';
 import { PaymentService } from './payment.service';
 import { Payment, PaymentSchema } from './schemas/payment.schema';
 
@@ -11,7 +12,8 @@ import { Payment, PaymentSchema } from './schemas/payment.schema';
     WalletModule,
   ],
   controllers: [PaymentController],
-  providers: [PaymentService],
+  providers: [PaymentService, PaymentListener],
   exports: [PaymentService],
 })
 export class PaymentModule {}
+
