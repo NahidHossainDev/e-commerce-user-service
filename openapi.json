@@ -8444,7 +8444,7 @@
             "type": "string",
             "example": "John Doe"
           },
-          "avatarUrl": {
+          "imageUrl": {
             "type": "string",
             "example": "https://example.com/avatar.jpg"
           }

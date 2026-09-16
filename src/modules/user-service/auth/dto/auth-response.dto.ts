@@ -10,7 +10,7 @@ export class UserProfileDto {
   fullName: string;
 
   @ApiProperty({ example: 'https://example.com/avatar.jpg', required: false })
-  avatarUrl?: string;
+  imageUrl?: string;
 }
 
 export class SanitizedUserDto {
