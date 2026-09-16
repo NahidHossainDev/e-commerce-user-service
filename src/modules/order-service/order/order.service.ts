@@ -335,7 +335,7 @@ export class OrderService {
   }
 
   async findOne(id: string): Promise<OrderDocument> {
-    const order = await this.orderModel.findById(id);
+    const order = await this.orderModel.findById(id).populate('addressId');
     if (!order) throw new NotFoundException('Order not found');
     return order;
   }
