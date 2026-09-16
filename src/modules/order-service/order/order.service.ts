@@ -67,7 +67,6 @@ export class OrderService {
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
-
   async checkout(userId: string, payload: CheckoutDto): Promise<OrderDocument> {
     const cart = await this.cartService.getCartDocument(userId);
 
@@ -76,7 +75,9 @@ export class OrderService {
     );
 
     if (eligibleItems.length === 0) {
-      throw new BadRequestException('No items selected or available for checkout');
+      throw new BadRequestException(
+        'No items selected or available for checkout',
+      );
     }
 
     // Validate Coupon if provided
@@ -296,7 +297,14 @@ export class OrderService {
     if (Object.keys(remainingFilters).length) {
       Object.entries(remainingFilters).forEach(([key, value]) => {
         if (orderFilterableFields.includes(key) && value) {
-          filterQuery[key] = value;
+          if (
+            (key === 'userId' || key === 'addressId') &&
+            Types.ObjectId.isValid(value as string)
+          ) {
+            filterQuery[key] = new Types.ObjectId(value as string);
+          } else {
+            filterQuery[key] = value;
+          }
         }
       });
     }
@@ -314,6 +322,7 @@ export class OrderService {
       model: this.orderModel,
       paginationQuery: pagination,
       filterQuery,
+      populate: ['addressId'],
     });
   }
 
@@ -335,11 +344,19 @@ export class OrderService {
     userId: string,
     orderId: string,
   ): Promise<OrderDocument> {
+    const isObjectId = Types.ObjectId.isValid(orderId);
+    const filterQuery: any = {
+      userId: new Types.ObjectId(userId),
+    };
+
+    if (isObjectId) {
+      filterQuery.$or = [{ orderId }, { _id: new Types.ObjectId(orderId) }];
+    } else {
+      filterQuery.orderId = orderId;
+    }
+
     const order = await this.orderModel
-      .findOne({
-        orderId,
-        userId: new Types.ObjectId(userId),
-      })
+      .findOne(filterQuery)
       .populate('addressId');
     if (!order) throw new NotFoundException('Order not found');
     return order;
@@ -561,7 +578,11 @@ export class OrderService {
       .findOneAndUpdate(
         { _id: `order_${dateStr}` as any },
         { $inc: { seq: 1 } },
-        { upsert: true, returnDocument: 'after', session: session || undefined },
+        {
+          upsert: true,
+          returnDocument: 'after',
+          session: session || undefined,
+        },
       );
 
     const seq = (result as any)?.seq ?? (result as any)?.value?.seq ?? 1;
@@ -569,7 +590,3 @@ export class OrderService {
     return `ORD-${dateStr}-${sequence}`; // e.g. ORD-260915-0001
   }
 }
-
-
-
-
