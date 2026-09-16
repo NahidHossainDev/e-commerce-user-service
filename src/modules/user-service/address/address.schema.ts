@@ -8,7 +8,7 @@ export enum AddressType {
   HOME = 'HOME',
   WORK = 'WORK',
   OFFICE = 'OFFICE',
-  OTHER = 'SUPER_ADMIN',
+  OTHER = 'OTHER',
 }
 
 @Schema({ timestamps: true })

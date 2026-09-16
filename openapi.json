@@ -9163,7 +9163,7 @@
               "HOME",
               "WORK",
               "OFFICE",
-              "SUPER_ADMIN"
+              "OTHER"
             ],
             "example": "HOME"
           },
@@ -9242,7 +9242,7 @@
               "HOME",
               "WORK",
               "OFFICE",
-              "SUPER_ADMIN"
+              "OTHER"
             ],
             "example": "HOME",
             "description": "Type of address"
@@ -9313,7 +9313,7 @@
               "HOME",
               "WORK",
               "OFFICE",
-              "SUPER_ADMIN"
+              "OTHER"
             ],
             "example": "HOME",
             "description": "Type of address"
