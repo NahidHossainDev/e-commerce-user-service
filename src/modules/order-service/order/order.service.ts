@@ -138,6 +138,7 @@ export class OrderService {
           paymentMethod: payload.paymentIntent.method,
         },
         placedAt: new Date(),
+        note: payload.note,
       });
 
       const savedOrder = await order.save({ session: session as any });

@@ -127,6 +127,9 @@ export class Order {
 
   @Prop({ default: 0, min: 0 })
   totalRefundedAmount: number;
+
+  @Prop({ required: false })
+  note?: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
