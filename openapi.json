@@ -1348,6 +1348,66 @@
         ]
       }
     },
+    "/address/{id}/default": {
+      "patch": {
+        "operationId": "AddressController_setDefault",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address set as default successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/AddressResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Set an address as default",
+        "tags": [
+          "Address"
+        ]
+      }
+    },
     "/address/{id}": {
       "get": {
         "operationId": "AddressController_findOne",
@@ -1531,6 +1591,438 @@
         "summary": "Delete an address by ID",
         "tags": [
           "Address"
+        ]
+      }
+    },
+    "/wishlist": {
+      "get": {
+        "operationId": "WishlistController_getWishlist",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wishlist retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/WishlistPaginatedResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user wishlist with product details",
+        "tags": [
+          "Wishlist"
+        ]
+      },
+      "delete": {
+        "operationId": "WishlistController_clearWishlist",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Wishlist cleared",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Clear all items from wishlist",
+        "tags": [
+          "Wishlist"
+        ]
+      }
+    },
+    "/wishlist/ids": {
+      "get": {
+        "operationId": "WishlistController_getWishlistIds",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Product ID array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all product IDs in user wishlist",
+        "tags": [
+          "Wishlist"
+        ]
+      }
+    },
+    "/wishlist/toggle": {
+      "post": {
+        "operationId": "WishlistController_toggleWishlist",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToggleWishlistDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Toggle status result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Toggle product in/out of wishlist",
+        "tags": [
+          "Wishlist"
+        ]
+      }
+    },
+    "/wishlist/{productId}/notify": {
+      "patch": {
+        "operationId": "WishlistController_updateNotify",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNotifyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification preference updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update out-of-stock notification alert (Notify Me)",
+        "tags": [
+          "Wishlist"
+        ]
+      }
+    },
+    "/wishlist/merge": {
+      "post": {
+        "operationId": "WishlistController_mergeWishlist",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergeWishlistDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Merged product IDs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Merge guest wishlist items into user account",
+        "tags": [
+          "Wishlist"
+        ]
+      }
+    },
+    "/wishlist/{productId}": {
+      "delete": {
+        "operationId": "WishlistController_removeItem",
+        "parameters": [
+          {
+            "name": "productId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove a specific product from wishlist",
+        "tags": [
+          "Wishlist"
         ]
       }
     },
@@ -8314,222 +8806,6 @@
           "Admin CMS Components"
         ]
       }
-    },
-    "/wishlist": {
-      "get": {
-        "operationId": "WishlistController_getWishlist",
-        "summary": "Get current user wishlist with product details",
-        "tags": [
-          "Wishlist"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Wishlist retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WishlistPaginatedResponseDto"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "operationId": "WishlistController_clearWishlist",
-        "summary": "Clear all items from wishlist",
-        "tags": [
-          "Wishlist"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Wishlist cleared successfully"
-          }
-        }
-      }
-    },
-    "/wishlist/ids": {
-      "get": {
-        "operationId": "WishlistController_getWishlistIds",
-        "summary": "Get all product IDs in user wishlist",
-        "tags": [
-          "Wishlist"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Product ID array",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/wishlist/toggle": {
-      "post": {
-        "operationId": "WishlistController_toggleWishlist",
-        "summary": "Toggle product in/out of wishlist",
-        "tags": [
-          "Wishlist"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ToggleWishlistDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Toggle status result"
-          }
-        }
-      }
-    },
-    "/wishlist/{productId}/notify": {
-      "patch": {
-        "operationId": "WishlistController_updateNotify",
-        "summary": "Update out-of-stock notification alert (Notify Me)",
-        "tags": [
-          "Wishlist"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateNotifyDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Notification preference updated"
-          }
-        }
-      }
-    },
-    "/wishlist/merge": {
-      "post": {
-        "operationId": "WishlistController_mergeWishlist",
-        "summary": "Merge guest wishlist items into user account",
-        "tags": [
-          "Wishlist"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MergeWishlistDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Merged product IDs"
-          }
-        }
-      }
-    },
-    "/wishlist/{productId}": {
-      "delete": {
-        "operationId": "WishlistController_removeItem",
-        "summary": "Remove a specific product from wishlist",
-        "tags": [
-          "Wishlist"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Item removed from wishlist"
-          }
-        }
-      }
     }
   },
   "info": {
@@ -8600,7 +8876,7 @@
             "type": "string",
             "example": "John Doe"
           },
-          "avatarUrl": {
+          "imageUrl": {
             "type": "string",
             "example": "https://example.com/avatar.jpg"
           }
@@ -9319,7 +9595,7 @@
               "HOME",
               "WORK",
               "OFFICE",
-              "SUPER_ADMIN"
+              "OTHER"
             ],
             "example": "HOME"
           },
@@ -9398,7 +9674,7 @@
               "HOME",
               "WORK",
               "OFFICE",
-              "SUPER_ADMIN"
+              "OTHER"
             ],
             "example": "HOME",
             "description": "Type of address"
@@ -9435,7 +9711,6 @@
           }
         },
         "required": [
-          "userId",
           "fullName",
           "phoneNumber",
           "type",
@@ -9470,7 +9745,7 @@
               "HOME",
               "WORK",
               "OFFICE",
-              "SUPER_ADMIN"
+              "OTHER"
             ],
             "example": "HOME",
             "description": "Type of address"
@@ -9517,6 +9792,103 @@
         },
         "required": [
           "message"
+        ]
+      },
+      "WishlistItemResponseDto": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "variantSku": {
+            "type": "string"
+          },
+          "notifyWhenAvailable": {
+            "type": "boolean"
+          },
+          "priceWhenAdded": {
+            "type": "number"
+          },
+          "product": {
+            "type": "object",
+            "description": "Populated Product Object"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "productId",
+          "notifyWhenAvailable",
+          "product",
+          "createdAt"
+        ]
+      },
+      "WishlistPaginatedResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WishlistItemResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ]
+      },
+      "ToggleWishlistDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Target Product ObjectId",
+            "example": "65b9a12c8e4f0012a8849c01"
+          },
+          "variantSku": {
+            "type": "string",
+            "description": "Optional variant SKU"
+          }
+        },
+        "required": [
+          "productId"
+        ]
+      },
+      "UpdateNotifyDto": {
+        "type": "object",
+        "properties": {
+          "notify": {
+            "type": "boolean",
+            "description": "Whether user wants stock notification",
+            "example": true
+          }
+        },
+        "required": [
+          "notify"
+        ]
+      },
+      "MergeWishlistDto": {
+        "type": "object",
+        "properties": {
+          "productIds": {
+            "description": "Array of Product IDs from guest local storage",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "productIds"
         ]
       },
       "ProductMediaDto": {
@@ -13802,101 +14174,6 @@
             ]
           }
         }
-      },
-      "ToggleWishlistDto": {
-        "type": "object",
-        "properties": {
-          "productId": {
-            "type": "string",
-            "description": "Target Product ObjectId"
-          },
-          "variantSku": {
-            "type": "string",
-            "description": "Optional variant SKU"
-          }
-        },
-        "required": [
-          "productId"
-        ]
-      },
-      "UpdateNotifyDto": {
-        "type": "object",
-        "properties": {
-          "notify": {
-            "type": "boolean",
-            "description": "Whether user wants stock notification"
-          }
-        },
-        "required": [
-          "notify"
-        ]
-      },
-      "MergeWishlistDto": {
-        "type": "object",
-        "properties": {
-          "productIds": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "description": "Array of Product IDs from guest local storage"
-          }
-        },
-        "required": [
-          "productIds"
-        ]
-      },
-      "WishlistItemResponseDto": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "productId": {
-            "type": "string"
-          },
-          "variantSku": {
-            "type": "string"
-          },
-          "notifyWhenAvailable": {
-            "type": "boolean"
-          },
-          "priceWhenAdded": {
-            "type": "number"
-          },
-          "product": {
-            "$ref": "#/components/schemas/ProductResponseDto"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "_id",
-          "productId",
-          "notifyWhenAvailable",
-          "product",
-          "createdAt"
-        ]
-      },
-      "WishlistPaginatedResponseDto": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WishlistItemResponseDto"
-            }
-          },
-          "total": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "items",
-          "total"
-        ]
       }
     }
   }
