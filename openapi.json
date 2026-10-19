@@ -743,6 +743,70 @@
         ]
       }
     },
+    "/auth/google/url": {
+      "get": {
+        "operationId": "AuthController_getGoogleAuthUrl",
+        "parameters": [
+          {
+            "name": "callbackUrl",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirectUri",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get Google OAuth authorization redirect URL",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/facebook/url": {
+      "get": {
+        "operationId": "AuthController_getFacebookAuthUrl",
+        "parameters": [
+          {
+            "name": "callbackUrl",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirectUri",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get Facebook OAuth authorization redirect URL",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/auth/google": {
       "post": {
         "operationId": "AuthController_googleLogin",
@@ -793,7 +857,7 @@
             }
           }
         },
-        "summary": "Authenticate using a Google ID token",
+        "summary": "Authenticate using Google authorization code or ID token",
         "tags": [
           "Auth"
         ]
@@ -849,7 +913,7 @@
             }
           }
         },
-        "summary": "Authenticate using a Facebook access token",
+        "summary": "Authenticate using Facebook authorization code or access token",
         "tags": [
           "Auth"
         ]
@@ -9130,11 +9194,16 @@
           "googleIdToken": {
             "type": "string",
             "description": "ID Token received from Google"
+          },
+          "code": {
+            "type": "string",
+            "description": "Authorization code received from Google OAuth"
+          },
+          "redirectUri": {
+            "type": "string",
+            "description": "Redirect URI used during OAuth authorization"
           }
-        },
-        "required": [
-          "googleIdToken"
-        ]
+        }
       },
       "FacebookLoginDto": {
         "type": "object",
@@ -9142,11 +9211,16 @@
           "facebookAccessToken": {
             "type": "string",
             "description": "Access Token received from Facebook"
+          },
+          "code": {
+            "type": "string",
+            "description": "Authorization code received from Facebook OAuth"
+          },
+          "redirectUri": {
+            "type": "string",
+            "description": "Redirect URI used during OAuth authorization"
           }
-        },
-        "required": [
-          "facebookAccessToken"
-        ]
+        }
       },
       "UserProfileResponseDto": {
         "type": "object",

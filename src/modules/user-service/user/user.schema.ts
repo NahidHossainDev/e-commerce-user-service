@@ -201,6 +201,12 @@ export class User {
   @Prop({ type: Preferences, default: {} })
   preferences: Preferences;
 
+  @Prop({ type: Object, default: {} })
+  socialData?: {
+    google?: Record<string, any>;
+    facebook?: Record<string, any>;
+  };
+
   @Prop({ default: false })
   isDeleted: boolean;
 

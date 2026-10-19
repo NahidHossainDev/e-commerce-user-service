@@ -48,11 +48,15 @@ export interface Config {
   social: {
     google: {
       clientId: string;
+      clientSecret: string;
+      callbackUrl: string;
     };
     facebook: {
       appId: string;
       appSecret: string;
+      callbackUrl: string;
     };
+    frontendAppUrl: string;
   };
 }
 
@@ -85,8 +89,12 @@ const getConfig = (): Config => {
     SMTP_FROM: smtpFrom,
     MAIL_PROVIDER: mailProvider,
     GOOGLE_CLIENT_ID: googleClientId,
+    GOOGLE_CLIENT_SECRET: googleClientSecret,
+    GOOGLE_CALLBACK_URL: googleCallbackUrl,
     FACEBOOK_APP_ID: facebookAppId,
     FACEBOOK_APP_SECRET: facebookAppSecret,
+    FACEBOOK_CALLBACK_URL: facebookCallbackUrl,
+    FRONTEND_APP_URL: frontendAppUrl,
     EXPORT_SWAGGER: exportSwagger,
   } = process.env;
 
@@ -164,11 +172,15 @@ const getConfig = (): Config => {
     social: {
       google: {
         clientId: googleClientId || '',
+        clientSecret: googleClientSecret || '',
+        callbackUrl: googleCallbackUrl || '',
       },
       facebook: {
         appId: facebookAppId || '',
         appSecret: facebookAppSecret || '',
+        callbackUrl: facebookCallbackUrl || '',
       },
+      frontendAppUrl: frontendAppUrl || 'http://localhost:3001',
     },
   };
 };

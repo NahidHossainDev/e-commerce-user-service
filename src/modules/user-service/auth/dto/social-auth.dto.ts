@@ -1,16 +1,44 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class GoogleLoginDto {
-  @ApiProperty({ description: 'ID Token received from Google' })
+  @ApiPropertyOptional({ description: 'ID Token received from Google' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  googleIdToken: string;
+  googleIdToken?: string;
+
+  @ApiPropertyOptional({
+    description: 'Authorization code received from Google OAuth',
+  })
+  @IsOptional()
+  @IsString()
+  code?: string;
+
+  @ApiPropertyOptional({
+    description: 'Redirect URI used during OAuth authorization',
+  })
+  @IsOptional()
+  @IsString()
+  redirectUri?: string;
 }
 
 export class FacebookLoginDto {
-  @ApiProperty({ description: 'Access Token received from Facebook' })
+  @ApiPropertyOptional({ description: 'Access Token received from Facebook' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  facebookAccessToken: string;
+  facebookAccessToken?: string;
+
+  @ApiPropertyOptional({
+    description: 'Authorization code received from Facebook OAuth',
+  })
+  @IsOptional()
+  @IsString()
+  code?: string;
+
+  @ApiPropertyOptional({
+    description: 'Redirect URI used during OAuth authorization',
+  })
+  @IsOptional()
+  @IsString()
+  redirectUri?: string;
 }

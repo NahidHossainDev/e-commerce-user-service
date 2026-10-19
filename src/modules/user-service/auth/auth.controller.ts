@@ -292,8 +292,36 @@ export class AuthController {
   // Social Auth
   // ---------------------------------------------------------------------------
 
+  @Get('google/url')
+  @ApiOperation({ summary: 'Get Google OAuth authorization redirect URL' })
+  getGoogleAuthUrl(
+    @Query('callbackUrl') callbackUrl?: string,
+    @Query('redirectUri') redirectUri?: string,
+  ) {
+    const url = this.socialAuthService.generateGoogleAuthUrl({
+      callbackUrl,
+      redirectUri,
+    });
+    return { url };
+  }
+
+  @Get('facebook/url')
+  @ApiOperation({ summary: 'Get Facebook OAuth authorization redirect URL' })
+  getFacebookAuthUrl(
+    @Query('callbackUrl') callbackUrl?: string,
+    @Query('redirectUri') redirectUri?: string,
+  ) {
+    const url = this.socialAuthService.generateFacebookAuthUrl({
+      callbackUrl,
+      redirectUri,
+    });
+    return { url };
+  }
+
   @Post('google')
-  @ApiOperation({ summary: 'Authenticate using a Google ID token' })
+  @ApiOperation({
+    summary: 'Authenticate using Google authorization code or ID token',
+  })
   @ApiWrappedResponse({
     status: 200,
     description:
@@ -310,10 +338,11 @@ export class AuthController {
   }
 
   @Post('facebook')
-  @ApiOperation({ summary: 'Authenticate using a Facebook access token' })
+  @ApiOperation({
+    summary: 'Authenticate using Facebook authorization code or access token',
+  })
   @ApiWrappedResponse({
     status: 200,
-
     description:
       'Facebook login successful – returns JWT tokens and sanitized user.',
     type: AuthResponseDto,
