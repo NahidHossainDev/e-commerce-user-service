@@ -3,6 +3,7 @@ import { config } from '../../../config';
 import { EMAIL_PROVIDER } from './interfaces/email-provider.interface';
 import { NotificationListener } from './notification.listener';
 import { NotificationService } from './notification.service';
+import { ConsoleEmailProvider } from './providers/console-email.provider';
 import { NodemailerEmailProvider } from './providers/nodemailer-email.provider';
 import { SendGridEmailProvider } from './providers/sendgrid-email.provider';
 
@@ -15,6 +16,9 @@ import { SendGridEmailProvider } from './providers/sendgrid-email.provider';
       useFactory: () => {
         if (config.mail.provider === 'sendgrid') {
           return new SendGridEmailProvider();
+        }
+        if (config.mail.provider === 'console') {
+          return new ConsoleEmailProvider();
         }
         return new NodemailerEmailProvider(config);
       },

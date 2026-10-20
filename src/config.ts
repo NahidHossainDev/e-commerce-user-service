@@ -38,7 +38,7 @@ export interface Config {
     tempFileExpirationHours: number;
   };
   mail: {
-    provider: 'nodemailer' | 'sendgrid' | 'ses';
+    provider: 'nodemailer' | 'sendgrid' | 'ses' | 'console';
     host: string;
     port: number;
     user: string;
@@ -162,7 +162,7 @@ const getConfig = (): Config => {
     },
     mail: {
       provider:
-        (mailProvider as 'nodemailer' | 'sendgrid' | 'ses') || 'nodemailer',
+        (mailProvider as 'nodemailer' | 'sendgrid' | 'ses' | 'console') || 'nodemailer',
       host: smtpHost || '',
       port: Number(smtpPort) || 587,
       user: smtpUser || '',

@@ -8,7 +8,7 @@ import {
 export class SendGridEmailProvider implements EmailProvider {
   private readonly logger = new Logger(SendGridEmailProvider.name);
 
-  async send(options: EmailOptions): Promise<void> {
+  send(options: EmailOptions): Promise<void> {
     this.logger.log(
       `[SendGrid STUB] Sending email to ${options.to} with subject: ${options.subject}`,
     );
