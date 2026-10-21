@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -11,7 +12,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { UserDocument } from 'src/modules/user-service/user/user.schema';
-import { ApplyCouponDto, CheckoutDto } from '../dto/order.dto';
+import { ApplyCouponDto, CancelOrderDto, CheckoutDto } from '../dto/order.dto';
 import { OrderQueryOptions } from '../dto/order.query-options.dto';
 import { OrderService } from '../order.service';
 
@@ -56,5 +57,15 @@ export class OrderController {
   @ApiOperation({ summary: 'Remove applied coupon and preview billing' })
   removeCoupon(@CurrentUser() user: UserDocument) {
     return this.orderService.removeCoupon(user._id?.toString());
+  }
+
+  @Patch(':orderId/cancel')
+  @ApiOperation({ summary: 'Cancel an order' })
+  cancelOrder(
+    @CurrentUser() user: UserDocument,
+    @Param('orderId') orderId: string,
+    @Body() dto: CancelOrderDto,
+  ) {
+    return this.orderService.cancelOrder(user._id?.toString(), orderId, dto);
   }
 }

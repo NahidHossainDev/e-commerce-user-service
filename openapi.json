@@ -5723,6 +5723,45 @@
         ]
       }
     },
+    "/orders/{orderId}/cancel": {
+      "patch": {
+        "operationId": "OrderController_cancelOrder",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancel an order",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
     "/admin/orders/stats": {
       "get": {
         "operationId": "AdminOrderController_getStats",
@@ -11981,6 +12020,17 @@
         },
         "required": [
           "code"
+        ]
+      },
+      "CancelOrderDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
         ]
       },
       "UpdateOrderStatusDto": {
