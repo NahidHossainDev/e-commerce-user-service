@@ -7574,6 +7574,709 @@
         ]
       }
     },
+    "/issues": {
+      "post": {
+        "operationId": "IssueController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIssueDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Issue reported successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Issue"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Report a new issue for an order (Customer)",
+        "tags": [
+          "Private / Issues"
+        ]
+      },
+      "get": {
+        "operationId": "IssueController_findAllByUser",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by issue number, subject, or orderId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OPEN",
+                "IN_PROGRESS",
+                "RESOLVED",
+                "CLOSED",
+                "REJECTED"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DAMAGED_PACKAGE",
+                "MISSING_ITEMS",
+                "WRONG_ITEM_DELIVERED",
+                "DELIVERY_DELAY",
+                "BILLING_ISSUE",
+                "PRODUCT_QUALITY",
+                "CUSTOMER_SERVICE",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "priority",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "LOW",
+                "MEDIUM",
+                "HIGH",
+                "URGENT"
+              ]
+            }
+          },
+          {
+            "name": "orderId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by specific order ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user issues with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedIssueResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all reported issues for current user",
+        "tags": [
+          "Private / Issues"
+        ]
+      }
+    },
+    "/issues/{id}": {
+      "get": {
+        "operationId": "IssueController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Issue details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Issue"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get issue details by ID (Customer)",
+        "tags": [
+          "Private / Issues"
+        ]
+      }
+    },
+    "/admin/issues": {
+      "get": {
+        "operationId": "AdminIssueController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by issue number, subject, or orderId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OPEN",
+                "IN_PROGRESS",
+                "RESOLVED",
+                "CLOSED",
+                "REJECTED"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DAMAGED_PACKAGE",
+                "MISSING_ITEMS",
+                "WRONG_ITEM_DELIVERED",
+                "DELIVERY_DELAY",
+                "BILLING_ISSUE",
+                "PRODUCT_QUALITY",
+                "CUSTOMER_SERVICE",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "priority",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "LOW",
+                "MEDIUM",
+                "HIGH",
+                "URGENT"
+              ]
+            }
+          },
+          {
+            "name": "orderId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by specific order ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of order issues with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PaginatedIssueResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all order issues with search, filter, and sorting (Admin)",
+        "tags": [
+          "Admin / Issues"
+        ]
+      }
+    },
+    "/admin/issues/{id}": {
+      "get": {
+        "operationId": "AdminIssueController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order issue details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Issue"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get order issue details (Admin)",
+        "tags": [
+          "Admin / Issues"
+        ]
+      }
+    },
+    "/admin/issues/{id}/status": {
+      "patch": {
+        "operationId": "AdminIssueController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIssueStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Issue status updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Issue"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update issue status (Admin)",
+        "tags": [
+          "Admin / Issues"
+        ]
+      }
+    },
+    "/admin/issues/{id}/resolve": {
+      "patch": {
+        "operationId": "AdminIssueController_resolve",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveIssueDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Issue resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Issue"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Resolve an order issue (Admin)",
+        "tags": [
+          "Admin / Issues"
+        ]
+      }
+    },
+    "/admin/issues/{id}/notes": {
+      "post": {
+        "operationId": "AdminIssueController_addNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddIssueNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Note added to issue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "nullable": true,
+                      "example": null,
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Issue"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add internal note to issue (Admin)",
+        "tags": [
+          "Admin / Issues"
+        ]
+      }
+    },
     "/payments/initiate": {
       "post": {
         "operationId": "PaymentController_initiate",
@@ -12921,6 +13624,409 @@
         },
         "required": [
           "note"
+        ]
+      },
+      "IssueItem": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "example": "Wireless Headphones"
+          },
+          "variantSku": {
+            "type": "string",
+            "example": "SKU-123-WH"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1
+          },
+          "notes": {
+            "type": "string",
+            "example": "Broken seal on box"
+          }
+        },
+        "required": [
+          "productId",
+          "name",
+          "variantSku",
+          "quantity",
+          "notes"
+        ]
+      },
+      "IssueTimeline": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "example": "STATUS_CHANGED"
+          },
+          "actorType": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "ADMIN",
+              "SYSTEM"
+            ],
+            "example": "ADMIN"
+          },
+          "actorId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "example": "Investigating delivery logs with courier"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-10-22T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "action",
+          "actorType",
+          "actorId",
+          "notes",
+          "createdAt"
+        ]
+      },
+      "Issue": {
+        "type": "object",
+        "properties": {
+          "issueNumber": {
+            "type": "string",
+            "example": "ISS-20261022-1001"
+          },
+          "orderId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "userId": {
+            "example": "64b1f2c3d4e5f6a7b8c9d0e2",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DAMAGED_PACKAGE",
+              "MISSING_ITEMS",
+              "WRONG_ITEM_DELIVERED",
+              "DELIVERY_DELAY",
+              "BILLING_ISSUE",
+              "PRODUCT_QUALITY",
+              "CUSTOMER_SERVICE",
+              "OTHER"
+            ],
+            "example": "DAMAGED_PACKAGE"
+          },
+          "subject": {
+            "type": "string",
+            "example": "Parcel was arrived crushed with broken seal"
+          },
+          "description": {
+            "type": "string",
+            "example": "The delivery box was torn open and 1 item is missing"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "URGENT"
+            ],
+            "example": "MEDIUM"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "IN_PROGRESS",
+              "RESOLVED",
+              "CLOSED",
+              "REJECTED"
+            ],
+            "example": "OPEN"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IssueItem"
+            }
+          },
+          "attachments": {
+            "example": [
+              "https://storage.example.com/box1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "adminNotes": {
+            "type": "string",
+            "example": "Customer called, verified courier damage receipt"
+          },
+          "resolutionNotes": {
+            "type": "string",
+            "example": "Replacement sent via express delivery #TRK-992"
+          },
+          "resolutionAction": {
+            "type": "string",
+            "enum": [
+              "REFUND_OFFERED",
+              "REPLACEMENT_SENT",
+              "COUPON_ISSUED",
+              "EXPLAINED_TO_CUSTOMER",
+              "NO_ACTION_REQUIRED",
+              "OTHER"
+            ]
+          },
+          "resolvedBy": {
+            "$ref": "#/components/schemas/ObjectId"
+          },
+          "resolvedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IssueTimeline"
+            }
+          }
+        },
+        "required": [
+          "issueNumber",
+          "orderId",
+          "userId",
+          "type",
+          "subject",
+          "description",
+          "priority",
+          "status",
+          "items",
+          "attachments",
+          "adminNotes",
+          "resolutionNotes",
+          "resolutionAction",
+          "resolvedBy",
+          "resolvedAt",
+          "timeline"
+        ]
+      },
+      "IssueItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1"
+          },
+          "name": {
+            "type": "string",
+            "example": "Wireless Headphones"
+          },
+          "variantSku": {
+            "type": "string",
+            "example": "SKU-123-WH"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1
+          },
+          "notes": {
+            "type": "string",
+            "example": "Broken seal on box"
+          }
+        },
+        "required": [
+          "productId"
+        ]
+      },
+      "CreateIssueDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "64b1f2c3d4e5f6a7b8c9d0e1",
+            "description": "The order ID the issue relates to"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DAMAGED_PACKAGE",
+              "MISSING_ITEMS",
+              "WRONG_ITEM_DELIVERED",
+              "DELIVERY_DELAY",
+              "BILLING_ISSUE",
+              "PRODUCT_QUALITY",
+              "CUSTOMER_SERVICE",
+              "OTHER"
+            ],
+            "example": "DAMAGED_PACKAGE",
+            "description": "Type / category of the issue"
+          },
+          "subject": {
+            "type": "string",
+            "example": "Package arrived torn open",
+            "description": "Brief headline of the issue"
+          },
+          "description": {
+            "type": "string",
+            "example": "Courier delivered parcel with ripped seal and 1 item missing.",
+            "description": "Detailed description of the issue"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "URGENT"
+            ],
+            "example": "MEDIUM"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IssueItemDto"
+            }
+          },
+          "attachments": {
+            "example": [
+              "https://example.com/box1.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "orderId",
+          "type",
+          "subject",
+          "description"
+        ]
+      },
+      "PaginatedIssueResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Issue"
+            }
+          },
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "example": 10
+          },
+          "total": {
+            "type": "number",
+            "example": 25
+          },
+          "totalPages": {
+            "type": "number",
+            "example": 3
+          }
+        },
+        "required": [
+          "data",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "UpdateIssueStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "IN_PROGRESS",
+              "RESOLVED",
+              "CLOSED",
+              "REJECTED"
+            ],
+            "example": "IN_PROGRESS"
+          },
+          "notes": {
+            "type": "string",
+            "example": "Assigned to logistics team for courier review"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "ResolveIssueDto": {
+        "type": "object",
+        "properties": {
+          "resolutionNotes": {
+            "type": "string",
+            "example": "Customer was refunded for damaged item and replacement coupon sent",
+            "description": "Detailed description of how the issue was resolved"
+          },
+          "resolutionAction": {
+            "type": "string",
+            "enum": [
+              "REFUND_OFFERED",
+              "REPLACEMENT_SENT",
+              "COUPON_ISSUED",
+              "EXPLAINED_TO_CUSTOMER",
+              "NO_ACTION_REQUIRED",
+              "OTHER"
+            ],
+            "example": "REPLACEMENT_SENT"
+          },
+          "internalNotes": {
+            "type": "string",
+            "example": "Customer acknowledged and agreed via phone"
+          }
+        },
+        "required": [
+          "resolutionNotes"
+        ]
+      },
+      "AddIssueNoteDto": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "example": "Spoke with delivery agent, confirmed accident during transport"
+          }
+        },
+        "required": [
+          "notes"
         ]
       },
       "InitiatePaymentDto": {
