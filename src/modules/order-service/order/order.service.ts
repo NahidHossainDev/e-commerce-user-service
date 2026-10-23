@@ -271,7 +271,9 @@ export class OrderService {
     const updatedOrder = await order.save();
     void this.eventEmitter.emit(OrderEvents.ORDER_STATUS_UPDATED, {
       orderId: updatedOrder.orderId,
+      userId: updatedOrder.userId?.toString(),
       status: updatedOrder.status,
+      reason: updatedOrder.cancellationReason,
     });
 
     return updatedOrder;
@@ -389,6 +391,7 @@ export class OrderService {
     const updatedOrder = await order.save();
     void this.eventEmitter.emit(OrderEvents.ORDER_STATUS_UPDATED, {
       orderId: updatedOrder.orderId,
+      userId: updatedOrder.userId?.toString(),
       status: updatedOrder.status,
       paymentStatus: updatedOrder.billingInfo.paymentStatus,
     });
