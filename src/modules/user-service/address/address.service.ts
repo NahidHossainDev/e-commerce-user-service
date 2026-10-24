@@ -99,6 +99,6 @@ export class AddressService {
       return { isValid: false, error: 'Address does not belong to user' };
     }
 
-    return { isValid: true };
+    return { isValid: true, address: address.toObject() };
   }
 }

@@ -28,6 +28,7 @@ import { CartService } from 'src/modules/order-service/cart/cart.service';
 import { CartDocument } from 'src/modules/order-service/cart/schemas/cart.schema';
 import { CouponService } from 'src/modules/order-service/coupon/coupon.service';
 import { CouponDocument } from 'src/modules/order-service/coupon/schemas/coupon.schema';
+import { DeliveryConfigService } from '../delivery/delivery-config.service';
 import { paginationHelpers, pick } from 'src/utils/helpers';
 import { getPaginatedData } from 'src/utils/mongodb/getPaginatedData';
 import {
@@ -65,6 +66,7 @@ export class OrderService {
     @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
     private readonly cartService: CartService,
     private readonly couponService: CouponService,
+    private readonly deliveryConfigService: DeliveryConfigService,
     private readonly eventEmitter: EventEmitter2,
     @InjectConnection() private readonly connection: Connection,
   ) {}
@@ -82,18 +84,6 @@ export class OrderService {
       );
     }
 
-    // Validate Coupon if provided
-    let coupon: CouponDocument | undefined;
-    if (payload.couponId) {
-      coupon = await this.couponService.validateCoupon({
-        userId,
-        couponId: payload.couponId,
-        orderAmount: cart.totalAmount,
-      });
-    }
-
-    const billingInfo = this.calculateBilling(cart, coupon);
-
     // Validate Address via Event
     const [addressResult] = (await this.eventEmitter.emitAsync(
       UserEvents.VALIDATE_ADDRESS,
@@ -105,6 +95,22 @@ export class OrderService {
         addressResult?.error || 'Invalid shipping address',
       );
     }
+
+    // Validate Coupon if provided
+    let coupon: CouponDocument | undefined;
+    if (payload.couponId) {
+      coupon = await this.couponService.validateCoupon({
+        userId,
+        couponId: payload.couponId,
+        orderAmount: cart.totalAmount,
+      });
+    }
+
+    const billingInfo = await this.calculateBilling(
+      cart,
+      coupon,
+      addressResult.address?.city,
+    );
 
     const session = await this.connection.startSession();
     session.startTransaction();
@@ -598,30 +604,23 @@ export class OrderService {
       orderAmount: cart.totalAmount,
     });
 
-    return this.calculateBilling(cart, coupon);
+    return await this.calculateBilling(cart, coupon);
   }
 
   async removeCoupon(userId: string): Promise<BillingInfo> {
     const cart = await this.cartService.getCartDocument(userId);
-    return this.calculateBilling(cart);
+    return await this.calculateBilling(cart);
   }
 
-  private calculateBilling(
+  private async calculateBilling(
     cart: CartDocument,
     coupon?: CouponDocument,
-  ): BillingInfo {
+    city?: string,
+  ): Promise<BillingInfo> {
     const totalAmount = cart.totalAmount || 0;
     const itemLevelDiscount = cart.totalDiscount || 0;
     const discountedSubTotal = Math.max(0, totalAmount - itemLevelDiscount);
     let couponDiscount = 0;
-
-    // Delivery fee rule: Free if subtotal >= 500 or subtotal is 0, otherwise standard 60 BDT
-    const freeDeliveryThreshold = 500;
-    const defaultDeliveryFee = 60;
-    let deliveryCharge =
-      discountedSubTotal === 0 || discountedSubTotal >= freeDeliveryThreshold
-        ? 0
-        : defaultDeliveryFee;
 
     if (coupon && discountedSubTotal > 0) {
       if (coupon.discountType === DiscountType.PERCENTAGE) {
@@ -635,11 +634,16 @@ export class OrderService {
         couponDiscount = Math.min(couponDiscount, discountedSubTotal);
       } else if (coupon.discountType === DiscountType.FIXED_AMOUNT) {
         couponDiscount = Math.min(coupon.discountValue, discountedSubTotal);
-      } else if ((coupon.discountType as any) === 'FREE_SHIPPING') {
-        deliveryCharge = 0;
-        couponDiscount = 0;
       }
     }
+
+    // Dynamic Delivery Fee calculation via DeliveryConfigService
+    const deliveryResult = await this.deliveryConfigService.calculateDeliveryFee(
+      discountedSubTotal,
+      city,
+      coupon ? { discountType: coupon.discountType, code: coupon.code } : undefined,
+    );
+    const deliveryCharge = deliveryResult.deliveryFee;
 
     const payableAmount = Math.max(
       0,
