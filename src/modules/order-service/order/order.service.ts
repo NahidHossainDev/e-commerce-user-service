@@ -113,10 +113,16 @@ export class OrderService {
       const orderId = await this.generateNextOrderId(session);
 
       const orderItems = eligibleItems.map((item) => {
-        const unitPrice =
-          item.price.discountPrice > 0
-            ? item.price.discountPrice
-            : item.price.basePrice;
+        const base = Number(item.price?.basePrice) || 0;
+        const discount = Number(item.price?.discountPrice);
+        const rate = Number(item.price?.discountRate);
+
+        let unitPrice = base;
+        if (!isNaN(discount) && discount > 0 && discount < base) {
+          unitPrice = discount;
+        } else if (!isNaN(rate) && rate > 0 && rate <= 100) {
+          unitPrice = Math.round(base * (1 - rate / 100) * 100) / 100;
+        }
 
         return {
           productId: item.productId,
@@ -125,7 +131,7 @@ export class OrderService {
           variantSku: item.variantSku,
           quantity: item.quantity,
           price: item.price,
-          total: unitPrice * item.quantity,
+          total: Math.round(unitPrice * item.quantity * 100) / 100,
         };
       });
 
@@ -604,29 +610,40 @@ export class OrderService {
     cart: CartDocument,
     coupon?: CouponDocument,
   ): BillingInfo {
-    const totalAmount = cart.totalAmount;
+    const totalAmount = cart.totalAmount || 0;
     const itemLevelDiscount = cart.totalDiscount || 0;
+    const discountedSubTotal = Math.max(0, totalAmount - itemLevelDiscount);
     let couponDiscount = 0;
-    const deliveryCharge = 0; // TODO: Implement delivery charge logic if needed
 
-    if (coupon) {
+    // Delivery fee rule: Free if subtotal >= 500 or subtotal is 0, otherwise standard 60 BDT
+    const freeDeliveryThreshold = 500;
+    const defaultDeliveryFee = 60;
+    let deliveryCharge =
+      discountedSubTotal === 0 || discountedSubTotal >= freeDeliveryThreshold
+        ? 0
+        : defaultDeliveryFee;
+
+    if (coupon && discountedSubTotal > 0) {
       if (coupon.discountType === DiscountType.PERCENTAGE) {
-        couponDiscount = (totalAmount * coupon.discountValue) / 100;
-        if (
-          coupon.maxDiscountAmount &&
-          couponDiscount > coupon.maxDiscountAmount
-        ) {
-          couponDiscount = coupon.maxDiscountAmount;
-        }
+        const rawDiscount = Math.round(
+          (discountedSubTotal * coupon.discountValue) / 100,
+        );
+        couponDiscount =
+          coupon.maxDiscountAmount && coupon.maxDiscountAmount > 0
+            ? Math.min(rawDiscount, coupon.maxDiscountAmount)
+            : rawDiscount;
+        couponDiscount = Math.min(couponDiscount, discountedSubTotal);
       } else if (coupon.discountType === DiscountType.FIXED_AMOUNT) {
-        couponDiscount = Math.min(coupon.discountValue, totalAmount);
+        couponDiscount = Math.min(coupon.discountValue, discountedSubTotal);
+      } else if ((coupon.discountType as any) === 'FREE_SHIPPING') {
+        deliveryCharge = 0;
+        couponDiscount = 0;
       }
     }
 
-    const totalDiscount = itemLevelDiscount + couponDiscount;
     const payableAmount = Math.max(
       0,
-      totalAmount - totalDiscount + deliveryCharge,
+      discountedSubTotal - couponDiscount + deliveryCharge,
     );
 
     return {

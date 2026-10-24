@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -6,7 +7,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, FilterQuery, Model, Types } from 'mongoose';
-import { paginateOptions } from '../../../common/constants';
+import { DEFAULT_CURRENCY, paginateOptions } from '../../../common/constants';
 import {
   ImageAttachedEvent,
   ImageDetachedEvent,
@@ -83,8 +84,11 @@ export class ProductService {
         (m) => m && typeof m.url === 'string' && m.url.trim() !== '',
       );
 
+      const normalizedPrice = this.normalizePrice(createProductDto.price);
+
       const product = new this.productModel({
         ...createProductDto,
+        price: normalizedPrice,
         media: cleanMedia,
         slug,
         sku,
@@ -243,6 +247,18 @@ export class ProductService {
 
     if (updateProductDto.title) {
       updateData.slug = generateSlug(updateProductDto.title);
+    }
+
+    if (updateProductDto.price) {
+      const existingPrice = oldProduct.price
+        ? typeof (oldProduct.price as any).toObject === 'function'
+          ? (oldProduct.price as any).toObject()
+          : oldProduct.price
+        : {};
+      updateData.price = this.normalizePrice({
+        ...existingPrice,
+        ...updateProductDto.price,
+      });
     }
 
     const updateQuery: any = {};
@@ -573,8 +589,67 @@ export class ProductService {
       pagination.sortBy = field;
       pagination.sortOrder = sortOption[field];
     } else if (pagination.sortBy === 'price') {
-      pagination.sortBy = 'price.discountPrice';
+      pagination.sortBy = 'price.basePrice';
     }
+  }
+
+  private normalizePrice(price: any): any {
+    if (!price) {
+      throw new BadRequestException('Product price is required');
+    }
+
+    const basePrice = Number(price.basePrice);
+    if (isNaN(basePrice) || basePrice < 0) {
+      throw new BadRequestException('Base price must be a valid non-negative number');
+    }
+
+    let discountPrice =
+      price.discountPrice !== undefined &&
+      price.discountPrice !== null &&
+      price.discountPrice !== ''
+        ? Number(price.discountPrice)
+        : undefined;
+
+    let discountRate =
+      price.discountRate !== undefined &&
+      price.discountRate !== null &&
+      price.discountRate !== ''
+        ? Number(price.discountRate)
+        : undefined;
+
+    if (discountPrice !== undefined) {
+      if (isNaN(discountPrice) || discountPrice < 0) {
+        throw new BadRequestException('Discount price cannot be negative');
+      }
+      if (discountPrice > basePrice) {
+        throw new BadRequestException('Discount price cannot exceed base price');
+      }
+      if (discountPrice === basePrice) {
+        discountPrice = undefined;
+        discountRate = 0;
+      } else {
+        discountRate =
+          basePrice > 0
+            ? Math.round(((basePrice - discountPrice) / basePrice) * 100)
+            : 0;
+      }
+    } else if (discountRate !== undefined && discountRate > 0) {
+      if (isNaN(discountRate) || discountRate < 0 || discountRate > 100) {
+        throw new BadRequestException('Discount rate must be between 0 and 100');
+      }
+      discountPrice = Math.round(basePrice * (1 - discountRate / 100) * 100) / 100;
+    } else {
+      discountPrice = undefined;
+      discountRate = 0;
+    }
+
+    return {
+      ...price,
+      basePrice,
+      discountPrice,
+      discountRate: discountRate ?? 0,
+      currency: price.currency || DEFAULT_CURRENCY,
+    };
   }
 
   private emitMediaEvents(

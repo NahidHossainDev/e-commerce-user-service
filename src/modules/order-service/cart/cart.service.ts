@@ -389,30 +389,38 @@ export class CartService {
     await cart.save();
   }
 
+  private getEffectiveUnitPrice(price: any): number {
+    if (!price) return 0;
+    const base = Number(price.basePrice) || 0;
+    const discount = Number(price.discountPrice);
+    if (!isNaN(discount) && discount > 0 && discount < base) {
+      return discount;
+    }
+    const rate = Number(price.discountRate);
+    if (!isNaN(rate) && rate > 0 && rate <= 100) {
+      return Math.round(base * (1 - rate / 100) * 100) / 100;
+    }
+    return base;
+  }
+
   private calculateTotals(cart: CartDocument): void {
-    // Calculate subtotal from items
+    // Calculate original total from items at base price
     cart.totalAmount = cart.items.reduce((acc, item) => {
       if (item.isOutOfStock || !item.isSelected) return acc;
-      return acc + (item.price.basePrice || 0) * item.quantity;
+      return acc + (Number(item.price?.basePrice) || 0) * item.quantity;
     }, 0);
-
-    let discountedTotal = cart.totalAmount;
 
     // Apply item-level discounts
     const itemDiscountedTotal = cart.items.reduce((acc, item) => {
       if (item.isOutOfStock || !item.isSelected) return acc;
-      const unitPrice =
-        item.price.discountPrice && item.price.discountPrice > 0
-          ? item.price.discountPrice
-          : item.price.basePrice;
+      const unitPrice = this.getEffectiveUnitPrice(item.price);
       return acc + unitPrice * item.quantity;
     }, 0);
 
-    const itemLevelDiscount = cart.totalAmount - itemDiscountedTotal;
-    discountedTotal = itemDiscountedTotal;
+    const itemLevelDiscount = Math.max(0, cart.totalAmount - itemDiscountedTotal);
 
     cart.totalDiscount = itemLevelDiscount;
-    cart.payableAmount = Math.max(0, discountedTotal);
+    cart.payableAmount = Math.max(0, itemDiscountedTotal);
   }
 
   private formatCartResponse(cart: CartDocument): FormattedCartResponse {
@@ -420,10 +428,8 @@ export class CartService {
       const pId = item.productId ? item.productId.toString() : '';
       const compositeId = item.variantSku ? `${pId}::${item.variantSku}` : pId;
       const basePrice = item.price?.basePrice ?? 0;
-      const discountPrice =
-        item.price?.discountPrice && item.price.discountPrice > 0
-          ? item.price.discountPrice
-          : 0;
+      const effectivePrice = this.getEffectiveUnitPrice(item.price);
+      const discountPrice = effectivePrice < basePrice ? effectivePrice : 0;
 
       const updatedAtTime = item.updatedAt
         ? new Date(item.updatedAt).getTime()
