@@ -12,7 +12,12 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/decorators';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { UserDocument } from 'src/modules/user-service/user/user.schema';
-import { ApplyCouponDto, CancelOrderDto, CheckoutDto } from '../dto/order.dto';
+import {
+  ApplyCouponDto,
+  CancelOrderDto,
+  CheckoutDto,
+  RetryPaymentDto,
+} from '../dto/order.dto';
 import { OrderQueryOptions } from '../dto/order.query-options.dto';
 import { OrderService } from '../order.service';
 
@@ -67,5 +72,15 @@ export class OrderController {
     @Body() dto: CancelOrderDto,
   ) {
     return this.orderService.cancelOrder(user._id?.toString(), orderId, dto);
+  }
+
+  @Post(':orderId/retry-payment')
+  @ApiOperation({ summary: 'Retry payment or change payment method for an order' })
+  retryPayment(
+    @CurrentUser() user: UserDocument,
+    @Param('orderId') orderId: string,
+    @Body() dto: RetryPaymentDto,
+  ) {
+    return this.orderService.retryPayment(user._id?.toString(), orderId, dto);
   }
 }

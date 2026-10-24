@@ -229,12 +229,13 @@ export class PaymentService {
 
   async getPaymentByTransactionId(
     transactionId: string,
-    userId: string,
+    userId?: string,
   ): Promise<PaymentDocument> {
-    const payment = await this.paymentModel.findOne({
-      transactionId,
-      userId: new Types.ObjectId(userId),
-    });
+    const filter: any = { transactionId };
+    if (userId) {
+      filter.userId = new Types.ObjectId(userId);
+    }
+    const payment = await this.paymentModel.findOne(filter);
     if (!payment) {
       throw new NotFoundException('Payment not found');
     }

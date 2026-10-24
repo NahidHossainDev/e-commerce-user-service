@@ -92,3 +92,9 @@ export class CancelOrderDto {
   @IsNotEmpty()
   reason: string;
 }
+
+export class RetryPaymentDto {
+  @ApiProperty({ enum: PaymentMethod, example: PaymentMethod.SSL })
+  @IsEnum(PaymentMethod)
+  paymentMethod: PaymentMethod;
+}

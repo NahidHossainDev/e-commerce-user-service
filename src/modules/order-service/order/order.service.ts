@@ -41,6 +41,7 @@ import {
   ApplyCouponDto,
   CancelOrderDto,
   CheckoutDto,
+  RetryPaymentDto,
   UpdateOrderStatusDto,
   UpdatePaymentStatusDto,
 } from './dto/order.dto';
@@ -54,6 +55,7 @@ import {
   Order,
   OrderDocument,
   OrderStatus,
+  PaymentMethod,
   PaymentStatus,
 } from './schemas/order.schema';
 
@@ -179,10 +181,15 @@ export class OrderService {
       }
 
       // Update Order with payment result
-      savedOrder.billingInfo.paymentStatus =
-        paymentResult.status === 'PAID'
-          ? PaymentStatus.PAID
-          : PaymentStatus.PENDING;
+      if (paymentResult.status === 'PAID') {
+        savedOrder.billingInfo.paymentStatus = PaymentStatus.PAID;
+        if (savedOrder.status === OrderStatus.PENDING) {
+          savedOrder.status = OrderStatus.CONFIRMED;
+          savedOrder.confirmedAt = new Date();
+        }
+      } else {
+        savedOrder.billingInfo.paymentStatus = PaymentStatus.PENDING;
+      }
 
       if (paymentResult.transactionId) {
         savedOrder.billingInfo.paymentTransactionId =
@@ -247,6 +254,10 @@ export class OrderService {
     const order = await this.orderModel.findById(id);
     if (!order) throw new NotFoundException('Order not found');
 
+    if (order.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException('Order is already cancelled');
+    }
+
     order.status = dto.status;
 
     // Update timestamps based on status
@@ -265,6 +276,19 @@ export class OrderService {
       case OrderStatus.CANCELLED:
         order.cancelledAt = now;
         order.cancellationReason = dto.reason || 'No reason provided';
+        for (const item of order.items) {
+          await this.eventEmitter.emitAsync(
+            InventoryEvents.ADJUST_STOCK,
+            new InventoryAdjustEvent({
+              productId: item.productId.toString(),
+              quantity: item.quantity,
+              type: InventoryTransactionType.RETURN,
+              variantSku: item.variantSku,
+              referenceId: order.orderId,
+              reason: `Order cancellation: ${order.orderId}`,
+            }),
+          );
+        }
         break;
     }
 
@@ -422,6 +446,87 @@ export class OrderService {
       status: OrderStatus.CANCELLED,
       reason: dto.reason,
     });
+  }
+
+  async retryPayment(
+    userId: string,
+    orderId: string,
+    dto: RetryPaymentDto,
+  ): Promise<any> {
+    const order = Types.ObjectId.isValid(orderId)
+      ? await this.orderModel.findOne({
+          $or: [{ _id: new Types.ObjectId(orderId) }, { orderId }],
+          userId: new Types.ObjectId(userId),
+        })
+      : await this.orderModel.findOne({
+          orderId,
+          userId: new Types.ObjectId(userId),
+        });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException('Cannot retry payment for a cancelled order');
+    }
+
+    if (order.billingInfo.paymentStatus === PaymentStatus.PAID) {
+      throw new BadRequestException('Order is already paid');
+    }
+
+    order.billingInfo.paymentMethod = dto.paymentMethod;
+    order.billingInfo.paymentAttempt =
+      (order.billingInfo.paymentAttempt || 0) + 1;
+    order.billingInfo.paymentFailureReason = undefined;
+
+    // For COD: remain in PENDING status awaiting admin confirmation
+    if (dto.paymentMethod === PaymentMethod.COD) {
+      order.billingInfo.paymentStatus = PaymentStatus.PENDING;
+      order.status = OrderStatus.PENDING;
+      order.set('confirmedAt', undefined);
+      const updatedOrder = await order.save();
+      return {
+        ...updatedOrder.toObject(),
+        paymentResult: {
+          status: PaymentStatus.PENDING,
+        },
+      };
+    }
+
+    // For online methods (CARD, MFS), re-delegate payment request
+    const [paymentResult] = (await this.eventEmitter.emitAsync(
+      OrderEvents.REQUEST_PAYMENT,
+      new OrderPaymentRequestEvent({
+        orderId: (order as any)._id.toString(),
+        userId,
+        totalAmount: order.billingInfo.payableAmount,
+        paymentIntent: { method: dto.paymentMethod },
+      }),
+    )) as PaymentRequestResult[];
+
+    if (!paymentResult || paymentResult.status === 'FAILED') {
+      throw new BadRequestException('Payment initiation failed');
+    }
+
+    if (paymentResult.transactionId) {
+      order.billingInfo.paymentTransactionId = paymentResult.transactionId;
+    }
+
+    if (paymentResult.status === 'PAID') {
+      order.billingInfo.paymentStatus = PaymentStatus.PAID;
+      order.status = OrderStatus.CONFIRMED;
+      order.confirmedAt = new Date();
+    } else {
+      order.billingInfo.paymentStatus = PaymentStatus.PENDING;
+    }
+
+    const updatedOrder = await order.save();
+
+    return {
+      ...updatedOrder.toObject(),
+      paymentResult,
+    };
   }
 
   async getStats(): Promise<any> {

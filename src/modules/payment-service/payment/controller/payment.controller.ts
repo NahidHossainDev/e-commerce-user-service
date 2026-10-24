@@ -72,6 +72,37 @@ export class PaymentController {
     );
   }
 
+  @Get(':transactionId/public')
+  @ApiOperation({ summary: 'Get payment details for gateway simulation' })
+  getPaymentPublic(@Param('transactionId') transactionId: string) {
+    return this.paymentService.getPaymentByTransactionId(transactionId);
+  }
+
+  @Post(':transactionId/simulate-success')
+  @ApiOperation({ summary: 'Simulate successful payment callback (Development/Testing)' })
+  simulateSuccess(
+    @Param('transactionId') transactionId: string,
+    @Body() body?: { gatewayTransactionId?: string },
+  ) {
+    return this.paymentService.processPaymentSuccess(transactionId, {
+      gatewayTransactionId: body?.gatewayTransactionId || `SIM_TXN_${Date.now()}`,
+      status: 'SUCCESS',
+      simulated: true,
+    });
+  }
+
+  @Post(':transactionId/simulate-failure')
+  @ApiOperation({ summary: 'Simulate failed payment callback (Development/Testing)' })
+  simulateFailure(
+    @Param('transactionId') transactionId: string,
+    @Body() body?: { reason?: string },
+  ) {
+    return this.paymentService.processPaymentFailure(
+      transactionId,
+      body?.reason || 'Payment cancelled or declined by user',
+    );
+  }
+
   @Get('available-payment-methods')
   @ApiOperation({ summary: 'Get available payment methods' })
   getAvailablePaymentMethods() {
