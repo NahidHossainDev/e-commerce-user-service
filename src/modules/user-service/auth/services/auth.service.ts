@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -355,6 +356,23 @@ export class AuthService {
           ? 'Please verify your email to login'
           : `Account is ${user.accountStatus}`;
       throw new UnauthorizedException(message);
+    }
+
+    if (loginDto.portal === 'customer') {
+      if (user.primaryRole !== UserRole.CUSTOMER) {
+        throw new ForbiddenException(
+          'Admin accounts cannot log in to the customer portal',
+        );
+      }
+    } else if (loginDto.portal === 'admin') {
+      if (
+        user.primaryRole !== UserRole.ADMIN &&
+        user.primaryRole !== UserRole.SUPER_ADMIN
+      ) {
+        throw new ForbiddenException(
+          'Only admin accounts can log in to the admin portal',
+        );
+      }
     }
 
     return this.issueTokens(user);

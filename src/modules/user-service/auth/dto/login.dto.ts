@@ -25,4 +25,9 @@ export class LoginDto {
   @IsString()
   @MinLength(6)
   password: string;
+
+  @ApiProperty({ example: 'customer', enum: ['customer', 'admin'], required: false })
+  @IsOptional()
+  @IsString()
+  portal?: 'customer' | 'admin';
 }
