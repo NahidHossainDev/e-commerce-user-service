@@ -99,10 +99,14 @@ export class OrderService {
     // Validate Coupon if provided
     let coupon: CouponDocument | undefined;
     if (payload.couponId) {
+      const discountedSubTotal = Math.max(
+        0,
+        (cart.totalAmount || 0) - (cart.totalDiscount || 0),
+      );
       coupon = await this.couponService.validateCoupon({
         userId,
         couponId: payload.couponId,
-        orderAmount: cart.totalAmount,
+        orderAmount: discountedSubTotal,
       });
     }
 
@@ -149,7 +153,10 @@ export class OrderService {
         status: OrderStatus.PENDING,
         billingInfo: {
           ...billingInfo,
-          paymentMethod: payload.paymentIntent.method,
+          paymentMethod:
+            payload.paymentIntent?.method ||
+            (payload.paymentIntent as any)?.paymentMethod ||
+            PaymentMethod.COD,
         },
         placedAt: new Date(),
         note: payload.note,
@@ -183,7 +190,14 @@ export class OrderService {
           orderId: (savedOrder as any)._id.toString(),
           userId,
           totalAmount: billingInfo.payableAmount,
-          paymentIntent: payload.paymentIntent,
+          paymentIntent: {
+            method:
+              payload.paymentIntent?.method ||
+              (payload.paymentIntent as any)?.paymentMethod ||
+              PaymentMethod.COD,
+            useWallet: payload.paymentIntent?.useWallet,
+            useCashback: payload.paymentIntent?.useCashback,
+          },
           session: session as any,
         }),
       )) as PaymentRequestResult[];
@@ -221,7 +235,8 @@ export class OrderService {
             {
               couponId: coupon._id.toString(),
               userId: userId,
-              orderId: savedOrder.orderId,
+              orderId: (savedOrder._id as Types.ObjectId).toString(),
+              orderCode: savedOrder.orderId,
               discountAmount: billingInfo.couponDiscount,
             },
             session as any,
@@ -299,6 +314,13 @@ export class OrderService {
               referenceId: order.orderId,
               reason: `Order cancellation: ${order.orderId}`,
             }),
+          );
+        }
+        if (order.billingInfo?.appliedCouponId) {
+          await this.couponService.decrementUsage(
+            order.billingInfo.appliedCouponId.toString(),
+            order.userId.toString(),
+            (order._id as Types.ObjectId).toString(),
           );
         }
         break;
@@ -596,12 +618,16 @@ export class OrderService {
 
   async applyCoupon(userId: string, dto: ApplyCouponDto): Promise<BillingInfo> {
     const cart = await this.cartService.getCartDocument(userId);
+    const discountedSubTotal = Math.max(
+      0,
+      (cart.totalAmount || 0) - (cart.totalDiscount || 0),
+    );
 
     // Validate coupon
     const coupon = await this.couponService.validateCoupon({
       code: dto.code,
       userId,
-      orderAmount: cart.totalAmount,
+      orderAmount: discountedSubTotal,
     });
 
     return await this.calculateBilling(cart, coupon);
@@ -624,9 +650,10 @@ export class OrderService {
 
     if (coupon && discountedSubTotal > 0) {
       if (coupon.discountType === DiscountType.PERCENTAGE) {
-        const rawDiscount = Math.round(
-          (discountedSubTotal * coupon.discountValue) / 100,
-        );
+        const rawDiscount =
+          Math.round(
+            ((discountedSubTotal * coupon.discountValue) / 100) * 100,
+          ) / 100;
         couponDiscount =
           coupon.maxDiscountAmount && coupon.maxDiscountAmount > 0
             ? Math.min(rawDiscount, coupon.maxDiscountAmount)

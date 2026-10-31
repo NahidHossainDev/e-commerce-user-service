@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, FilterQuery, Model, Types } from 'mongoose';
 import { paginateOptions } from 'src/common/constants';
@@ -21,6 +22,7 @@ import {
   CouponQueryOptions,
   CouponUsageQueryOptions,
 } from './dto/coupon.query-options.dto';
+import { ICouponUsagePayload } from './interface';
 import {
   CouponUsage,
   CouponUsageDocument,
@@ -37,6 +39,16 @@ export class CouponService {
   ) {}
 
   async create(payload: CreateCouponDto): Promise<CouponDocument> {
+    if (
+      payload.discountType === DiscountType.PERCENTAGE &&
+      payload.discountValue > 100
+    ) {
+      throw new BadRequestException('Percentage discount cannot exceed 100%');
+    }
+    if (new Date(payload.validTo) <= new Date(payload.validFrom)) {
+      throw new BadRequestException('Validity end date must be after start date');
+    }
+
     const existing = await this.couponModel.findOne({
       code: payload?.code?.toUpperCase(),
     });
@@ -112,6 +124,21 @@ export class CouponService {
   }
 
   async update(id: string, dto: CreateCouponDto): Promise<CouponDocument> {
+    if (
+      dto.discountType === DiscountType.PERCENTAGE &&
+      dto.discountValue !== undefined &&
+      dto.discountValue > 100
+    ) {
+      throw new BadRequestException('Percentage discount cannot exceed 100%');
+    }
+    if (
+      dto.validTo &&
+      dto.validFrom &&
+      new Date(dto.validTo) <= new Date(dto.validFrom)
+    ) {
+      throw new BadRequestException('Validity end date must be after start date');
+    }
+
     const updatePayload: any = { ...dto };
     if (dto.code) {
       updatePayload.code = dto.code.toUpperCase();
@@ -368,18 +395,16 @@ export class CouponService {
       }
     }
 
-    if (
-      userId &&
-      coupon.usageLimitPerUser > 0 &&
-      coupon.usageCount >= coupon.usageLimitPerUser
-    )
-      throw new BadRequestException('Coupon usage limit per user reached!');
-
     if (userId) {
       await this.checkUsageLimit(coupon, userId);
     }
 
-    if (orderAmount && orderAmount < coupon.minOrderAmount)
+    if (
+      orderAmount !== undefined &&
+      coupon.minOrderAmount !== undefined &&
+      coupon.minOrderAmount > 0 &&
+      orderAmount < coupon.minOrderAmount
+    )
       throw new BadRequestException(
         'Order amount is less than minimum order amount!',
       );
@@ -391,11 +416,60 @@ export class CouponService {
     payload: ICouponUsagePayload,
     session?: ClientSession,
   ): Promise<void> {
-    await this.couponModel
-      .findByIdAndUpdate(payload.couponId, { $inc: { usageCount: 1 } })
-      .session(session || null);
+    const coupon = await this.couponModel
+      .findOneAndUpdate(
+        {
+          _id: new Types.ObjectId(payload.couponId),
+          $or: [
+            { usageLimit: 0 },
+            { $expr: { $lt: ['$usageCount', '$usageLimit'] } },
+          ],
+        },
+        { $inc: { usageCount: 1 } },
+        { session: session || null, new: true },
+      );
+
+    if (!coupon) {
+      throw new BadRequestException(
+        'Coupon usage limit reached or coupon inactive',
+      );
+    }
 
     await this.logUsage(payload, session);
+  }
+
+  @OnEvent('refund.coupon.restore')
+  async handleRefundCouponRestore(payload: {
+    couponId: string | Types.ObjectId;
+    userId: string | Types.ObjectId;
+    orderId?: string | Types.ObjectId;
+  }): Promise<void> {
+    if (payload?.couponId && payload?.userId) {
+      await this.decrementUsage(
+        payload.couponId.toString(),
+        payload.userId.toString(),
+        payload.orderId?.toString(),
+      );
+    }
+  }
+
+  async decrementUsage(
+    couponId: string,
+    userId: string,
+    orderId?: string,
+  ): Promise<void> {
+    await this.couponModel.findByIdAndUpdate(couponId, {
+      $inc: { usageCount: -1 },
+    });
+
+    const query: FilterQuery<CouponUsageDocument> = {
+      couponId: new Types.ObjectId(couponId),
+      userId: new Types.ObjectId(userId),
+    };
+    if (orderId && Types.ObjectId.isValid(orderId)) {
+      query.orderId = new Types.ObjectId(orderId);
+    }
+    await this.couponUsageModel.findOneAndDelete(query);
   }
 
   async checkUsageLimit(coupon: CouponDocument, userId: string): Promise<void> {
@@ -403,7 +477,7 @@ export class CouponService {
 
     const usageCount = await this.couponUsageModel.countDocuments({
       couponId: coupon._id,
-      userId,
+      userId: new Types.ObjectId(userId),
     });
 
     if (
@@ -417,7 +491,13 @@ export class CouponService {
   }
 
   async logUsage(payload: ICouponUsagePayload, session?: ClientSession) {
-    const usage = new this.couponUsageModel(payload);
+    const usage = new this.couponUsageModel({
+      couponId: new Types.ObjectId(payload.couponId),
+      userId: new Types.ObjectId(payload.userId),
+      orderId: new Types.ObjectId(payload.orderId),
+      orderCode: payload.orderCode,
+      discountAmount: payload.discountAmount,
+    });
     await usage.save({ session });
   }
 
@@ -427,12 +507,23 @@ export class CouponService {
     const paginateQueries = pick(query, paginateOptions);
     const { searchTerm, ...remainingFilters } = query;
 
-    const filterQuery = {};
+    const filterQuery: FilterQuery<CouponUsageDocument> = {};
 
     if (searchTerm) {
-      filterQuery['$or'] = couponSearchableFields.map((field) => ({
-        [field]: { $regex: searchTerm, $options: 'i' },
-      }));
+      const matchedCoupons = await this.couponModel
+        .find({
+          $or: [
+            { code: { $regex: searchTerm, $options: 'i' } },
+            { name: { $regex: searchTerm, $options: 'i' } },
+          ],
+        })
+        .select('_id');
+      const couponIds = matchedCoupons.map((c) => c._id);
+
+      filterQuery['$or'] = [
+        { couponId: { $in: couponIds } },
+        { orderCode: { $regex: searchTerm, $options: 'i' } },
+      ];
     }
 
     if (Object.keys(remainingFilters).length) {
@@ -449,6 +540,11 @@ export class CouponService {
       model: this.couponUsageModel,
       paginationQuery: pagination,
       filterQuery,
+      populate: [
+        { path: 'couponId', select: 'code name discountType discountValue' },
+        { path: 'userId', select: 'fullName email phone' },
+        { path: 'orderId', select: 'orderId status' },
+      ],
     });
   }
 }

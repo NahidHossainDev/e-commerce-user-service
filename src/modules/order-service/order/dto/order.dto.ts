@@ -18,8 +18,13 @@ import {
 // --- Order DTOs ---
 
 export class PaymentIntentDto {
+  @IsOptional()
   @IsEnum(PaymentMethod)
-  method: PaymentMethod;
+  method?: PaymentMethod;
+
+  @IsOptional()
+  @IsEnum(PaymentMethod)
+  paymentMethod?: PaymentMethod;
 
   @IsOptional()
   @IsBoolean()
