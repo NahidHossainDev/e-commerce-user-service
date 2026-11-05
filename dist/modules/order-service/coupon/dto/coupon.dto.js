@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CouponValidationDto = exports.CreateCouponDto = void 0;
+exports.GetAvailableCouponsQueryDto = exports.CouponValidationDto = exports.CreateCouponDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
@@ -19,6 +19,9 @@ class CreateCouponDto {
     name;
     description;
     isActive;
+    isPublic;
+    isFirstOrderOnly;
+    eligibleUserIds;
     discountType;
     discountValue;
     maxDiscountAmount;
@@ -53,6 +56,24 @@ __decorate([
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], CreateCouponDto.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ default: false, description: 'Whether coupon is publicly visible/applicable to guest users' }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateCouponDto.prototype, "isPublic", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ default: false, description: 'Whether coupon is applicable only on user first order' }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateCouponDto.prototype, "isFirstOrderOnly", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: [String], description: 'List of specific eligible user IDs' }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateCouponDto.prototype, "eligibleUserIds", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ enum: coupon_schema_1.DiscountType }),
     (0, class_validator_1.IsEnum)(coupon_schema_1.DiscountType),
@@ -138,4 +159,18 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CouponValidationDto.prototype, "orderAmount", void 0);
+class GetAvailableCouponsQueryDto {
+    orderAmount;
+}
+exports.GetAvailableCouponsQueryDto = GetAvailableCouponsQueryDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Current cart / order subtotal amount to check coupon eligibility and min order requirements',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    __metadata("design:type", Number)
+], GetAvailableCouponsQueryDto.prototype, "orderAmount", void 0);
 //# sourceMappingURL=coupon.dto.js.map

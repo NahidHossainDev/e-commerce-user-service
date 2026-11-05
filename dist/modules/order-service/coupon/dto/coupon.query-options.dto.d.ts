@@ -4,6 +4,8 @@ export declare class CouponQueryOptions extends QueryOptions {
     searchTerm?: string;
     discountType?: DiscountType;
     isActive?: 'true' | 'false';
+    isPublic?: 'true' | 'false';
+    isFirstOrderOnly?: 'true' | 'false';
     usageCount?: 'asc' | 'desc';
     validTo?: Date;
 }

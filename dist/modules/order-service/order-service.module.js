@@ -10,6 +10,8 @@ exports.OrderServiceModule = void 0;
 const common_1 = require("@nestjs/common");
 const cart_module_1 = require("./cart/cart.module");
 const coupon_module_1 = require("./coupon/coupon.module");
+const delivery_config_module_1 = require("./delivery/delivery-config.module");
+const issue_module_1 = require("./issue/issue.module");
 const order_module_1 = require("./order/order.module");
 const refund_module_1 = require("./refund/refund.module");
 let OrderServiceModule = class OrderServiceModule {
@@ -17,8 +19,22 @@ let OrderServiceModule = class OrderServiceModule {
 exports.OrderServiceModule = OrderServiceModule;
 exports.OrderServiceModule = OrderServiceModule = __decorate([
     (0, common_1.Module)({
-        imports: [order_module_1.OrderModule, cart_module_1.CartModule, coupon_module_1.CouponModule, refund_module_1.RefundModule],
-        exports: [order_module_1.OrderModule, cart_module_1.CartModule, coupon_module_1.CouponModule, refund_module_1.RefundModule],
+        imports: [
+            order_module_1.OrderModule,
+            cart_module_1.CartModule,
+            coupon_module_1.CouponModule,
+            refund_module_1.RefundModule,
+            issue_module_1.IssueModule,
+            delivery_config_module_1.DeliveryConfigModule,
+        ],
+        exports: [
+            order_module_1.OrderModule,
+            cart_module_1.CartModule,
+            coupon_module_1.CouponModule,
+            refund_module_1.RefundModule,
+            issue_module_1.IssueModule,
+            delivery_config_module_1.DeliveryConfigModule,
+        ],
     })
 ], OrderServiceModule);
 //# sourceMappingURL=order-service.module.js.map

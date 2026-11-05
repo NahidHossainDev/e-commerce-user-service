@@ -1,21 +1,32 @@
+export declare class CmsImageDto {
+    imageUrl: string;
+    altText: string;
+    actionLink?: string;
+}
+export declare class CmsActionDto {
+    label: string;
+    actionLink: string;
+}
 export declare class HeroSliderSlideDto {
-    image: string;
+    image: CmsImageDto;
     showTitle?: boolean;
     title?: string;
     subtitle?: string;
     showButton?: boolean;
-    buttonText?: string;
-    buttonLink?: string;
+    button?: CmsActionDto;
 }
-export declare class HeroSliderDataDto {
-    slides: HeroSliderSlideDto[];
+export declare class CmsSliderSettingsDto {
     autoplay?: boolean;
     interval?: number;
     showArrows?: boolean;
     showDots?: boolean;
 }
+export declare class HeroSliderDataDto {
+    slides: HeroSliderSlideDto[];
+    sliderSettings: CmsSliderSettingsDto;
+}
 export declare class FeatureIconItemDto {
-    icon: string;
+    image: CmsImageDto;
     title: string;
     subtitle: string;
 }
@@ -26,36 +37,22 @@ export declare class FeatureIconsDataDto {
     subTextSize?: number;
     items: FeatureIconItemDto[];
 }
-export declare class ProductSectionSliderSettingsDto {
-    autoplay?: boolean;
-    showArrows?: boolean;
-    showDots?: boolean;
-    interval?: number;
-}
 export declare class ProductSectionDataDto {
-    title?: string;
     productIds: string[];
     cardType: 'half_border' | 'full_border';
     enableSlider?: boolean;
     slidesPerView?: number;
     slidesToScroll?: number;
-    sliderSettings?: ProductSectionSliderSettingsDto;
-}
-export declare class CategoryGridItemDto {
-    image: string;
-    title: string;
-    subtitle: string;
+    sliderSettings?: CmsSliderSettingsDto;
 }
 export declare class CategoryGridDataDto {
-    categoryIds?: string[];
-    showDivider?: boolean;
-    items: CategoryGridItemDto[];
+    categoryIds: string[];
+    showDivider: boolean;
 }
 export declare class ImageGridItemDto {
-    image: string;
-    altText?: string;
-    name?: string;
-    link?: string;
+    image: CmsImageDto;
+    title: string;
+    actionLink?: string;
 }
 export declare class ImageGridDataDto {
     layoutMode: 'grid' | 'carousel';
@@ -69,15 +66,11 @@ export declare class ImageGridDataDto {
     paddingBottom?: number;
     images: ImageGridItemDto[];
 }
-export declare class PromoBannerItemDto {
-    image: string;
-    link?: string;
-}
 export declare class PromoBannerDataDto {
     gapWidth?: number;
     gapColor?: string;
     gapType?: 'middle' | 'none' | 'around';
-    banners: PromoBannerItemDto[];
+    banners: CmsImageDto[];
 }
 export declare class BlogGridDataDto {
     title: string;
@@ -114,17 +107,23 @@ export declare class RichTextDataDto {
 export declare class CustomHtmlDataDto {
     html: string;
 }
+export declare class SectionHeaderButtonDto {
+    label: string;
+    link: string;
+}
+export declare class SectionHeaderPaddingDto {
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+}
 export declare class SectionHeaderDataDto {
     title: string;
+    titleAlign: 'left' | 'center' | 'right';
     subtitle?: string;
-    textCenter?: boolean;
-    showButton?: boolean;
-    buttonText?: string;
-    buttonLink?: string;
-    paddingTop?: number;
-    paddingBottom?: number;
-    paddingLeft?: number;
-    paddingRight?: number;
+    showButton: boolean;
+    button?: SectionHeaderButtonDto;
+    padding?: SectionHeaderPaddingDto;
 }
 export declare class CtaBannerDataDto {
     image: string;
@@ -144,15 +143,9 @@ export declare class InfoBoxDataDto {
     borderColor: string;
     backgroundColor: string;
 }
-export declare class BrandGridSliderSettingsDto {
-    autoplay?: boolean;
-    showArrows?: boolean;
-    showDots?: boolean;
-    interval?: number;
-}
 export declare class BrandGridDataDto {
     brandIds: string[];
     showDivider?: boolean;
     enableSlider?: boolean;
-    sliderSettings?: BrandGridSliderSettingsDto;
+    sliderSettings?: CmsSliderSettingsDto;
 }

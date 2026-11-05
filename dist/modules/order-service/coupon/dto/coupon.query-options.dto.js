@@ -19,6 +19,8 @@ class CouponQueryOptions extends queryOptions_dto_1.QueryOptions {
     searchTerm;
     discountType;
     isActive;
+    isPublic;
+    isFirstOrderOnly;
     usageCount;
     validTo;
 }
@@ -43,6 +45,16 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CouponQueryOptions.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by public visibility' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CouponQueryOptions.prototype, "isPublic", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Filter by first order only' }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CouponQueryOptions.prototype, "isFirstOrderOnly", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Sort by usage count' }),
     (0, class_validator_1.IsOptional)(),
