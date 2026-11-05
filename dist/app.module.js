@@ -15,13 +15,13 @@ const throttler_1 = require("@nestjs/throttler");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const config_2 = require("./config");
+const cms_module_1 = require("./modules/cms/cms.module");
 const communication_service_module_1 = require("./modules/communication-service/communication-service.module");
 const media_module_1 = require("./modules/media/media.module");
 const order_service_module_1 = require("./modules/order-service/order-service.module");
 const payment_service_module_1 = require("./modules/payment-service/payment-service.module");
 const product_service_module_1 = require("./modules/product-service/product-service.module");
 const user_service_module_1 = require("./modules/user-service/user-service.module");
-const cms_module_1 = require("./modules/cms/cms.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -47,7 +47,7 @@ exports.AppModule = AppModule = __decorate([
             throttler_1.ThrottlerModule.forRoot([
                 {
                     ttl: 60000,
-                    limit: 10,
+                    limit: 100,
                 },
             ]),
             user_service_module_1.UserServiceModule,

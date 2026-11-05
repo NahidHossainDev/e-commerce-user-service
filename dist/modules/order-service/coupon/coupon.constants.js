@@ -5,6 +5,8 @@ exports.couponFilterableFields = [
     'searchTerm',
     'discountType',
     'isActive',
+    'isPublic',
+    'isFirstOrderOnly',
     'usageCount',
     'validTo',
 ];

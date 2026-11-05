@@ -26,9 +26,9 @@ export declare class ProductService {
     restore(id: string): Promise<ProductDocument>;
     bulkUpdateStatus(ids: string[], status: ProductStatus): Promise<any>;
     updateStock(productId: string, quantityChange: number): Promise<void>;
-    private applySearchFilters;
-    private applyIdFilters;
-    private applyPriceFilters;
+    findByIds(ids: string[]): Promise<ProductDocument[]>;
+    private buildProductFilter;
     private applySorting;
+    private normalizePrice;
     private emitMediaEvents;
 }

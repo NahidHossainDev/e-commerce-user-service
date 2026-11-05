@@ -67,8 +67,12 @@ let ProductService = class ProductService {
                     createProductDto.barcode.trim() === '')
                 ? undefined
                 : createProductDto.barcode.trim();
+            const cleanMedia = (createProductDto.media || []).filter((m) => m && typeof m.url === 'string' && m.url.trim() !== '');
+            const normalizedPrice = this.normalizePrice(createProductDto.price);
             const product = new this.productModel({
                 ...createProductDto,
+                price: normalizedPrice,
+                media: cleanMedia,
                 slug,
                 sku,
                 barcode,
@@ -101,17 +105,12 @@ let ProductService = class ProductService {
     }
     async findAllPublic(queryDto) {
         const paginateQueries = (0, helpers_1.pick)(queryDto, constants_1.paginateOptions);
-        const filters = (0, helpers_1.pick)(queryDto, product_constants_1.PRODUCT_FILTER_FIELDS);
-        const { searchTerm, categoryId, brandId, minPrice, maxPrice, ...remainingFilters } = filters;
-        const filterQuery = {
-            isDeleted: false,
-            status: product_schema_1.ProductStatus.ACTIVE,
-            ...remainingFilters,
-        };
-        this.applySearchFilters(filterQuery, searchTerm);
-        this.applyIdFilters(filterQuery, categoryId, brandId);
-        this.applyPriceFilters(filterQuery, minPrice, maxPrice);
+        const filterQuery = this.buildProductFilter(queryDto, true);
         const pagination = helpers_1.paginationHelpers.calculatePagination(paginateQueries);
+        if (pagination.limit > 30) {
+            pagination.limit = 30;
+            pagination.skip = (pagination.page - 1) * pagination.limit;
+        }
         this.applySorting(pagination);
         const result = await (0, getPaginatedData_1.getPaginatedData)({
             model: this.productModel,
@@ -120,27 +119,27 @@ let ProductService = class ProductService {
             populate: ['categoryId', 'brandId', 'subCategoryIds'],
         });
         result.data = result.data.map((item) => {
-            const obj = item.toObject ? item.toObject() : item;
+            const obj = item.toObject ? item.toObject() : { ...item };
             delete obj.vendorId;
             delete obj.isDeleted;
             delete obj.deletedAt;
             delete obj.lastStockSyncAt;
+            if (obj.categoryId && !obj.category) {
+                obj.category = obj.categoryId;
+            }
+            if (obj.brandId && !obj.brand) {
+                obj.brand = obj.brandId;
+            }
+            if (obj.subCategoryIds && !obj.subCategories) {
+                obj.subCategories = obj.subCategoryIds;
+            }
             return obj;
         });
         return result;
     }
     async findAllAdmin(queryDto) {
         const paginateQueries = (0, helpers_1.pick)(queryDto, constants_1.paginateOptions);
-        const filters = (0, helpers_1.pick)(queryDto, product_constants_1.PRODUCT_FILTER_FIELDS);
-        const { searchTerm, categoryId, brandId, vendorId, minPrice, maxPrice, ...remainingFilters } = filters;
-        const filterQuery = {
-            ...remainingFilters,
-        };
-        if (vendorId)
-            filterQuery.vendorId = new mongoose_2.Types.ObjectId(vendorId);
-        this.applySearchFilters(filterQuery, searchTerm);
-        this.applyIdFilters(filterQuery, categoryId, brandId);
-        this.applyPriceFilters(filterQuery, minPrice, maxPrice);
+        const filterQuery = this.buildProductFilter(queryDto, false);
         const pagination = helpers_1.paginationHelpers.calculatePagination(paginateQueries);
         this.applySorting(pagination);
         return await (0, getPaginatedData_1.getPaginatedData)({
@@ -150,6 +149,7 @@ let ProductService = class ProductService {
             populate: [
                 { path: 'categoryId', select: 'name' },
                 { path: 'brandId', select: 'name logo' },
+                { path: 'subCategoryIds', select: 'name' },
             ],
         });
     }
@@ -186,8 +186,22 @@ let ProductService = class ProductService {
         const updateData = {
             ...updateProductDto,
         };
+        if (updateProductDto.media) {
+            updateData.media = updateProductDto.media.filter((m) => m && typeof m.url === 'string' && m.url.trim() !== '');
+        }
         if (updateProductDto.title) {
             updateData.slug = (0, product_helper_1.generateSlug)(updateProductDto.title);
+        }
+        if (updateProductDto.price) {
+            const existingPrice = oldProduct.price
+                ? typeof oldProduct.price.toObject === 'function'
+                    ? oldProduct.price.toObject()
+                    : oldProduct.price
+                : {};
+            updateData.price = this.normalizePrice({
+                ...existingPrice,
+                ...updateProductDto.price,
+            });
         }
         const updateQuery = {};
         const unsetQuery = {};
@@ -214,6 +228,26 @@ let ProductService = class ProductService {
             updateProductDto.thumbnail !== oldProduct.thumbnail) {
             this.emitMediaEvents(oldProduct, 'detach', true);
             this.emitMediaEvents(product, 'attach', true);
+        }
+        if (updateProductDto.media) {
+            const oldMediaUrls = new Set((oldProduct.media || []).map((m) => m.url));
+            const newMediaUrls = new Set((product.media || []).map((m) => m.url));
+            (oldProduct.media || []).forEach((m) => {
+                if (!newMediaUrls.has(m.url)) {
+                    const mediaId = (0, media_helper_1.extractMediaIdFromUrl)(m.url);
+                    if (mediaId) {
+                        this.eventEmitter.emit(media_events_1.MediaEvent.IMAGE_DETACHED, new media_events_1.ImageDetachedEvent(mediaId));
+                    }
+                }
+            });
+            (product.media || []).forEach((m) => {
+                if (!oldMediaUrls.has(m.url)) {
+                    const mediaId = (0, media_helper_1.extractMediaIdFromUrl)(m.url);
+                    if (mediaId) {
+                        this.eventEmitter.emit(media_events_1.MediaEvent.IMAGE_ATTACHED, new media_events_1.ImageAttachedEvent(mediaId, product._id.toString(), 'product'));
+                    }
+                }
+            });
         }
         return product;
     }
@@ -270,30 +304,149 @@ let ProductService = class ProductService {
             reason: 'Manual adjustment via Product Service',
         });
     }
-    applySearchFilters(filterQuery, searchTerm) {
-        if (!searchTerm)
-            return;
-        if (mongoose_2.Types.ObjectId.isValid(searchTerm)) {
-            filterQuery._id = new mongoose_2.Types.ObjectId(searchTerm);
-            return;
+    async findByIds(ids) {
+        if (!ids || ids.length === 0) {
+            return [];
         }
-        filterQuery['$or'] = product_constants_1.PRODUCT_SEARCH_FIELDS
-            .filter((field) => field !== '_id')
-            .map((field) => ({ [field]: { $regex: searchTerm, $options: 'i' } }));
-    }
-    applyIdFilters(filterQuery, categoryId, brandId) {
-        if (categoryId)
-            filterQuery.categoryId = new mongoose_2.Types.ObjectId(categoryId);
-        if (brandId)
-            filterQuery.brandId = new mongoose_2.Types.ObjectId(brandId);
-    }
-    applyPriceFilters(filterQuery, minPrice, maxPrice) {
-        if (minPrice !== undefined || maxPrice !== undefined) {
-            filterQuery['price.basePrice'] = {
-                ...(minPrice !== undefined && { $gte: minPrice }),
-                ...(maxPrice !== undefined && { $lte: maxPrice }),
-            };
+        const safeIds = ids.slice(0, 30);
+        const objectIds = safeIds
+            .filter((id) => mongoose_2.Types.ObjectId.isValid(id))
+            .map((id) => new mongoose_2.Types.ObjectId(id));
+        const products = await this.productModel
+            .find({
+            _id: { $in: objectIds },
+            isDeleted: false,
+        })
+            .select('-vendorId -isDeleted -deletedAt -lastStockSyncAt -__v')
+            .populate(['categoryId', 'brandId', 'subCategoryIds'])
+            .exec();
+        const productMap = new Map(products.map((product) => [
+            product._id.toString(),
+            product,
+        ]));
+        const result = [];
+        for (const id of safeIds) {
+            const found = productMap.get(id);
+            if (found) {
+                result.push(found);
+            }
         }
+        return result;
+    }
+    buildProductFilter(query, isPublic = true) {
+        const filter = {};
+        if (isPublic) {
+            filter.isDeleted = false;
+            filter.status = query.status
+                ? query.status
+                : product_schema_1.ProductStatus.ACTIVE;
+        }
+        else {
+            if (query.status) {
+                filter.status = query.status;
+            }
+        }
+        if (query.vendorId && mongoose_2.Types.ObjectId.isValid(query.vendorId)) {
+            filter.vendorId = new mongoose_2.Types.ObjectId(query.vendorId);
+        }
+        const normalizeToArray = (val) => {
+            if (!val)
+                return [];
+            if (Array.isArray(val)) {
+                return val
+                    .flatMap((v) => (typeof v === 'string' ? v.split(',') : [v]))
+                    .map((s) => String(s).trim())
+                    .filter(Boolean);
+            }
+            if (typeof val === 'string') {
+                return val
+                    .split(',')
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+            }
+            return [String(val)];
+        };
+        const brandRaw = query.brandId || query.brand;
+        const brandVals = normalizeToArray(brandRaw);
+        if (brandVals.length > 0) {
+            const objectIds = brandVals
+                .filter((id) => mongoose_2.Types.ObjectId.isValid(id))
+                .map((id) => new mongoose_2.Types.ObjectId(id));
+            const matchValues = [...brandVals, ...objectIds];
+            filter.$and = filter.$and || [];
+            filter.$and.push({
+                $or: [
+                    { 'brand.id': { $in: matchValues } },
+                    { 'brand._id': { $in: matchValues } },
+                    { brand: { $in: matchValues } },
+                    { brandId: { $in: matchValues } },
+                ],
+            });
+        }
+        const catRaw = query.categoryId || query.category;
+        const catVals = normalizeToArray(catRaw);
+        if (catVals.length > 0) {
+            const objectIds = catVals
+                .filter((id) => mongoose_2.Types.ObjectId.isValid(id))
+                .map((id) => new mongoose_2.Types.ObjectId(id));
+            const matchValues = [...catVals, ...objectIds];
+            filter.$and = filter.$and || [];
+            filter.$and.push({
+                $or: [
+                    { 'category.id': { $in: matchValues } },
+                    { 'category._id': { $in: matchValues } },
+                    { category: { $in: matchValues } },
+                    { categoryId: { $in: matchValues } },
+                    { 'subCategories.id': { $in: matchValues } },
+                    { 'subCategories._id': { $in: matchValues } },
+                    { subCategoryIds: { $in: matchValues } },
+                ],
+            });
+        }
+        if (query.searchTerm && query.searchTerm.trim()) {
+            const term = query.searchTerm.trim();
+            const regex = new RegExp(term, 'i');
+            const searchConditions = [
+                { title: { $regex: regex } },
+                { description: { $regex: regex } },
+                { tags: { $in: [regex] } },
+                { keywords: { $in: [regex] } },
+            ];
+            if (mongoose_2.Types.ObjectId.isValid(term)) {
+                searchConditions.push({ _id: new mongoose_2.Types.ObjectId(term) });
+            }
+            filter.$and = filter.$and || [];
+            filter.$and.push({ $or: searchConditions });
+        }
+        if (query.minPrice !== undefined || query.maxPrice !== undefined) {
+            const priceCond = {};
+            if (query.minPrice !== undefined && !isNaN(Number(query.minPrice))) {
+                priceCond.$gte = Number(query.minPrice);
+            }
+            if (query.maxPrice !== undefined && !isNaN(Number(query.maxPrice))) {
+                priceCond.$lte = Number(query.maxPrice);
+            }
+            if (Object.keys(priceCond).length > 0) {
+                filter.$and = filter.$and || [];
+                filter.$and.push({
+                    $or: [
+                        { 'price.discountPrice': priceCond },
+                        { 'price.basePrice': priceCond },
+                    ],
+                });
+            }
+        }
+        if (typeof query.isOnOffer === 'boolean')
+            filter.isOnOffer = query.isOnOffer;
+        if (typeof query.isBestSeller === 'boolean')
+            filter.isBestSeller = query.isBestSeller;
+        if (typeof query.isFeatured === 'boolean')
+            filter.isFeatured = query.isFeatured;
+        if (typeof query.isNew === 'boolean')
+            filter.isNew = query.isNew;
+        if (typeof query.isPerishable === 'boolean')
+            filter.isPerishable = query.isPerishable;
+        return filter;
     }
     applySorting(pagination) {
         if (pagination.sortBy && product_constants_1.PRODUCT_SORT_OPTIONS[pagination.sortBy]) {
@@ -302,6 +455,63 @@ let ProductService = class ProductService {
             pagination.sortBy = field;
             pagination.sortOrder = sortOption[field];
         }
+        else if (pagination.sortBy === 'price') {
+            pagination.sortBy = 'price.basePrice';
+        }
+    }
+    normalizePrice(price) {
+        if (!price) {
+            throw new common_1.BadRequestException('Product price is required');
+        }
+        const basePrice = Number(price.basePrice);
+        if (isNaN(basePrice) || basePrice < 0) {
+            throw new common_1.BadRequestException('Base price must be a valid non-negative number');
+        }
+        let discountPrice = price.discountPrice !== undefined &&
+            price.discountPrice !== null &&
+            price.discountPrice !== ''
+            ? Number(price.discountPrice)
+            : undefined;
+        let discountRate = price.discountRate !== undefined &&
+            price.discountRate !== null &&
+            price.discountRate !== ''
+            ? Number(price.discountRate)
+            : undefined;
+        if (discountPrice !== undefined) {
+            if (isNaN(discountPrice) || discountPrice < 0) {
+                throw new common_1.BadRequestException('Discount price cannot be negative');
+            }
+            if (discountPrice > basePrice) {
+                throw new common_1.BadRequestException('Discount price cannot exceed base price');
+            }
+            if (discountPrice === basePrice) {
+                discountPrice = undefined;
+                discountRate = 0;
+            }
+            else {
+                discountRate =
+                    basePrice > 0
+                        ? Math.round(((basePrice - discountPrice) / basePrice) * 100)
+                        : 0;
+            }
+        }
+        else if (discountRate !== undefined && discountRate > 0) {
+            if (isNaN(discountRate) || discountRate < 0 || discountRate > 100) {
+                throw new common_1.BadRequestException('Discount rate must be between 0 and 100');
+            }
+            discountPrice = Math.round(basePrice * (1 - discountRate / 100) * 100) / 100;
+        }
+        else {
+            discountPrice = undefined;
+            discountRate = 0;
+        }
+        return {
+            ...price,
+            basePrice,
+            discountPrice,
+            discountRate: discountRate ?? 0,
+            currency: price.currency || constants_1.DEFAULT_CURRENCY,
+        };
     }
     emitMediaEvents(product, type, thumbnailOnly = false) {
         const productId = product._id.toString();

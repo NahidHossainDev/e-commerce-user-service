@@ -4,6 +4,9 @@ export declare class CreateCouponDto {
     name: string;
     description?: string;
     isActive: boolean;
+    isPublic?: boolean;
+    isFirstOrderOnly?: boolean;
+    eligibleUserIds?: string[];
     discountType: DiscountType;
     discountValue: number;
     maxDiscountAmount?: number;
@@ -18,5 +21,8 @@ export declare class CouponValidationDto {
     code?: string;
     couponId?: string;
     userId?: string;
+    orderAmount?: number;
+}
+export declare class GetAvailableCouponsQueryDto {
     orderAmount?: number;
 }

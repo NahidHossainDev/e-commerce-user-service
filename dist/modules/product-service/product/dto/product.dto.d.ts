@@ -1,5 +1,11 @@
 import { AppCurrency } from '../../../../common/constants/currency.constants';
-import { ProductStatus } from '../schemas/product.schema';
+import { ProductMediaType, ProductStatus } from '../schemas/product.schema';
+export declare class ProductMediaDto {
+    url: string;
+    altText?: string;
+    format?: string;
+    type?: ProductMediaType;
+}
 export declare class PriceDto {
     basePrice: number;
     discountPrice?: number;
@@ -38,6 +44,7 @@ export declare class CreateProductDto {
     description: string;
     status?: ProductStatus;
     thumbnail: string;
+    media?: ProductMediaDto[];
     categoryId: string;
     subCategoryIds?: string[];
     brandId?: string;
@@ -72,4 +79,4 @@ export declare class CreateProductDto {
 declare const UpdateProductDto_base: import("@nestjs/common").Type<Partial<CreateProductDto>>;
 export declare class UpdateProductDto extends UpdateProductDto_base {
 }
-export {};
+export * from './product-query-options.dto';

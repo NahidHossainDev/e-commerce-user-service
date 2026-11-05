@@ -9,27 +9,70 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BrandGridDataDto = exports.BrandGridSliderSettingsDto = exports.InfoBoxDataDto = exports.CtaBannerDataDto = exports.SectionHeaderDataDto = exports.CustomHtmlDataDto = exports.RichTextDataDto = exports.TestimonialsDataDto = exports.TestimonialItemDto = exports.VideoSectionDataDto = exports.BlogGridDataDto = exports.PromoBannerDataDto = exports.PromoBannerItemDto = exports.ImageGridDataDto = exports.ImageGridItemDto = exports.CategoryGridDataDto = exports.CategoryGridItemDto = exports.ProductSectionDataDto = exports.ProductSectionSliderSettingsDto = exports.FeatureIconsDataDto = exports.FeatureIconItemDto = exports.HeroSliderDataDto = exports.HeroSliderSlideDto = void 0;
+exports.BrandGridDataDto = exports.InfoBoxDataDto = exports.CtaBannerDataDto = exports.SectionHeaderDataDto = exports.SectionHeaderPaddingDto = exports.SectionHeaderButtonDto = exports.CustomHtmlDataDto = exports.RichTextDataDto = exports.TestimonialsDataDto = exports.TestimonialItemDto = exports.VideoSectionDataDto = exports.BlogGridDataDto = exports.PromoBannerDataDto = exports.ImageGridDataDto = exports.ImageGridItemDto = exports.CategoryGridDataDto = exports.ProductSectionDataDto = exports.FeatureIconsDataDto = exports.FeatureIconItemDto = exports.HeroSliderDataDto = exports.CmsSliderSettingsDto = exports.HeroSliderSlideDto = exports.CmsActionDto = exports.CmsImageDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+class CmsImageDto {
+    imageUrl;
+    altText;
+    actionLink;
+}
+exports.CmsImageDto = CmsImageDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Image asset target URL' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CmsImageDto.prototype, "imageUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Accessibility tag descriptive text' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CmsImageDto.prototype, "altText", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Image click redirect URL link' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CmsImageDto.prototype, "actionLink", void 0);
+class CmsActionDto {
+    label;
+    actionLink;
+}
+exports.CmsActionDto = CmsActionDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Action button label text' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CmsActionDto.prototype, "label", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Action button redirect destination URL' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CmsActionDto.prototype, "actionLink", void 0);
 class HeroSliderSlideDto {
     image;
     showTitle;
     title;
     subtitle;
     showButton;
-    buttonText;
-    buttonLink;
+    button;
 }
 exports.HeroSliderSlideDto = HeroSliderSlideDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Slide background image URL' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+    (0, swagger_1.ApiProperty)({
+        type: () => CmsImageDto,
+        description: 'Slide background image',
+    }),
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => CmsImageDto),
+    __metadata("design:type", CmsImageDto)
 ], HeroSliderSlideDto.prototype, "image", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show title overlay text flag', default: true }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Show title overlay text flag',
+        default: true,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
@@ -47,29 +90,70 @@ __decorate([
     __metadata("design:type", String)
 ], HeroSliderSlideDto.prototype, "subtitle", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show action button flag', default: false }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Show action button flag',
+        default: false,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], HeroSliderSlideDto.prototype, "showButton", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Action button label text' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        type: () => CmsActionDto,
+        description: 'Action button parameters configuration',
+    }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], HeroSliderSlideDto.prototype, "buttonText", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Action button redirect destination URL' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], HeroSliderSlideDto.prototype, "buttonLink", void 0);
-class HeroSliderDataDto {
-    slides;
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => CmsActionDto),
+    __metadata("design:type", CmsActionDto)
+], HeroSliderSlideDto.prototype, "button", void 0);
+class CmsSliderSettingsDto {
     autoplay;
     interval;
     showArrows;
     showDots;
+}
+exports.CmsSliderSettingsDto = CmsSliderSettingsDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Enable slide transitions automatic rotations flag',
+        default: true,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CmsSliderSettingsDto.prototype, "autoplay", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Slider rotation duration interval in ms',
+        default: 4000,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CmsSliderSettingsDto.prototype, "interval", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Display next/prev navigator arrow indicators flag',
+        default: true,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CmsSliderSettingsDto.prototype, "showArrows", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Display slide dots paginator controls flag',
+        default: true,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CmsSliderSettingsDto.prototype, "showDots", void 0);
+class HeroSliderDataDto {
+    slides;
+    sliderSettings;
 }
 exports.HeroSliderDataDto = HeroSliderDataDto;
 __decorate([
@@ -80,40 +164,29 @@ __decorate([
     __metadata("design:type", Array)
 ], HeroSliderDataDto.prototype, "slides", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Enable slide transitions automatic rotations flag', default: true }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], HeroSliderDataDto.prototype, "autoplay", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Slider rotation duration interval in ms', default: 4000 }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], HeroSliderDataDto.prototype, "interval", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Display next/prev navigator arrow indicators flag', default: true }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], HeroSliderDataDto.prototype, "showArrows", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Display slide dots paginator controls flag', default: true }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], HeroSliderDataDto.prototype, "showDots", void 0);
+    (0, swagger_1.ApiProperty)({
+        type: () => CmsSliderSettingsDto,
+        description: 'Slider settings parameters configuration',
+    }),
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => CmsSliderSettingsDto),
+    __metadata("design:type", CmsSliderSettingsDto)
+], HeroSliderDataDto.prototype, "sliderSettings", void 0);
 class FeatureIconItemDto {
-    icon;
+    image;
     title;
     subtitle;
 }
 exports.FeatureIconItemDto = FeatureIconItemDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Icon name (e.g. Truck, CustomerService)' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], FeatureIconItemDto.prototype, "icon", void 0);
+    (0, swagger_1.ApiProperty)({
+        type: () => CmsImageDto,
+        description: 'Feature highlight icon details',
+    }),
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => CmsImageDto),
+    __metadata("design:type", CmsImageDto)
+], FeatureIconItemDto.prototype, "image", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Heading label title text' }),
     (0, class_validator_1.IsString)(),
@@ -133,7 +206,10 @@ class FeatureIconsDataDto {
 }
 exports.FeatureIconsDataDto = FeatureIconsDataDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show grid layout borders divide lines flag', default: true }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Show grid layout borders divide lines flag',
+        default: true,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
@@ -145,57 +221,34 @@ __decorate([
     __metadata("design:type", String)
 ], FeatureIconsDataDto.prototype, "titleColor", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Title size font index override', default: 14 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Title size font index override',
+        default: 14,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], FeatureIconsDataDto.prototype, "titleSize", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Subtitle size font index override', default: 12 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Subtitle size font index override',
+        default: 12,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], FeatureIconsDataDto.prototype, "subTextSize", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [FeatureIconItemDto], description: 'Feature highlights list items' }),
+    (0, swagger_1.ApiProperty)({
+        type: [FeatureIconItemDto],
+        description: 'Feature highlights list items',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => FeatureIconItemDto),
     __metadata("design:type", Array)
 ], FeatureIconsDataDto.prototype, "items", void 0);
-class ProductSectionSliderSettingsDto {
-    autoplay;
-    showArrows;
-    showDots;
-    interval;
-}
-exports.ProductSectionSliderSettingsDto = ProductSectionSliderSettingsDto;
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Autoplay slider flag', default: false }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], ProductSectionSliderSettingsDto.prototype, "autoplay", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show slider navigation arrows flag', default: true }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], ProductSectionSliderSettingsDto.prototype, "showArrows", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show slider dots pagination flag', default: false }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], ProductSectionSliderSettingsDto.prototype, "showDots", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Autoplay transition duration speed in ms', default: 3000 }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], ProductSectionSliderSettingsDto.prototype, "interval", void 0);
 class ProductSectionDataDto {
-    title;
     productIds;
     cardType;
     enableSlider;
@@ -205,125 +258,102 @@ class ProductSectionDataDto {
 }
 exports.ProductSectionDataDto = ProductSectionDataDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Optional Section Title heading text' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], ProductSectionDataDto.prototype, "title", void 0);
-__decorate([
     (0, swagger_1.ApiProperty)({ type: [String], description: 'Selected Product IDs list' }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], ProductSectionDataDto.prototype, "productIds", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Visual border style pattern for product cards', enum: ['half_border', 'full_border'] }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Visual border style pattern for product cards',
+        enum: ['half_border', 'full_border'],
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsIn)(['half_border', 'full_border']),
     __metadata("design:type", String)
 ], ProductSectionDataDto.prototype, "cardType", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Enable slider layout mode view option', default: false }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Enable slider layout mode view option',
+        default: false,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], ProductSectionDataDto.prototype, "enableSlider", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Count of visible card items per page row view', default: 4 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Count of visible card items per page row view',
+        default: 4,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], ProductSectionDataDto.prototype, "slidesPerView", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Count of card items to shift per swipe pagination', default: 1 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Count of card items to shift per swipe pagination',
+        default: 1,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], ProductSectionDataDto.prototype, "slidesToScroll", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ type: ProductSectionSliderSettingsDto, description: 'Slider specific configurations' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        type: CmsSliderSettingsDto,
+        description: 'Slider specific configurations',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateNested)(),
-    (0, class_transformer_1.Type)(() => ProductSectionSliderSettingsDto),
-    __metadata("design:type", ProductSectionSliderSettingsDto)
+    (0, class_transformer_1.Type)(() => CmsSliderSettingsDto),
+    __metadata("design:type", CmsSliderSettingsDto)
 ], ProductSectionDataDto.prototype, "sliderSettings", void 0);
-class CategoryGridItemDto {
-    image;
-    title;
-    subtitle;
-}
-exports.CategoryGridItemDto = CategoryGridItemDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Category image asset cover URL' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CategoryGridItemDto.prototype, "image", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Category name header text' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CategoryGridItemDto.prototype, "title", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Category secondary info description' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], CategoryGridItemDto.prototype, "subtitle", void 0);
 class CategoryGridDataDto {
     categoryIds;
     showDivider;
-    items;
 }
 exports.CategoryGridDataDto = CategoryGridDataDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ type: [String], description: 'Mapped category database reference IDs' }),
-    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({
+        type: [String],
+        description: 'Mapped category database reference IDs',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], CategoryGridDataDto.prototype, "categoryIds", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show card divide borders lines flag', default: false }),
-    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({
+        description: 'Show card divide borders lines flag',
+        default: false,
+    }),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], CategoryGridDataDto.prototype, "showDivider", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: [CategoryGridItemDto], description: 'Category grid list cards items' }),
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.ValidateNested)({ each: true }),
-    (0, class_transformer_1.Type)(() => CategoryGridItemDto),
-    __metadata("design:type", Array)
-], CategoryGridDataDto.prototype, "items", void 0);
 class ImageGridItemDto {
     image;
-    altText;
-    name;
-    link;
+    title;
+    actionLink;
 }
 exports.ImageGridItemDto = ImageGridItemDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Image asset target URL' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
+    (0, swagger_1.ApiProperty)({ type: () => CmsImageDto, description: 'Image details' }),
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => CmsImageDto),
+    __metadata("design:type", CmsImageDto)
 ], ImageGridItemDto.prototype, "image", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Accessibility tag descriptive text' }),
-    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({ description: 'Overlay name tag label text' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], ImageGridItemDto.prototype, "altText", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Overlay name tag label text' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], ImageGridItemDto.prototype, "name", void 0);
+], ImageGridItemDto.prototype, "title", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Image card click redirect URL link' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], ImageGridItemDto.prototype, "link", void 0);
+], ImageGridItemDto.prototype, "actionLink", void 0);
 class ImageGridDataDto {
     layoutMode;
     columns;
@@ -338,31 +368,46 @@ class ImageGridDataDto {
 }
 exports.ImageGridDataDto = ImageGridDataDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Image display layout mode structure style', enum: ['grid', 'carousel'] }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Image display layout mode structure style',
+        enum: ['grid', 'carousel'],
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsIn)(['grid', 'carousel']),
     __metadata("design:type", String)
 ], ImageGridDataDto.prototype, "layoutMode", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Max row columns count display layout', default: 4 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Max row columns count display layout',
+        default: 4,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], ImageGridDataDto.prototype, "columns", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Custom grid cell gutter width size in pixels', default: 16 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Custom grid cell gutter width size in pixels',
+        default: 16,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], ImageGridDataDto.prototype, "gapWidth", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Gutter mapping coverage pattern', default: 'middle' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Gutter mapping coverage pattern',
+        default: 'middle',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], ImageGridDataDto.prototype, "gapType", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show dividers lines borders between image tiles flag', default: false }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Show dividers lines borders between image tiles flag',
+        default: false,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
@@ -392,28 +437,15 @@ __decorate([
     __metadata("design:type", Number)
 ], ImageGridDataDto.prototype, "paddingBottom", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [ImageGridItemDto], description: 'Grid image list array' }),
+    (0, swagger_1.ApiProperty)({
+        type: [ImageGridItemDto],
+        description: 'Grid image list array',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => ImageGridItemDto),
     __metadata("design:type", Array)
 ], ImageGridDataDto.prototype, "images", void 0);
-class PromoBannerItemDto {
-    image;
-    link;
-}
-exports.PromoBannerItemDto = PromoBannerItemDto;
-__decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Promo banner asset cover image URL' }),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], PromoBannerItemDto.prototype, "image", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Promo banner click destination redirect URL' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], PromoBannerItemDto.prototype, "link", void 0);
 class PromoBannerDataDto {
     gapWidth;
     gapColor;
@@ -422,7 +454,10 @@ class PromoBannerDataDto {
 }
 exports.PromoBannerDataDto = PromoBannerDataDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Banner spacing gutter width size in pixels', default: 16 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Banner spacing gutter width size in pixels',
+        default: 16,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
@@ -434,17 +469,24 @@ __decorate([
     __metadata("design:type", String)
 ], PromoBannerDataDto.prototype, "gapColor", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Gutter coverage layout pattern', enum: ['middle', 'none', 'around'], default: 'middle' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Gutter coverage layout pattern',
+        enum: ['middle', 'none', 'around'],
+        default: 'middle',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsIn)(['middle', 'none', 'around']),
     __metadata("design:type", String)
 ], PromoBannerDataDto.prototype, "gapType", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [PromoBannerItemDto], description: 'Campaign banners list array' }),
+    (0, swagger_1.ApiProperty)({
+        type: [CmsImageDto],
+        description: 'Campaign banners list array',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
-    (0, class_transformer_1.Type)(() => PromoBannerItemDto),
+    (0, class_transformer_1.Type)(() => CmsImageDto),
     __metadata("design:type", Array)
 ], PromoBannerDataDto.prototype, "banners", void 0);
 class BlogGridDataDto {
@@ -461,20 +503,30 @@ __decorate([
     __metadata("design:type", String)
 ], BlogGridDataDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Max articles fetch limit count', default: 3 }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Max articles fetch limit count',
+        default: 3,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], BlogGridDataDto.prototype, "limit", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Display layout presentation mode', enum: ['grid', 'list'], default: 'grid' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Display layout presentation mode',
+        enum: ['grid', 'list'],
+        default: 'grid',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsIn)(['grid', 'list']),
     __metadata("design:type", String)
 ], BlogGridDataDto.prototype, "layout", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show view all CTA button option flag', default: true }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Show view all CTA button option flag',
+        default: true,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
@@ -501,7 +553,9 @@ __decorate([
     __metadata("design:type", String)
 ], VideoSectionDataDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Section description subtitle detail text' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Section description subtitle detail text',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -512,7 +566,9 @@ __decorate([
     __metadata("design:type", String)
 ], VideoSectionDataDto.prototype, "videoUrl", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Fallback thumbnail preview cover image URL' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Fallback thumbnail preview cover image URL',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -524,13 +580,19 @@ __decorate([
     __metadata("design:type", String)
 ], VideoSectionDataDto.prototype, "altText", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Enable autoplay playback flag', default: false }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Enable autoplay playback flag',
+        default: false,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], VideoSectionDataDto.prototype, "autoplay", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Audio output muted default flag', default: false }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Audio output muted default flag',
+        default: false,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
@@ -562,7 +624,9 @@ __decorate([
     __metadata("design:type", String)
 ], TestimonialItemDto.prototype, "altText", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Author business job title or role tag text' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Author business job title or role tag text',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -591,14 +655,20 @@ __decorate([
     __metadata("design:type", String)
 ], TestimonialsDataDto.prototype, "title", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [TestimonialItemDto], description: 'Review cards list array' }),
+    (0, swagger_1.ApiProperty)({
+        type: [TestimonialItemDto],
+        description: 'Review cards list array',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),
     (0, class_transformer_1.Type)(() => TestimonialItemDto),
     __metadata("design:type", Array)
 ], TestimonialsDataDto.prototype, "items", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Autoplay slider transition rotate option flag', default: true }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Autoplay slider transition rotate option flag',
+        default: true,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
@@ -621,17 +691,59 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CustomHtmlDataDto.prototype, "html", void 0);
+class SectionHeaderButtonDto {
+    label;
+    link;
+}
+exports.SectionHeaderButtonDto = SectionHeaderButtonDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Call-to-action button label text' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], SectionHeaderButtonDto.prototype, "label", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Call-to-action redirect link destination URL' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], SectionHeaderButtonDto.prototype, "link", void 0);
+class SectionHeaderPaddingDto {
+    top;
+    bottom;
+    left;
+    right;
+}
+exports.SectionHeaderPaddingDto = SectionHeaderPaddingDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Top padding in pixels' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SectionHeaderPaddingDto.prototype, "top", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Bottom padding in pixels' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SectionHeaderPaddingDto.prototype, "bottom", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Left padding in pixels' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SectionHeaderPaddingDto.prototype, "left", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Right padding in pixels' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], SectionHeaderPaddingDto.prototype, "right", void 0);
 class SectionHeaderDataDto {
     title;
+    titleAlign;
     subtitle;
-    textCenter;
     showButton;
-    buttonText;
-    buttonLink;
-    paddingTop;
-    paddingBottom;
-    paddingLeft;
-    paddingRight;
+    button;
+    padding;
 }
 exports.SectionHeaderDataDto = SectionHeaderDataDto;
 __decorate([
@@ -640,59 +752,44 @@ __decorate([
     __metadata("design:type", String)
 ], SectionHeaderDataDto.prototype, "title", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Title text alignment positioning',
+        enum: ['left', 'center', 'right'],
+    }),
+    (0, class_validator_1.IsEnum)(['left', 'center', 'right']),
+    __metadata("design:type", String)
+], SectionHeaderDataDto.prototype, "titleAlign", void 0);
+__decorate([
     (0, swagger_1.ApiPropertyOptional)({ description: 'Secondary header subtitle' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SectionHeaderDataDto.prototype, "subtitle", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Center align text flag', default: false }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], SectionHeaderDataDto.prototype, "textCenter", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Display header right call-to-action button', default: false }),
-    (0, class_validator_1.IsOptional)(),
+    (0, swagger_1.ApiProperty)({ description: 'Display header right call-to-action button' }),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], SectionHeaderDataDto.prototype, "showButton", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Action button label text' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        type: SectionHeaderButtonDto,
+        description: 'Button parameters configuration',
+    }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], SectionHeaderDataDto.prototype, "buttonText", void 0);
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => SectionHeaderButtonDto),
+    __metadata("design:type", SectionHeaderButtonDto)
+], SectionHeaderDataDto.prototype, "button", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Action button redirect destination URL' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        type: SectionHeaderPaddingDto,
+        description: 'Custom padding dimensions configuration',
+    }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
-], SectionHeaderDataDto.prototype, "buttonLink", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Top padding size in pixels' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], SectionHeaderDataDto.prototype, "paddingTop", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Bottom padding size in pixels' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], SectionHeaderDataDto.prototype, "paddingBottom", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Left padding size in pixels' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], SectionHeaderDataDto.prototype, "paddingLeft", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Right padding size in pixels' }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], SectionHeaderDataDto.prototype, "paddingRight", void 0);
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => SectionHeaderPaddingDto),
+    __metadata("design:type", SectionHeaderPaddingDto)
+], SectionHeaderDataDto.prototype, "padding", void 0);
 class CtaBannerDataDto {
     image;
     badge;
@@ -733,19 +830,27 @@ __decorate([
     __metadata("design:type", String)
 ], CtaBannerDataDto.prototype, "buttonText", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Action button click redirect destination URL' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Action button click redirect destination URL',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CtaBannerDataDto.prototype, "buttonLink", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Content positioning layout alignment style', enum: ['left', 'right', 'center'] }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Content positioning layout alignment style',
+        enum: ['left', 'right', 'center'],
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsIn)(['left', 'right', 'center']),
     __metadata("design:type", String)
 ], CtaBannerDataDto.prototype, "position", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'Visual style theme mode', enum: ['light', 'dark'] }),
+    (0, swagger_1.ApiProperty)({
+        description: 'Visual style theme mode',
+        enum: ['light', 'dark'],
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsIn)(['light', 'dark']),
     __metadata("design:type", String)
@@ -789,37 +894,6 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], InfoBoxDataDto.prototype, "backgroundColor", void 0);
-class BrandGridSliderSettingsDto {
-    autoplay;
-    showArrows;
-    showDots;
-    interval;
-}
-exports.BrandGridSliderSettingsDto = BrandGridSliderSettingsDto;
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Autoplay slider transitions flag', default: false }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], BrandGridSliderSettingsDto.prototype, "autoplay", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show navigation arrows controls flag', default: true }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], BrandGridSliderSettingsDto.prototype, "showArrows", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show slider dots pagination flag', default: false }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], BrandGridSliderSettingsDto.prototype, "showDots", void 0);
-__decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Autoplay transition duration speed in ms', default: 3000 }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
-], BrandGridSliderSettingsDto.prototype, "interval", void 0);
 class BrandGridDataDto {
     brandIds;
     showDivider;
@@ -828,28 +902,40 @@ class BrandGridDataDto {
 }
 exports.BrandGridDataDto = BrandGridDataDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: [String], description: 'Selected Brand reference IDs list' }),
+    (0, swagger_1.ApiProperty)({
+        type: [String],
+        description: 'Selected Brand reference IDs list',
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", Array)
 ], BrandGridDataDto.prototype, "brandIds", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Show card divide borders lines flag', default: true }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Show card divide borders lines flag',
+        default: true,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], BrandGridDataDto.prototype, "showDivider", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ description: 'Enable slider layout mode option flag', default: false }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Enable slider layout mode option flag',
+        default: false,
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], BrandGridDataDto.prototype, "enableSlider", void 0);
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ type: BrandGridSliderSettingsDto, description: 'Slider specific configurations' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        type: CmsSliderSettingsDto,
+        description: 'Slider specific configurations',
+    }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateNested)(),
-    (0, class_transformer_1.Type)(() => BrandGridSliderSettingsDto),
-    __metadata("design:type", BrandGridSliderSettingsDto)
+    (0, class_transformer_1.Type)(() => CmsSliderSettingsDto),
+    __metadata("design:type", CmsSliderSettingsDto)
 ], BrandGridDataDto.prototype, "sliderSettings", void 0);
 //# sourceMappingURL=component-data.dto.js.map

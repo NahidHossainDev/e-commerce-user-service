@@ -1,20 +1,70 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateProductDto = exports.CreateProductDto = exports.PerishableInfoDto = exports.ProductVariantDto = exports.ProductAttributeDto = exports.ProductUnitDto = exports.PriceDto = void 0;
+exports.UpdateProductDto = exports.CreateProductDto = exports.PerishableInfoDto = exports.ProductVariantDto = exports.ProductAttributeDto = exports.ProductUnitDto = exports.PriceDto = exports.ProductMediaDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const currency_constants_1 = require("../../../../common/constants/currency.constants");
 const product_schema_1 = require("../schemas/product.schema");
+class ProductMediaDto {
+    url;
+    altText;
+    format;
+    type;
+}
+exports.ProductMediaDto = ProductMediaDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Media URL' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], ProductMediaDto.prototype, "url", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Alt text', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ProductMediaDto.prototype, "altText", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Media format (e.g. image/jpeg)', required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ProductMediaDto.prototype, "format", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Media type',
+        enum: product_schema_1.ProductMediaType,
+        default: product_schema_1.ProductMediaType.IMAGE,
+        required: false,
+    }),
+    (0, class_validator_1.IsEnum)(product_schema_1.ProductMediaType),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], ProductMediaDto.prototype, "type", void 0);
 class PriceDto {
     basePrice;
     discountPrice;
@@ -199,6 +249,7 @@ class CreateProductDto {
     description;
     status;
     thumbnail;
+    media;
     categoryId;
     subCategoryIds;
     brandId;
@@ -251,6 +302,14 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "thumbnail", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [ProductMediaDto], required: false }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => ProductMediaDto),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateProductDto.prototype, "media", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Category ID' }),
     (0, class_validator_1.IsMongoId)(),
@@ -402,4 +461,5 @@ __decorate([
 class UpdateProductDto extends (0, swagger_1.PartialType)(CreateProductDto) {
 }
 exports.UpdateProductDto = UpdateProductDto;
+__exportStar(require("./product-query-options.dto"), exports);
 //# sourceMappingURL=product.dto.js.map

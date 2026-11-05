@@ -165,15 +165,15 @@ __decorate([
     __metadata("design:type", String)
 ], ProductMedia.prototype, "url", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ default: '' }),
     __metadata("design:type", String)
 ], ProductMedia.prototype, "altText", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ default: '' }),
     __metadata("design:type", String)
 ], ProductMedia.prototype, "format", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, enum: ProductMediaType }),
+    (0, mongoose_1.Prop)({ required: true, enum: ProductMediaType, default: ProductMediaType.IMAGE }),
     __metadata("design:type", String)
 ], ProductMedia.prototype, "type", void 0);
 exports.ProductMedia = ProductMedia = __decorate([
