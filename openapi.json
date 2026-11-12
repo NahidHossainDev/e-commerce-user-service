@@ -1290,6 +1290,414 @@
         ]
       }
     },
+    "/admin/notifications/send": {
+      "post": {
+        "operationId": "AdminNotificationController_sendNotification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminSendNotificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send marketing or broadcast notification to users (all, specific, or user group)",
+        "tags": [
+          "Admin Notifications"
+        ]
+      }
+    },
+    "/admin/notifications": {
+      "get": {
+        "operationId": "AdminNotificationController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isRead",
+            "required": false,
+            "in": "query",
+            "description": "Filter by read status",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by notification type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TRANSACTIONAL",
+                "MARKETING",
+                "SYSTEM"
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filter by notification category",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ORDER_PLACED",
+                "PAYMENT_SUCCESS",
+                "ORDER_CONFIRMED",
+                "ORDER_CANCELLED",
+                "ORDER_SHIPPED",
+                "ORDER_DELIVERED",
+                "REFUND_PROCESSED",
+                "MARKETING",
+                "ACCOUNT_WELCOME",
+                "ACCOUNT_SECURITY",
+                "SYSTEM_ALERT"
+              ]
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": false,
+            "in": "query",
+            "description": "Search in title or message",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recipientId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by recipient user ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all notifications with filtering (Admin)",
+        "tags": [
+          "Admin Notifications"
+        ]
+      }
+    },
+    "/admin/notifications/stats": {
+      "get": {
+        "operationId": "AdminNotificationController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get notification overview statistics (Admin)",
+        "tags": [
+          "Admin Notifications"
+        ]
+      }
+    },
+    "/admin/notifications/{id}": {
+      "delete": {
+        "operationId": "AdminNotificationController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a notification (Admin)",
+        "tags": [
+          "Admin Notifications"
+        ]
+      }
+    },
+    "/notifications": {
+      "get": {
+        "operationId": "NotificationController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort field",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isRead",
+            "required": false,
+            "in": "query",
+            "description": "Filter by read status",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by notification type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TRANSACTIONAL",
+                "MARKETING",
+                "SYSTEM"
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Filter by notification category",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ORDER_PLACED",
+                "PAYMENT_SUCCESS",
+                "ORDER_CONFIRMED",
+                "ORDER_CANCELLED",
+                "ORDER_SHIPPED",
+                "ORDER_DELIVERED",
+                "REFUND_PROCESSED",
+                "MARKETING",
+                "ACCOUNT_WELCOME",
+                "ACCOUNT_SECURITY",
+                "SYSTEM_ALERT"
+              ]
+            }
+          },
+          {
+            "name": "searchTerm",
+            "required": false,
+            "in": "query",
+            "description": "Search in title or message",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user notifications (paginated)",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationController_getUnreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current user unread notifications count",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationController_markAsRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark a notification as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationController_markAllAsRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mark all notifications as read for current user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/{id}": {
+      "delete": {
+        "operationId": "NotificationController_deleteForUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a notification for current user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/address": {
       "post": {
         "operationId": "AddressController_create",
@@ -5762,6 +6170,45 @@
         ]
       }
     },
+    "/orders/{orderId}/retry-payment": {
+      "post": {
+        "operationId": "OrderController_retryPayment",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retry payment or change payment method for an order",
+        "tags": [
+          "Orders"
+        ]
+      }
+    },
     "/admin/orders/stats": {
       "get": {
         "operationId": "AdminOrderController_getStats",
@@ -6714,6 +7161,192 @@
         "summary": "Validate a coupon code against user and cart amount",
         "tags": [
           "Coupons"
+        ]
+      }
+    },
+    "/admin/delivery-config": {
+      "get": {
+        "operationId": "AdminDeliveryConfigController_getConfig",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current delivery configuration (Admin)",
+        "tags": [
+          "Admin / Delivery Configuration"
+        ]
+      }
+    },
+    "/admin/delivery-config/global": {
+      "put": {
+        "operationId": "AdminDeliveryConfigController_updateGlobal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGlobalDeliveryConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update global delivery settings (Admin)",
+        "tags": [
+          "Admin / Delivery Configuration"
+        ]
+      }
+    },
+    "/admin/delivery-config/zones": {
+      "post": {
+        "operationId": "AdminDeliveryConfigController_addZone",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeliveryZoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a new delivery zone (Admin)",
+        "tags": [
+          "Admin / Delivery Configuration"
+        ]
+      }
+    },
+    "/admin/delivery-config/zones/{zoneId}": {
+      "put": {
+        "operationId": "AdminDeliveryConfigController_updateZone",
+        "parameters": [
+          {
+            "name": "zoneId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDeliveryZoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a delivery zone (Admin)",
+        "tags": [
+          "Admin / Delivery Configuration"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminDeliveryConfigController_deleteZone",
+        "parameters": [
+          {
+            "name": "zoneId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a delivery zone (Admin)",
+        "tags": [
+          "Admin / Delivery Configuration"
+        ]
+      }
+    },
+    "/delivery-config/public": {
+      "get": {
+        "operationId": "DeliveryConfigController_getPublicConfig",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get active delivery configuration and zones for storefront",
+        "tags": [
+          "Delivery Configuration"
+        ]
+      }
+    },
+    "/delivery-config/calculate": {
+      "post": {
+        "operationId": "DeliveryConfigController_calculateFee",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateDeliveryFeeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Preview delivery fee calculation for given cart subtotal and city",
+        "tags": [
+          "Delivery Configuration"
         ]
       }
     },
@@ -8511,6 +9144,78 @@
         ]
       }
     },
+    "/payments/{transactionId}/public": {
+      "get": {
+        "operationId": "PaymentController_getPaymentPublic",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get payment details for gateway simulation",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/payments/{transactionId}/simulate-success": {
+      "post": {
+        "operationId": "PaymentController_simulateSuccess",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Simulate successful payment callback (Development/Testing)",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/payments/{transactionId}/simulate-failure": {
+      "post": {
+        "operationId": "PaymentController_simulateFailure",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Simulate failed payment callback (Development/Testing)",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
     "/payments/available-payment-methods": {
       "get": {
         "operationId": "PaymentController_getAvailablePaymentMethods",
@@ -9784,6 +10489,14 @@
           "password": {
             "type": "string",
             "example": "12345678"
+          },
+          "portal": {
+            "type": "string",
+            "example": "customer",
+            "enum": [
+              "customer",
+              "admin"
+            ]
           }
         },
         "required": [
@@ -10384,6 +11097,109 @@
         },
         "required": [
           "isDeleted"
+        ]
+      },
+      "AdminSendNotificationDto": {
+        "type": "object",
+        "properties": {
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "ALL",
+              "SPECIFIC_USERS",
+              "USER_GROUP"
+            ],
+            "description": "Target audience type",
+            "example": "ALL"
+          },
+          "userIds": {
+            "description": "List of target user IDs (required when targetType is SPECIFIC_USERS)",
+            "example": [
+              "65b2a1e0..."
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "userGroup": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "SELLER",
+              "ADMIN",
+              "SUPER_ADMIN"
+            ],
+            "description": "Target user role/group (required when targetType is USER_GROUP)",
+            "example": "CUSTOMER"
+          },
+          "title": {
+            "type": "string",
+            "description": "Notification title",
+            "example": "Flash Sale Alert! 🎉"
+          },
+          "message": {
+            "type": "string",
+            "description": "Notification body message",
+            "example": "Get up to 50% off on all electronics this weekend only!"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "TRANSACTIONAL",
+              "MARKETING",
+              "SYSTEM"
+            ],
+            "default": "MARKETING",
+            "description": "Notification type (MARKETING or SYSTEM)"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "ORDER_PLACED",
+              "PAYMENT_SUCCESS",
+              "ORDER_CONFIRMED",
+              "ORDER_CANCELLED",
+              "ORDER_SHIPPED",
+              "ORDER_DELIVERED",
+              "REFUND_PROCESSED",
+              "MARKETING",
+              "ACCOUNT_WELCOME",
+              "ACCOUNT_SECURITY",
+              "SYSTEM_ALERT"
+            ],
+            "default": "MARKETING",
+            "description": "Notification category"
+          },
+          "data": {
+            "type": "object",
+            "description": "Arbitrary key-value metadata payload for deep links/action buttons",
+            "example": {
+              "url": "/sale",
+              "promoCode": "WEEKEND50"
+            }
+          },
+          "channels": {
+            "type": "array",
+            "default": [
+              "IN_APP"
+            ],
+            "description": "Target delivery channels",
+            "items": {
+              "type": "string",
+              "enum": [
+                "IN_APP",
+                "EMAIL",
+                "PUSH",
+                "SMS"
+              ]
+            }
+          }
+        },
+        "required": [
+          "targetType",
+          "title",
+          "message"
         ]
       },
       "AddressResponseDto": {
@@ -12736,6 +13552,26 @@
           "reason"
         ]
       },
+      "RetryPaymentDto": {
+        "type": "object",
+        "properties": {
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "BKASH",
+              "NAGAD",
+              "ROCKET",
+              "SSL",
+              "COD",
+              "WALLET"
+            ],
+            "example": "SSL"
+          }
+        },
+        "required": [
+          "paymentMethod"
+        ]
+      },
       "UpdateOrderStatusDto": {
         "type": "object",
         "properties": {
@@ -12965,6 +13801,143 @@
             "type": "number"
           }
         }
+      },
+      "UpdateGlobalDeliveryConfigDto": {
+        "type": "object",
+        "properties": {
+          "defaultFee": {
+            "type": "number",
+            "example": 60
+          },
+          "enableGlobalFreeDelivery": {
+            "type": "boolean",
+            "example": false
+          },
+          "globalFreeDeliveryMinOrder": {
+            "type": "object",
+            "example": 1000
+          }
+        }
+      },
+      "CreateDeliveryZoneDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Inside Dhaka"
+          },
+          "code": {
+            "type": "string",
+            "example": "INSIDE_DHAKA"
+          },
+          "deliveryFee": {
+            "type": "number",
+            "example": 70
+          },
+          "isDefault": {
+            "type": "boolean",
+            "default": false
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "matchedCities": {
+            "example": [
+              "Dhaka",
+              "Gazipur",
+              "Savar",
+              "Narayanganj"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "freeDeliveryPolicy": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "MIN_ORDER_AMOUNT",
+              "ALWAYS_FREE"
+            ],
+            "default": "NONE"
+          },
+          "minOrderForFreeDelivery": {
+            "type": "object",
+            "example": 800
+          },
+          "estimatedDays": {
+            "type": "string",
+            "example": "1-2 Days"
+          }
+        },
+        "required": [
+          "name",
+          "code",
+          "deliveryFee",
+          "freeDeliveryPolicy"
+        ]
+      },
+      "UpdateDeliveryZoneDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "deliveryFee": {
+            "type": "number"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "matchedCities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "freeDeliveryPolicy": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "MIN_ORDER_AMOUNT",
+              "ALWAYS_FREE"
+            ]
+          },
+          "minOrderForFreeDelivery": {
+            "type": "object"
+          },
+          "estimatedDays": {
+            "type": "string"
+          }
+        }
+      },
+      "CalculateDeliveryFeeDto": {
+        "type": "object",
+        "properties": {
+          "subTotal": {
+            "type": "number",
+            "example": 650
+          },
+          "city": {
+            "type": "string",
+            "example": "Dhaka"
+          },
+          "couponCode": {
+            "type": "string",
+            "example": "COUPON_FREE"
+          }
+        },
+        "required": [
+          "subTotal"
+        ]
       },
       "ObjectId": {
         "type": "object",
